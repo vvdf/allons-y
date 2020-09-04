@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server/index.js",
     "server-dev": "nodemon server/index.js",
-    "react-dev": "webpack --watch"
+    "client-dev": "webpack --watch"
   },
   "keywords": [],
   "author": "",
