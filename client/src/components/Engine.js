@@ -4,8 +4,8 @@ class Engine {
   constructor(targetEle) {
     const game = new PIXI.Application({
       backgroundColor: 0x20205f,
-      width: 250 * 2,
-      height: 150 * 2,
+      width: 800,
+      height: 500,
     });
 
     this.game = game;

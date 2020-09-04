@@ -7,8 +7,8 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        ALLONS-Y, ALLONSO!
+      <div className="main">
+        ALLONS-Y, ALONSO!
         <Game />
       </div>
     );
