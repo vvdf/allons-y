@@ -1,4 +1,5 @@
 import React from 'react';
+import Game from './Game.jsx';
 
 class App extends React.Component {
   componentDidMount() {
@@ -8,6 +9,7 @@ class App extends React.Component {
     return (
       <div>
         ALLONS-Y, ALLONSO!
+        <Game />
       </div>
     );
   }
