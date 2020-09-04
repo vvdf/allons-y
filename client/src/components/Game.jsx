@@ -3,6 +3,7 @@ import Engine from './Engine';
 
 class Game extends React.Component {
   componentDidMount() {
+    // instantiate game engine once the container div is mounted
     const app = new Engine(this.gameContainer);
     this.app = app;
   }
