@@ -1,5 +1,5 @@
 import React from 'react';
-import Game from './Game.jsx';
+import Game from './Game';
 
 class App extends React.Component {
   componentDidMount() {

@@ -1,20 +1,10 @@
 import React from 'react';
-import * as PIXI from 'pixi.js';
+import Engine from './Engine';
 
 class Game extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  // }
-
   componentDidMount() {
-    const app = new PIXI.Application({
-      backgroundColor: 0x20205f,
-      width: 250 * 2,
-      height: 150 * 2,
-    });
-
+    const app = new Engine(this.gameContainer);
     this.app = app;
-    this.gameContainer.appendChild(app.view);
   }
 
   render() {
