@@ -1,0 +1,77 @@
+{ "frames": {
+   "dirt.png": {
+    "frame": { "x": 0, "y": 0, "w": 64, "h": 44 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
+    "sourceSize": { "w": 16, "h": 16 }
+   },
+   "grass.png": {
+    "frame": { "x": 64, "y": 0, "w": 64, "h": 44 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
+    "sourceSize": { "w": 16, "h": 16 }
+   },
+   "road.png": {
+    "frame": { "x": 128, "y": 0, "w": 64, "h": 44 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
+    "sourceSize": { "w": 16, "h": 16 }
+   },
+   "road_line.png": {
+    "frame": { "x": 192, "y": 0, "w": 64, "h": 44 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
+    "sourceSize": { "w": 16, "h": 16 }
+   },
+   "water1.png": {
+    "frame": { "x": 0, "y": 44, "w": 64, "h": 44 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 250
+   },
+   "water2.png": {
+    "frame": { "x": 64, "y": 44, "w": 64, "h": 44 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 250
+   },
+   "water3.png": {
+    "frame": { "x": 128, "y": 44, "w": 64, "h": 44 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 250
+   },
+   "blank.png": {
+    "frame": { "x": 192, "y": 44, "w": 64, "h": 44 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
+    "sourceSize": { "w": 16, "h": 16 }
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.16.3-x64",
+  "image": "643212_floor_tiles.png",
+  "format": "RGBA8888",
+  "size": { "w": 256, "h": 88 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Floor Tile Sheet", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
