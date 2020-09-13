@@ -71,7 +71,17 @@ class Engine {
       } else if (keyCode === 37) {
         // arrow left
         this.player.x = this.player.x < 1 ? 0 : this.player.x - 1;
+      } else if (keyCode === 71) {
+        this.gameMap[this.player.y][this.player.x] = 'g';
+      } else if (keyCode === 87) {
+        this.gameMap[this.player.y][this.player.x] = 'w';
+      } else if (keyCode === 82) {
+        this.gameMap[this.player.y][this.player.x] = 'r';
+      } else {
+        // unlisted key
+        console.log(keyCode);
       }
+      // g = 71, w = 87, r = 82
       console.log(`Player Position: ${this.player.x}, ${this.player.y}`);
       this.render();
     }, false);
