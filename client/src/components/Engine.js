@@ -23,6 +23,7 @@ class Engine {
     this.game = game;
     this.state = this.play;
     this.textures = {};
+    this.sprites = {};
     this.entityList = {};
     this.player = {
       x: 0,
@@ -51,6 +52,29 @@ class Engine {
       .add('assets/96x48_rally_police_girl.png')
       .add('assets/643212_floor_tiles.json')
       .load(setup);
+
+    // TODO - refactor this code into a controls module
+    window.addEventListener('keydown', ({ keyCode }) => {
+      if (keyCode === 38) {
+        // arrow up
+        this.player.y = this.player.y < 1 ? 0 : this.player.y - 1;
+      } else if (keyCode === 39) {
+        // arrow right
+        this.player.x = this.player.x === this.gameMap[0].length - 1
+          ? this.player.x
+          : this.player.x + 1;
+      } else if (keyCode === 40) {
+        // arrow down
+        this.player.y = this.player.y === this.gameMap.length - 1
+          ? this.player.y
+          : this.player.y + 1;
+      } else if (keyCode === 37) {
+        // arrow left
+        this.player.x = this.player.x < 1 ? 0 : this.player.x - 1;
+      }
+      console.log(`Player Position: ${this.player.x}, ${this.player.y}`);
+      this.render();
+    }, false);
   }
 
   gameLoop(delta) {
@@ -86,7 +110,9 @@ class Engine {
   }
 
   renderMap() {
+    this.game.stage.removeChild(this.sprites.map);
     const mapSprite = new PIXI.Container();
+    this.sprites.map = mapSprite;
     for (let y = 0; y < this.gameMap.length; y += 1) {
       for (let x = 0; x < this.gameMap[y].length; x += 1) {
         const dy = y - this.player.y;
@@ -111,7 +137,9 @@ class Engine {
   }
 
   renderEntities() {
+    this.game.stage.removeChild(this.sprites.player);
     const playerSprite = new PIXI.Sprite(this.textures.player);
+    this.sprites.player = playerSprite;
     playerSprite.x = this.gridToViewX(playerSprite);
     playerSprite.y = this.gridToViewY(playerSprite, 0, 0, true);
 
