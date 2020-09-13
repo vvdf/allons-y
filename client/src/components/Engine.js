@@ -29,7 +29,7 @@ class Engine {
       x: 0,
       y: 0,
     };
-    this.gameMap = GameMap(10, 10, 'g');
+    this.gameMap = new GameMap(10, 10, 'g');
     this.loader = PIXI.Loader.shared;
     targetEle.appendChild(game.view);
     this.init();
@@ -60,12 +60,12 @@ class Engine {
         this.player.y = this.player.y < 1 ? 0 : this.player.y - 1;
       } else if (keyCode === 39) {
         // arrow right
-        this.player.x = this.player.x === this.gameMap[0].length - 1
+        this.player.x = this.player.x === this.gameMap.width - 1
           ? this.player.x
           : this.player.x + 1;
       } else if (keyCode === 40) {
         // arrow down
-        this.player.y = this.player.y === this.gameMap.length - 1
+        this.player.y = this.player.y === this.gameMap.height - 1
           ? this.player.y
           : this.player.y + 1;
       } else if (keyCode === 37) {
@@ -123,16 +123,16 @@ class Engine {
     this.game.stage.removeChild(this.sprites.map);
     const mapSprite = new PIXI.Container();
     this.sprites.map = mapSprite;
-    for (let y = 0; y < this.gameMap.length; y += 1) {
-      for (let x = 0; x < this.gameMap[y].length; x += 1) {
+    for (let y = 0; y < this.gameMap.height; y += 1) {
+      for (let x = 0; x < this.gameMap.width; x += 1) {
         const dy = y - this.player.y;
         const dx = x - this.player.x;
         let tile;
-        if (this.gameMap[y][x] === 'g') {
+        if (this.gameMap.get(x, y) === 'g') {
           tile = new PIXI.Sprite(this.textures.grass);
-        } else if (this.gameMap[y][x] === 'r') {
+        } else if (this.gameMap.get(x, y) === 'r') {
           tile = new PIXI.Sprite(this.textures.road);
-        } else if (this.gameMap[y][x] === 'w') {
+        } else if (this.gameMap.get(x, y) === 'w') {
           tile = new PIXI.Sprite(this.textures.water);
         }
 
