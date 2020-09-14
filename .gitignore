@@ -2,3 +2,4 @@
 design
 package-lock.json
 client/dist/bundle.js
+*.map
