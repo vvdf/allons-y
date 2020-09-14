@@ -20,6 +20,7 @@ class Engine {
 
     const game = new PIXI.Application(this.settings);
 
+    this.ticker = 0;
     this.game = game;
     this.state = this.play;
     this.textures = {};
@@ -44,7 +45,8 @@ class Engine {
       this.textures.road = PIXI.utils.TextureCache['road.png'];
       this.textures.water = PIXI.utils.TextureCache['water1.png'];
 
-      this.render();
+      // this.render();
+      this.game.ticker.add(delta => this.gameLoop(delta));
     };
 
     // load assets into renderer and then run renderer setup using loaded assets
@@ -72,18 +74,24 @@ class Engine {
         // arrow left
         this.player.x = this.player.x < 1 ? 0 : this.player.x - 1;
       } else if (keyCode === 71) {
+        // tile painting, 'G' for grass
         this.gameMap.set(this.player.x, this.player.y, 'g');
       } else if (keyCode === 87) {
+        // tile painting, 'W' for water
         this.gameMap.set(this.player.x, this.player.y, 'w');
       } else if (keyCode === 82) {
+        // tile painting, 'R' for rpad
         this.gameMap.set(this.player.x, this.player.y, 'r');
+      } else if (keyCode === 83) {
+        // saving map, 'S'
+        this.gameMap.save();
+      } else if (keyCode === 76) {
+        // loading map, 'L'
+        this.gameMap.load();
       } else {
         // unlisted key
-        console.log(keyCode);
+        console.log('Unassigned Key Pressed: ', keyCode);
       }
-      // g = 71, w = 87, r = 82
-      console.log(`Player Position: ${this.player.x}, ${this.player.y}`);
-      this.render();
     }, false);
   }
 
@@ -93,7 +101,11 @@ class Engine {
 
   play(delta) {
     // play state function
-
+    this.ticker += delta;
+    this.render();
+    if (this.ticker >= 60) {
+      this.ticker = this.ticker % 60;
+    }
   }
 
   gridToViewX(sprite, dx = 0, dy = 0) {
