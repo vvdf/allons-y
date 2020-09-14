@@ -72,11 +72,11 @@ class Engine {
         // arrow left
         this.player.x = this.player.x < 1 ? 0 : this.player.x - 1;
       } else if (keyCode === 71) {
-        this.gameMap[this.player.y][this.player.x] = 'g';
+        this.gameMap.set(this.player.x, this.player.y, 'g');
       } else if (keyCode === 87) {
-        this.gameMap[this.player.y][this.player.x] = 'w';
+        this.gameMap.set(this.player.x, this.player.y, 'w');
       } else if (keyCode === 82) {
-        this.gameMap[this.player.y][this.player.x] = 'r';
+        this.gameMap.set(this.player.x, this.player.y, 'r');
       } else {
         // unlisted key
         console.log(keyCode);

@@ -11,6 +11,14 @@ class GameMap {
     }
   }
 
+  save(fileName) {
+    // save current map to file
+  }
+
+  load(fileName) {
+    // load map from file
+  }
+
   get(x, y) {
     return this.grid[y][x];
   }
