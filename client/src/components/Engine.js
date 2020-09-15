@@ -43,9 +43,23 @@ class Engine {
       this.textures.player = this.loader.resources['assets/96x48_rally_police_girl.png'].texture;
       this.textures.grass = PIXI.utils.TextureCache['grass.png'];
       this.textures.road = PIXI.utils.TextureCache['road.png'];
-      this.textures.water = PIXI.utils.TextureCache['water1.png'];
+      this.textures.water1 = [
+        PIXI.utils.TextureCache['water_01.png'],
+        PIXI.utils.TextureCache['water_02.png'],
+        PIXI.utils.TextureCache['water_03.png'],
+      ];
+      this.textures.water2 = [
+        PIXI.utils.TextureCache['water_02.png'],
+        PIXI.utils.TextureCache['water_01.png'],
+        PIXI.utils.TextureCache['water_03.png'],
+      ];
+      this.textures.water3 = [
+        PIXI.utils.TextureCache['water_03.png'],
+        PIXI.utils.TextureCache['water_01.png'],
+        PIXI.utils.TextureCache['water_02.png'],
+      ];
 
-      // this.render();
+      this.render();
       this.game.ticker.add(delta => this.gameLoop(delta));
     };
 
@@ -92,6 +106,7 @@ class Engine {
         // unlisted key
         console.log('Unassigned Key Pressed: ', keyCode);
       }
+      this.render();
     }, false);
   }
 
@@ -102,10 +117,7 @@ class Engine {
   play(delta) {
     // play state function
     this.ticker += delta;
-    this.render();
-    if (this.ticker >= 60) {
-      this.ticker = this.ticker % 60;
-    }
+    // this.render();
   }
 
   gridToViewX(sprite, dx = 0, dy = 0) {
@@ -135,6 +147,7 @@ class Engine {
     this.game.stage.removeChild(this.sprites.map);
     const mapSprite = new PIXI.Container();
     this.sprites.map = mapSprite;
+    let waterStep = 0;
     for (let y = 0; y < this.gameMap.height; y += 1) {
       for (let x = 0; x < this.gameMap.width; x += 1) {
         const dy = y - this.player.y;
@@ -145,7 +158,16 @@ class Engine {
         } else if (this.gameMap.get(x, y) === 'r') {
           tile = new PIXI.Sprite(this.textures.road);
         } else if (this.gameMap.get(x, y) === 'w') {
-          tile = new PIXI.Sprite(this.textures.water);
+          if (waterStep === 0) {
+            tile = new PIXI.AnimatedSprite(this.textures.water1);
+          } else if (waterStep === 1) {
+            tile = new PIXI.AnimatedSprite(this.textures.water2);
+          } else {
+            tile = new PIXI.AnimatedSprite(this.textures.water3);
+          }
+          waterStep = (waterStep + 2) % 3;
+          tile.animationSpeed = 0.05;
+          tile.play();
         }
 
         tile.x = this.gridToViewX(tile, dx, dy);
