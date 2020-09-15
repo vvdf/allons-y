@@ -27,29 +27,29 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
     "sourceSize": { "w": 16, "h": 16 }
    },
-   "water1.png": {
+   "water_01.png": {
     "frame": { "x": 0, "y": 44, "w": 64, "h": 44 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
     "sourceSize": { "w": 16, "h": 16 },
-    "duration": 250
+    "duration": 1000
    },
-   "water2.png": {
+   "water_02.png": {
     "frame": { "x": 64, "y": 44, "w": 64, "h": 44 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
     "sourceSize": { "w": 16, "h": 16 },
-    "duration": 250
+    "duration": 1000
    },
-   "water3.png": {
+   "water_03.png": {
     "frame": { "x": 128, "y": 44, "w": 64, "h": 44 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 44 },
     "sourceSize": { "w": 16, "h": 16 },
-    "duration": 250
+    "duration": 1000
    },
    "blank.png": {
     "frame": { "x": 192, "y": 44, "w": 64, "h": 44 },
