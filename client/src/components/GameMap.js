@@ -13,10 +13,23 @@ class GameMap {
     }
   }
 
+  toString() {
+    // parse map data as a simple 2d grid of char data to be sent/saved
+    let result = '';
+    for (let i = 0; i < this.grid.length; i += 1) {
+      if (result.length === 0) {
+        result = this.grid[i].join('');
+      } else {
+        result = `${result}\n${this.grid[i].join('')}`;
+      }
+    }
+    return result;
+  }
+
   save(mapName = 'blank') {
     // save current map to file
     axios.post('/map', {
-      grid: JSON.stringify(this.grid),
+      grid: this.toString(),
       name: mapName,
     })
       .then((res) => console.log(`Save attempted for: "${mapName}"`, res));
@@ -26,11 +39,19 @@ class GameMap {
     // load map from file
     axios.get(`/map/${mapName}`)
       .then((res) => {
-        // console.log(`Load Attempted for: "${mapName}"`);
-        if (Array.isArray(res.data)) {
-          this.grid = res.data;
+        console.log('Load attempted for: ', mapName, res);
+        if (res.data.mapFound) {
+          this.loadFromString(res.data.mapData);
         }
       });
+  }
+
+  loadFromString(mapData) {
+    const result = mapData.split('\n');
+    for (let i = 0; i < result.length; i += 1) {
+      result[i] = result[i].split('');
+    }
+    this.grid = result;
   }
 
   get(x, y) {

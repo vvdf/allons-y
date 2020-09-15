@@ -31,12 +31,12 @@ app.get('/map/:mapName', (req, res) => {
     res.status(200).send(mapCache[req.params.mapName]);
   } else {
     // otherwise, load from file
-    fs.readFile(path.join(__dirname, '..', 'maps', `${req.params.mapName}.map`),
+    fs.readFile(path.join(__dirname, '..', 'maps', `${req.params.mapName}.map`), 'utf8',
       (err, data) => {
         if (err) {
-          res.status(200).send('Map not found');
+          res.status(200).send({ mapFound: false });
         } else {
-          res.status(200).send(data);
+          res.status(200).send({ mapFound: true, mapData: data });
         }
       });
   }
