@@ -30,7 +30,7 @@ class Engine {
       x: 0,
       y: 0,
     };
-    this.gameMap = new GameMap(10, 10, 'g');
+    this.gameMap = new GameMap(20, 20, 'g');
     this.loader = PIXI.Loader.shared;
     targetEle.appendChild(game.view);
     this.init();
@@ -43,6 +43,7 @@ class Engine {
       this.textures.player = this.loader.resources['assets/96x48_rally_police_girl.png'].texture;
       this.textures.grass = PIXI.utils.TextureCache['grass.png'];
       this.textures.road = PIXI.utils.TextureCache['road.png'];
+      this.textures.dirt = PIXI.utils.TextureCache['dirt.png'];
       this.textures.water1 = [
         PIXI.utils.TextureCache['water_01.png'],
         PIXI.utils.TextureCache['water_02.png'],
@@ -90,11 +91,14 @@ class Engine {
       } else if (keyCode === 71) {
         // tile painting, 'G' for grass
         this.gameMap.set(this.player.x, this.player.y, 'g');
+      } else if (keyCode === 68) {
+        // tile painting, 'D' for dirt
+        this.gameMap.set(this.player.x, this.player.y, 'd');
       } else if (keyCode === 87) {
         // tile painting, 'W' for water
         this.gameMap.set(this.player.x, this.player.y, 'w');
       } else if (keyCode === 82) {
-        // tile painting, 'R' for rpad
+        // tile painting, 'R' for road
         this.gameMap.set(this.player.x, this.player.y, 'r');
       } else if (keyCode === 83) {
         // saving map, 'S'
@@ -144,8 +148,15 @@ class Engine {
     this.renderEntities();
   }
 
+  renderClear() {
+
+  }
+
   renderMap() {
-    this.game.stage.removeChild(this.sprites.map);
+    if (this.sprites.map) {
+      this.game.stage.removeChild(this.sprites.map);
+      this.sprites.map.destroy({ children: true });
+    }
     const mapSprite = new PIXI.Container();
     this.sprites.map = mapSprite;
     let waterStep = 0;
@@ -158,6 +169,8 @@ class Engine {
           tile = new PIXI.Sprite(this.textures.grass);
         } else if (this.gameMap.get(x, y) === 'r') {
           tile = new PIXI.Sprite(this.textures.road);
+        } else if (this.gameMap.get(x, y) === 'd') {
+          tile = new PIXI.Sprite(this.textures.dirt);
         } else if (this.gameMap.get(x, y) === 'w') {
           if (waterStep === 0) {
             tile = new PIXI.AnimatedSprite(this.textures.water1);
