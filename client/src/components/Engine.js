@@ -144,19 +144,25 @@ class Engine {
   }
 
   render() {
+    this.renderClear();
     this.renderMap();
     this.renderEntities();
   }
 
   renderClear() {
-
-  }
-
-  renderMap() {
     if (this.sprites.map) {
+      // clear map sprites, incl children of map container
       this.game.stage.removeChild(this.sprites.map);
       this.sprites.map.destroy({ children: true });
     }
+
+    if (this.sprites.player) {
+      // clear entity sprites
+      this.game.stage.removeChild(this.sprites.player);
+    }
+  }
+
+  renderMap() {
     const mapSprite = new PIXI.Container();
     this.sprites.map = mapSprite;
     let waterStep = 0;
@@ -195,7 +201,6 @@ class Engine {
   }
 
   renderEntities() {
-    this.game.stage.removeChild(this.sprites.player);
     const playerSprite = new PIXI.Sprite(this.textures.player);
     this.sprites.player = playerSprite;
     playerSprite.x = this.gridToViewX(playerSprite);
