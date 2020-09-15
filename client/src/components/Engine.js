@@ -100,8 +100,9 @@ class Engine {
         // saving map, 'S'
         this.gameMap.save();
       } else if (keyCode === 76) {
-        // loading map, 'L'
-        this.gameMap.load();
+        // loading map, 'L', re-render if a map is successfully loaded
+        this.gameMap.load()
+          .then(() => this.render());
       } else {
         // unlisted key
         console.log('Unassigned Key Pressed: ', keyCode);

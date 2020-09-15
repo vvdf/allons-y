@@ -27,23 +27,36 @@ class GameMap {
   }
 
   save(mapName = 'blank') {
-    // save current map to file
-    axios.post('/map', {
-      grid: this.toString(),
-      name: mapName,
-    })
-      .then((res) => console.log(`Save attempted for: "${mapName}"`, res));
+    // return Promise to save current map to file
+    return new Promise((resolve, reject) => {
+      axios.post('/map', {
+        grid: this.toString(),
+        name: mapName,
+      })
+        .then((res) => {
+          if (res.status === 201) {
+            resolve('Map Saved');
+          } else {
+            reject();
+          }
+        });
+    });
   }
 
   load(mapName = 'blank') {
-    // load map from file
-    axios.get(`/map/${mapName}`)
-      .then((res) => {
-        console.log('Load attempted for: ', mapName, res);
-        if (res.data.mapFound) {
-          this.loadFromString(res.data.mapData);
-        }
-      });
+    // return Promise to load map from file
+    return new Promise((resolve, reject) => {
+      axios.get(`/map/${mapName}`)
+        .then((res) => {
+          console.log('Load attempted for: ', mapName, res);
+          if (res.data.mapFound) {
+            this.loadFromString(res.data.mapData);
+            resolve('Map Loaded');
+          } else {
+            reject();
+          }
+        });
+    });
   }
 
   loadFromString(mapData) {
