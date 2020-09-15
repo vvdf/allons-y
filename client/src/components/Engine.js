@@ -61,7 +61,7 @@ class Engine {
       ];
 
       this.render();
-      this.game.ticker.add(delta => this.gameLoop(delta));
+      this.game.ticker.add((delta) => this.gameLoop(delta));
     };
 
     // load assets into renderer and then run renderer setup using loaded assets
