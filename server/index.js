@@ -28,12 +28,13 @@ app.get('/map/:mapName', (req, res) => {
   console.log(`Loading Map, "${req.params.mapName}"`);
   if (mapCache[req.params.mapName]) {
     // load from cache if available
-    res.status(200).send(mapCache[req.params.mapName]);
+    res.status(200).send({ mapFound: true, mapData: mapCache[req.params.mapName] });
   } else {
     // otherwise, load from file
     fs.readFile(path.join(__dirname, '..', 'maps', `${req.params.mapName}.map`), 'utf8',
       (err, data) => {
         if (err) {
+          console.log(err);
           res.status(200).send({ mapFound: false });
         } else {
           res.status(200).send({ mapFound: true, mapData: data });
