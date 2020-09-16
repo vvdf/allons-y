@@ -23,6 +23,11 @@ class Entity {
     this.y = clamp(this.y + dy, 0, this.map.height - 1);
   }
 
+  setPos(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
   show() {
     this.visible = true;
   }
