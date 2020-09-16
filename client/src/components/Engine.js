@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import GameMap from './GameMap';
 import Entity from './Entity';
+import Input from './Input';
 
 class Engine {
   constructor(targetEle) {
@@ -21,16 +22,12 @@ class Engine {
 
     const game = new PIXI.Application(this.settings);
 
-    this.ticker = 0;
     this.game = game;
     this.state = this.play;
+    this.eventQueue = [];
     this.textures = {};
     this.sprites = {};
     this.entityList = {};
-    this.player = {
-      x: 0,
-      y: 0,
-    };
     this.gameMap = new GameMap(20, 20, 'g');
     this.loader = PIXI.Loader.shared;
     targetEle.appendChild(game.view);
@@ -61,6 +58,8 @@ class Engine {
         PIXI.utils.TextureCache['water_02.png'],
       ];
 
+      this.player = new Entity('Apron', this.textures.player, 0, 0, this.gameMap);
+      this.input = new Input(this.player, this.eventQueue);
       this.render();
       this.game.ticker.add((delta) => this.gameLoop(delta));
     };
@@ -70,50 +69,6 @@ class Engine {
       .add('assets/96x48_rally_police_girl.png')
       .add('assets/643212_floor_tiles.json')
       .load(setup);
-
-    // TODO - refactor this code into a controls module
-    window.addEventListener('keydown', ({ keyCode }) => {
-      if (keyCode === 38) {
-        // arrow up
-        this.player.y = this.player.y < 1 ? 0 : this.player.y - 1;
-      } else if (keyCode === 39) {
-        // arrow right
-        this.player.x = this.player.x === this.gameMap.width - 1
-          ? this.player.x
-          : this.player.x + 1;
-      } else if (keyCode === 40) {
-        // arrow down
-        this.player.y = this.player.y === this.gameMap.height - 1
-          ? this.player.y
-          : this.player.y + 1;
-      } else if (keyCode === 37) {
-        // arrow left
-        this.player.x = this.player.x < 1 ? 0 : this.player.x - 1;
-      } else if (keyCode === 71) {
-        // tile painting, 'G' for grass
-        this.gameMap.set(this.player.x, this.player.y, 'g');
-      } else if (keyCode === 68) {
-        // tile painting, 'D' for dirt
-        this.gameMap.set(this.player.x, this.player.y, 'd');
-      } else if (keyCode === 87) {
-        // tile painting, 'W' for water
-        this.gameMap.set(this.player.x, this.player.y, 'w');
-      } else if (keyCode === 82) {
-        // tile painting, 'R' for road
-        this.gameMap.set(this.player.x, this.player.y, 'r');
-      } else if (keyCode === 83) {
-        // saving map, 'S'
-        this.gameMap.save();
-      } else if (keyCode === 76) {
-        // loading map, 'L', re-render if a map is successfully loaded
-        this.gameMap.load()
-          .then(() => this.render());
-      } else {
-        // unlisted key
-        console.log('Unassigned Key Pressed: ', keyCode);
-      }
-      this.render();
-    }, false);
   }
 
   gameLoop(delta) {
@@ -122,8 +77,11 @@ class Engine {
 
   play(delta) {
     // play state function
-    this.ticker += delta;
-    // this.render();
+    // TODO - proper event/signal queue handling
+    if (this.eventQueue.length > 0) {
+      this.eventQueue.shift()(delta);
+      this.render();
+    }
   }
 
   gridToViewX(sprite, dx = 0, dy = 0) {
@@ -157,9 +115,9 @@ class Engine {
       this.sprites.map.destroy({ children: true });
     }
 
-    if (this.sprites.player) {
+    if (this.player.sprite) {
       // clear entity sprites
-      this.game.stage.removeChild(this.sprites.player);
+      this.game.stage.removeChild(this.player.sprite);
     }
   }
 
@@ -202,12 +160,10 @@ class Engine {
   }
 
   renderEntities() {
-    const playerSprite = new PIXI.Sprite(this.textures.player);
-    this.sprites.player = playerSprite;
-    playerSprite.x = this.gridToViewX(playerSprite);
-    playerSprite.y = this.gridToViewY(playerSprite, 0, 0, true);
+    this.player.sprite.x = this.gridToViewX(this.player.sprite);
+    this.player.sprite.y = this.gridToViewY(this.player.sprite, 0, 0, true);
 
-    this.game.stage.addChild(playerSprite);
+    this.game.stage.addChild(this.player.sprite);
   }
 
   addToScene(spritesArr) {
