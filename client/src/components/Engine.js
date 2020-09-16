@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import GameMap from './GameMap';
+import Entity from './Entity';
 
 class Engine {
   constructor(targetEle) {
