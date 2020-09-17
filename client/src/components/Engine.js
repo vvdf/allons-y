@@ -27,8 +27,10 @@ class Engine {
     this.eventQueue = [];
     this.textures = {};
     this.sprites = {};
-    this.entityList = {};
+    this.entities = [];
+    this.view = { x: 0, y: 0 };
     this.gameMap = new GameMap(20, 20, 'g');
+    this.gameMap.load();
     this.loader = PIXI.Loader.shared;
     targetEle.appendChild(game.view);
     this.init();
@@ -58,8 +60,8 @@ class Engine {
         PIXI.utils.TextureCache['water_02.png'],
       ];
 
-      this.player = new Entity('Apron', this.textures.player, 0, 0, this.gameMap);
-      this.input = new Input(this.player, this.eventQueue);
+      this.entities.push(new Entity('Apron', this.textures.player, 0, 0, this.gameMap));
+      this.input = new Input(this.entities[0], this.eventQueue);
       this.render();
       this.game.ticker.add((delta) => this.gameLoop(delta));
     };
@@ -80,6 +82,10 @@ class Engine {
     // TODO - proper event/signal queue handling
     if (this.eventQueue.length > 0) {
       this.eventQueue.shift()(delta);
+      // if (this.entities[0].x !== this.view.x || this.entities[0].y !== this.view.y) {
+      //   this.view.x = this.entities[0].x;
+      //   this.view.y = this.entities[0].y;
+      // }
       this.render();
     }
   }
@@ -115,20 +121,20 @@ class Engine {
       this.sprites.map.destroy({ children: true });
     }
 
-    if (this.player.sprite) {
+    if (this.sprites.entities) {
       // clear entity sprites
-      this.game.stage.removeChild(this.player.sprite);
+      this.game.stage.removeChild(this.sprites.entities);
+      this.sprites.entities.destroy();
     }
   }
 
   renderMap() {
-    const mapSprite = new PIXI.Container();
-    this.sprites.map = mapSprite;
+    this.sprites.map = new PIXI.Container();
     let waterStep = 0;
     for (let y = 0; y < this.gameMap.height; y += 1) {
       for (let x = 0; x < this.gameMap.width; x += 1) {
-        const dy = y - this.player.y;
-        const dx = x - this.player.x;
+        const dx = x - this.view.x;
+        const dy = y - this.view.y;
         let tile;
         if (this.gameMap.get(x, y) === 'g') {
           tile = new PIXI.Sprite(this.textures.grass);
@@ -144,7 +150,7 @@ class Engine {
           } else {
             tile = new PIXI.AnimatedSprite(this.textures.water3);
           }
-          waterStep = (waterStep + 2) % 3;
+          waterStep = (waterStep + 3) % 7;
           tile.animationSpeed = 0.05;
           tile.play();
         }
@@ -152,18 +158,25 @@ class Engine {
         tile.x = this.gridToViewX(tile, dx, dy);
         tile.y = this.gridToViewY(tile, dx, dy);
 
-        mapSprite.addChild(tile);
+        this.sprites.map.addChild(tile);
       }
     }
 
-    this.game.stage.addChild(mapSprite);
+    this.game.stage.addChild(this.sprites.map);
   }
 
   renderEntities() {
-    this.player.sprite.x = this.gridToViewX(this.player.sprite);
-    this.player.sprite.y = this.gridToViewY(this.player.sprite, 0, 0, true);
+    this.sprites.entities = new PIXI.Container();
+    for (let i = 0; i < this.entities.length; i += 1) {
+      const dx = this.entities[i].x - this.view.x;
+      const dy = this.entities[i].y - this.view.y;
+      this.entities[i].sprite.x = this.gridToViewX(this.entities[i].sprite, dx, dy);
+      this.entities[i].sprite.y = this.gridToViewY(this.entities[i].sprite, dx, dy, true);
 
-    this.game.stage.addChild(this.player.sprite);
+      this.sprites.entities.addChild(this.entities[i].sprite);
+    }
+
+    this.game.stage.addChild(this.sprites.entities);
   }
 
   addToScene(spritesArr) {

@@ -73,6 +73,7 @@ class GameMap {
 
   set(x, y, tile) {
     this.grid[y][x] = tile;
+    this.save();
   }
 }
 
