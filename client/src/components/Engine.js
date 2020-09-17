@@ -82,10 +82,10 @@ class Engine {
     // TODO - proper event/signal queue handling
     if (this.eventQueue.length > 0) {
       this.eventQueue.shift()(delta);
-      // if (this.entities[0].x !== this.view.x || this.entities[0].y !== this.view.y) {
-      //   this.view.x = this.entities[0].x;
-      //   this.view.y = this.entities[0].y;
-      // }
+      if (this.entities[0].x !== this.view.x || this.entities[0].y !== this.view.y) {
+        this.view.x = this.entities[0].x;
+        this.view.y = this.entities[0].y;
+      }
       this.render();
     }
   }
