@@ -2,7 +2,8 @@ import { Sprite, AnimatedSprite } from 'pixi.js';
 import { clamp } from './Utility';
 
 class Entity {
-  constructor(name, textures, x, y, map) {
+  constructor(name, textures, x, y, map, id = 0) {
+    this.id = id;
     this.name = name;
     if (!Number.isNaN(x) && !Number.isNaN(y) && map) {
       this.x = x;

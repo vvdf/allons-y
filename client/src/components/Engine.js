@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import GameMap from './GameMap';
 import Entity from './Entity';
 import Input from './Input';
+import EventQueue from './EventQueue';
 
 class Engine {
   constructor(targetEle) {
@@ -24,13 +25,16 @@ class Engine {
 
     this.game = game;
     this.state = this.play;
-    this.eventQueue = [];
+    this.eventQueue = new EventQueue();
     this.textures = {};
     this.sprites = {};
     this.entities = [];
+    this.entityNextId = 0;
+    this.entityIdMap = {};
     this.view = { x: 0, y: 0 };
     this.gameMap = new GameMap(20, 20, 'g');
     this.gameMap.load();
+    this.input = new Input(this.eventQueue);
     this.loader = PIXI.Loader.shared;
     targetEle.appendChild(game.view);
     this.init();
@@ -60,8 +64,7 @@ class Engine {
         PIXI.utils.TextureCache['water_02.png'],
       ];
 
-      this.entities.push(new Entity('Apron', this.textures.player, 0, 0, this.gameMap));
-      this.input = new Input(this.entities[0], this.eventQueue);
+      this.createEntity('Apron', this.textures.player, 0, 0, this.gameMap);
       this.render();
       this.game.ticker.add((delta) => this.gameLoop(delta));
     };
@@ -71,6 +74,17 @@ class Engine {
       .add('assets/96x48_rally_police_girl.png')
       .add('assets/643212_floor_tiles.json')
       .load(setup);
+
+    // define events for EventQueue/Reducer
+    this.eventQueue.defineEvent('MOVE_ENTITY',
+      (entityId, dx = 0, dy = 0) => {
+        this.entityIdMap[entityId].move(dx, dy);
+      });
+
+    this.eventQueue.defineEvent('PAINT_MAP',
+      (entityId, tile) => {
+        this.gameMap.set(this.entityIdMap[entityId].x, this.entityIdMap[entityId].y, tile);
+      });
   }
 
   gameLoop(delta) {
@@ -81,13 +95,25 @@ class Engine {
     // play state function
     // TODO - proper event/signal queue handling
     if (this.eventQueue.length > 0) {
-      this.eventQueue.shift()(delta);
+      this.eventQueue.next(delta);
       if (this.entities[0].x !== this.view.x || this.entities[0].y !== this.view.y) {
         this.view.x = this.entities[0].x;
         this.view.y = this.entities[0].y;
       }
       this.render();
     }
+  }
+
+  createEntity(name, texture, x, y, map) {
+    const id = this.entityNextId;
+    this.entityNextId += 1;
+    const createdEntity = new Entity(name, texture, x, y, map, id);
+    if (id < 1) {
+      // establishing player as id 0
+      this.input.setOwner(createdEntity);
+    }
+    this.entities.push(createdEntity);
+    this.entityIdMap[id] = createdEntity;
   }
 
   gridToViewX(sprite, dx = 0, dy = 0) {

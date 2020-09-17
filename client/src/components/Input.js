@@ -1,7 +1,7 @@
 class Input {
-  constructor(ownerEntity, targetEventQueue) {
-    this.owner = ownerEntity;
+  constructor(targetEventQueue, ownerEntity) {
     this.eventQueue = targetEventQueue;
+    this.owner = ownerEntity;
 
     this.keyMap = {};
 
@@ -23,7 +23,9 @@ class Input {
 
   init() {
     // assign keys to functions
-    this.mapKeys();
+    if (this.owner) {
+      this.mapKeys();
+    }
 
     // initialize key listener
     window.addEventListener('keydown', ({ keyCode }) => {
@@ -38,20 +40,26 @@ class Input {
 
   mapKeys() {
     // key mapping
-    this.keyMap[this.moveUp] = () => this.owner.move(0, -1);
-    this.keyMap[this.moveDown] = () => this.owner.move(0, 1);
-    this.keyMap[this.moveLeft] = () => this.owner.move(-1, 0);
-    this.keyMap[this.moveRight] = () => this.owner.move(1, 0);
+
+    this.keyMap[this.moveUp] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 0, -1] };
+    this.keyMap[this.moveDown] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 0, 1] };
+    this.keyMap[this.moveLeft] = { signal: 'MOVE_ENTITY', params: [this.owner.id, -1, 0] };
+    this.keyMap[this.moveRight] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 1, 0] };
 
     // debug key mapping
-    this.keyMap[this.paintGrass] = () => this.owner.map.set(this.owner.x, this.owner.y, 'g');
-    this.keyMap[this.paintDirt] = () => this.owner.map.set(this.owner.x, this.owner.y, 'd');
-    this.keyMap[this.paintRoad] = () => this.owner.map.set(this.owner.x, this.owner.y, 'r');
-    this.keyMap[this.paintWater] = () => this.owner.map.set(this.owner.x, this.owner.y, 'w');
+    this.keyMap[this.paintGrass] = { signal: 'PAINT_MAP', params: [this.owner.id, 'g'] };
+    this.keyMap[this.paintDirt] = { signal: 'PAINT_MAP', params: [this.owner.id, 'd'] };
+    this.keyMap[this.paintRoad] = { signal: 'PAINT_MAP', params: [this.owner.id, 'r'] };
+    this.keyMap[this.paintWater] = { signal: 'PAINT_MAP', params: [this.owner.id, 'w'] };
   }
 
-  sendEvent(callback) {
-    this.eventQueue.push(() => callback());
+  sendEvent(event) {
+    this.eventQueue.enqueue(event);
+  }
+
+  setOwner(ownerEntity) {
+    this.owner = ownerEntity;
+    this.mapKeys();
   }
 }
 
