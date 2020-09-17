@@ -40,7 +40,6 @@ class Input {
 
   mapKeys() {
     // key mapping
-
     this.keyMap[this.moveUp] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 0, -1] };
     this.keyMap[this.moveDown] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 0, 1] };
     this.keyMap[this.moveLeft] = { signal: 'MOVE_ENTITY', params: [this.owner.id, -1, 0] };
