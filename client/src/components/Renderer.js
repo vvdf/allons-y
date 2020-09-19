@@ -47,9 +47,9 @@ class Renderer {
           this.sprites.blank = new PIXI.Sprite(this.textures.blank);
 
           if (errorsCounted < 1) {
-            console.log('ERROR LOADING RESOURCES', errorsCounted);
             res();
           } else {
+            console.log('ERRORS LOADING RESOURCES:', errorsCounted, ' ERRORS');
             rej();
           }
         });
