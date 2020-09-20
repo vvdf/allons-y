@@ -87,12 +87,6 @@ class Engine {
 
   play(delta) {
     // play state function
-    axios.get('/entity')
-      .then((response) => {
-        if (response.data && response.data.length > 1) {
-          this.updateEntities(response.data);
-        }
-      });
     if (this.eventQueue.length > 0) {
       this.eventQueue.next(delta);
       console.log('ENTITY COUNT: ', this.entities.length);
@@ -117,17 +111,18 @@ class Engine {
   }
 
   updateEntities(entityArr) {
-    this.entities = this.entities.slice(0, 2);
-    for (let i = 1; i < entityArr.length; i += 1) {
-      const {
-        name,
-        textureKey,
-        x,
-        y,
-      } = entityArr[i];
-      this.createEntity(name, textureKey, x, y);
-    }
-    this.renderer.render();
+    // TODO - populate this with proper code
+    // this.entities = this.entities.slice(0, 2);
+    // for (let i = 1; i < entityArr.length; i += 1) {
+    //   const {
+    //     name,
+    //     textureKey,
+    //     x,
+    //     y,
+    //   } = entityArr[i];
+    //   this.createEntity(name, textureKey, x, y);
+    // }
+    // this.renderer.render();
   }
 
   centerCamera(updateView = true) {

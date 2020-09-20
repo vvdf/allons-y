@@ -36,8 +36,8 @@ app.post('/entity', (req, res) => {
   }
 
   // TODO - proper organization of entity registration, tracking, and sending within GET
-  console.log(`Registering the following Entity to Client[${clientId}]:`
-    + `(${req.body.name}, ${req.body.x}, ${req.body.y})`);
+  // console.log(`Registering the following Entity to Client[${clientId}]:`
+  //   + `(${req.body.name}, ${req.body.x}, ${req.body.y})`);
   entities[clients[clientId]] = req.body;
   if (!req.body.x || !req.body.y) {
     // TODO - input data validation
