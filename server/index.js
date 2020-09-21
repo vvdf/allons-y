@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const { parseCookies } = require('./utility');
@@ -101,14 +100,16 @@ app.get('/map/:mapName', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('USER CONNECTED VIA SOCKETS', socket);
+  console.log('USER CONNECTED VIA SOCKET');
   socket.send('SEND ; HOWDY DOODY, CONNECTED');
 
   socket.emit('gameEvent', { tag: 'MOVE ENTITY Or SMTH' });
 
   socket.on('serverLog', (data) => {
     console.log(data);
+    socket.emit('gameEvent', data);
   });
 });
 
 app.listen(PORT, () => console.log(`Server ready, listening on ${PORT}`));
+server.listen(3001, () => console.log(`Socket server open, listening on ${3001}`));

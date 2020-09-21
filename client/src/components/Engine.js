@@ -23,7 +23,6 @@ class Engine {
       tileDepth: 10,
     };
 
-    this.socket = io();
     this.state = this.play;
     this.eventQueue = new EventQueue();
     this.entities = [];
@@ -65,12 +64,11 @@ class Engine {
         this.renderer.render();
       });
 
+    this.socket = io('127.0.0.1:3001');
     this.socket.emit('serverLog', 'data of random text');
-
     this.socket.on('connect', () => {
       console.log('Socket Connected on Client Side');
     });
-
     this.socket.on('gameEvent', (data) => {
       console.log('GameEvent received via sockets: ', data);
     });
@@ -82,7 +80,7 @@ class Engine {
         if (entityId === 1) {
           // if entity moved is player, move camera also
           this.entityIdMap[0].move(dx, dy);
-          axios.post('/entity', { ...this.entities[1], map: null });
+          this.socket.emit('serverLog', `MOVED ${dx}, ${dy}`);
         }
       });
 
