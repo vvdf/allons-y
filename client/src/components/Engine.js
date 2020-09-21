@@ -1,4 +1,5 @@
 import axios from 'axios';
+import io from 'socket.io-client';
 import GameMap from './GameMap';
 import Entity from './Entity';
 import Input from './Input';
@@ -22,6 +23,7 @@ class Engine {
       tileDepth: 10,
     };
 
+    this.socket = io();
     this.state = this.play;
     this.eventQueue = new EventQueue();
     this.entities = [];
@@ -62,6 +64,16 @@ class Engine {
         this.renderer.addToTicker((delta) => this.gameLoop(delta));
         this.renderer.render();
       });
+
+    this.socket.emit('serverLog', 'data of random text');
+
+    this.socket.on('connect', () => {
+      console.log('Socket Connected on Client Side');
+    });
+
+    this.socket.on('gameEvent', (data) => {
+      console.log('GameEvent received via sockets: ', data);
+    });
 
     // define events for EventQueue/Reducer
     this.eventQueue.defineEvent('MOVE_ENTITY',

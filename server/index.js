@@ -1,10 +1,14 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+
+const app = express();
+
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
 const { parseCookies } = require('./utility');
 
 const PORT = 3000;
-const app = express();
 app.use(express.json());
 
 // client id : entity id map
@@ -94,6 +98,17 @@ app.get('/map/:mapName', (req, res) => {
         }
       });
   }
+});
+
+io.on('connection', (socket) => {
+  console.log('USER CONNECTED VIA SOCKETS', socket);
+  socket.send('SEND ; HOWDY DOODY, CONNECTED');
+
+  socket.emit('gameEvent', { tag: 'MOVE ENTITY Or SMTH' });
+
+  socket.on('serverLog', (data) => {
+    console.log(data);
+  });
 });
 
 app.listen(PORT, () => console.log(`Server ready, listening on ${PORT}`));
