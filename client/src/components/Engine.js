@@ -23,10 +23,10 @@ class Engine {
       tileDepth: 10,
     };
 
+    this.playerEntityId = 1;
     this.state = this.play;
     this.eventQueue = new EventQueue();
     this.entities = [];
-    this.entityNextId = 0;
     this.entityIdMap = {};
     this.gameMap = new GameMap(40, 40, 'w');
     this.gameMap.load();
@@ -39,27 +39,30 @@ class Engine {
 
   init() {
     // initialize game Engine variables/systems/assets
-    this.createEntity('Camera', 'blank'); // create game camera as focus entity
-    this.createEntity(`Apron${Math.floor(Math.random() * 1000)}`, 'player'); // create player entity
+
+    // create game camera as focus entity
+    this.createEntity({
+      name: 'Camera',
+      textureKey: 'blank',
+      gameMap: this.gameMap,
+      id: 0,
+    });
+
     axios.get('/entity')
       .then((response) => {
-        if (response.data[0] && response.data[0].x && response.data[0].y) {
-          console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
-          this.entities[1].setPos(response.data[0].x, response.data[0].y);
-          this.centerCamera(false);
-        } else {
-          axios.post('/entity', { ...this.entities[1], map: null });
-        }
-        for (let i = 1; i < response.data.length; i += 1) {
+        console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
+        for (let i = 0; i < response.data.length; i += 1) {
           console.log(response.data[i]);
-          const { name, x, y } = response.data[i];
-          this.createEntity(name, 'player', x, y);
+          this.createEntity(response.data[i]);
         }
+        this.playerEntityId = this.entities[1].id;
+        this.input.setOwner(this.entities[1]);
       })
       .then(() => {
         // initialize game loop and perform first render
         // after initialization of player/camera/etc
         console.log('INIT GAME LOOP + FIRST RENDER');
+        this.centerCamera(false);
         this.renderer.addToTicker((delta) => this.gameLoop(delta));
         this.renderer.render();
       });
@@ -77,7 +80,7 @@ class Engine {
     this.eventQueue.defineEvent('MOVE_ENTITY',
       (entityId, dx = 0, dy = 0) => {
         this.entityIdMap[entityId].move(dx, dy);
-        if (entityId === 1) {
+        if (entityId === this.playerEntityId) {
           // if entity moved is player, move camera also
           this.entityIdMap[0].move(dx, dy);
           this.socket.emit('serverLog', `MOVED ${dx}, ${dy}`);
@@ -110,15 +113,16 @@ class Engine {
     }
   }
 
-  createEntity(name, textureKey, x = 0, y = 0, map = this.gameMap) {
-    const id = this.entityNextId;
-    this.entityNextId += 1;
-    const createdEntity = new Entity(name, textureKey, x, y, map, id);
+  createEntity({
+    name,
+    textureKey,
+    x,
+    y,
+    gameMap,
+    id,
+  }) {
+    const createdEntity = new Entity(name, textureKey, x, y, this.gameMap, id);
     this.renderer.updateEntitySprite(id, textureKey);
-    if (id === 1) {
-      // establishing player as id 1, as camera is 0
-      this.input.setOwner(createdEntity);
-    }
     this.entities.push(createdEntity);
     this.entityIdMap[id] = createdEntity;
   }

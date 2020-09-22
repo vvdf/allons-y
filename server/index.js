@@ -19,45 +19,34 @@ const entities = {};
 
 app.use('/', express.static(path.join(__dirname, '..', 'client', 'dist')));
 
-// entity register
-app.post('/entity', (req, res) => {
-  const cookies = parseCookies(req.headers.cookie);
-  let clientId;
-  let entityId;
-
-  // check for existing clientId
-  if (cookies.cid && clients[cookies.cid]) {
-    // cid exists on cookies AND exists within local cached cid list
-    clientId = cookies.cid;
-  } else {
-    // no cid found OR doesn't exist within cache, create and assign valid cid
-    // TODO - utilize real UUID generation
-    clientId = `CID${Math.floor(Math.random() * 100000).toString() + req.body.name.toUpperCase()}`;
-    entityId = `EID${[...req.body.name].map((char) => char.charCodeAt(0)).reduce((val, acc) => `${val}${acc}`)}`;
-    res.cookie('cid', clientId);
-    console.log('NEW CID: ', clientId, ' - NEW EID: ', entityId);
-    clients[clientId] = entityId;
-  }
-
-  // TODO - proper organization of entity registration, tracking, and sending within GET
-  // console.log(`Registering the following Entity to Client[${clientId}]:`
-  //   + `(${req.body.name}, ${req.body.x}, ${req.body.y})`);
-  entities[clients[clientId]] = req.body;
-  if (!req.body.x || !req.body.y) {
-    // TODO - input data validation
-    entities[clients[clientId]].x = 0;
-    entities[clients[clientId]].y = 0;
-  }
-  res
-    .status(201)
-    .send('Entity Registered');
-});
-
 // load all entities, starting with player (will be empty if cid not found/registered)
 app.get('/entity', (req, res) => {
   const { cid } = parseCookies(req.headers.cookie);
   const entityList = [];
-  entityList.push(entities[clients[cid]]);
+  if (cid && clients[cid] && entities[clients[cid]]) {
+    // player character found, add to start of entity list
+    entityList.push(entities[clients[cid]]);
+  } else {
+    // no player character OR no cid found, create and send one
+    // TODO - build real generator functions for server
+    const name = `Apron${String.fromCharCode(Math.random * 120) + String.fromCharCode(Math.random * 120)}`;
+    const entityId = `EID${[name]
+      .map((char) => char.charCodeAt(0))
+      .reduce((val, acc) => `${val}${acc}`)}
+      ${String.fromCharCode(Math.random * 120) + String.fromCharCode(Math.random * 120)}`;
+    const playerEntityBase = {
+      id: entityId,
+      name,
+      textureKey: 'player',
+      x: 0,
+      y: 0,
+      gameMap: 0,
+    };
+    entityList.push(playerEntityBase);
+
+    const clientId = `CID${Math.floor(Math.random() * 100000).toString() + name.toUpperCase()}`;
+    res.cookie('cid', clientId);
+  }
   Object.keys(entities).forEach((key) => {
     // console.log(`${key} ${entities[key]}`);
     if (key !== clients[cid]) {
