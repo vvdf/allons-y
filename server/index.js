@@ -7,7 +7,8 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const { parseCookies } = require('./utility');
 
-const PORT = 3000;
+const REST_PORT = 3000;
+const SOCK_PORT = 3001;
 app.use(express.json());
 
 // client id : entity id map
@@ -106,10 +107,9 @@ io.on('connection', (socket) => {
   socket.emit('gameEvent', { tag: 'MOVE ENTITY Or SMTH' });
 
   socket.on('serverLog', (data) => {
-    console.log(data);
-    socket.emit('gameEvent', data);
+    socket.emit('gameEvent', 'MOVE TEST');
   });
 });
 
-app.listen(PORT, () => console.log(`Server ready, listening on ${PORT}`));
-server.listen(3001, () => console.log(`Socket server open, listening on ${3001}`));
+app.listen(REST_PORT, () => console.log(`REST API Server open, listening on ${REST_PORT}`));
+server.listen(SOCK_PORT, () => console.log(`Socket server open, listening on ${SOCK_PORT}`));

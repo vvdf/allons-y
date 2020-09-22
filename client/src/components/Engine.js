@@ -28,7 +28,7 @@ class Engine {
     this.entities = [];
     this.entityNextId = 0;
     this.entityIdMap = {};
-    this.gameMap = new GameMap(50, 50, 'g');
+    this.gameMap = new GameMap(40, 40, 'w');
     this.gameMap.load();
     this.input = new Input(this.eventQueue);
     this.renderer = new Renderer(this.settings, this.constants, this.entities, this.gameMap);
@@ -99,7 +99,10 @@ class Engine {
     // play state function
     if (this.eventQueue.length > 0) {
       this.eventQueue.next(delta);
-      console.log('ENTITY COUNT: ', this.entities.length);
+      if (this.entities.length > 2) {
+        console.log('ENTITY COUNT: ', this.entities.length);
+      }
+      // console.log('EVENT COUNT: ', this.eventQueue.length);
       if (this.eventQueue.length < 1) {
         // if event queue is emptied, ie all potential state change is computed, re-render
         this.renderer.update();
