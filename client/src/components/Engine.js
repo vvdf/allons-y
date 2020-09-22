@@ -114,14 +114,14 @@ class Engine {
   }
 
   createEntity({
-    name,
-    textureKey,
-    x,
-    y,
-    gameMap,
-    id,
+    name = 'Generic Entity',
+    textureKey = 'blank',
+    x = 0,
+    y = 0,
+    gameMap = this.gameMap,
+    id = 1,
   }) {
-    const createdEntity = new Entity(name, textureKey, x, y, this.gameMap, id);
+    const createdEntity = new Entity(name, textureKey, x, y, gameMap, id);
     this.renderer.updateEntitySprite(id, textureKey);
     this.entities.push(createdEntity);
     this.entityIdMap[id] = createdEntity;
