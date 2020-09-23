@@ -1,10 +1,10 @@
 import axios from 'axios';
-import io from 'socket.io-client';
 import GameMap from './GameMap';
 import Entity from './Entity';
 import Input from './Input';
 import EventQueue from './EventQueue';
 import Renderer from './Renderer';
+import SocketInterface from './SocketInterface';
 
 class Engine {
   constructor(targetEle) {
@@ -65,16 +65,11 @@ class Engine {
         this.centerCamera(false);
         this.renderer.addToTicker((delta) => this.gameLoop(delta));
         this.renderer.render();
-      });
 
-    this.socket = io('127.0.0.1:3001');
-    this.socket.on('connect', () => {
-      // this.socket.emit('register', {});
-    });
-    this.socket.on('gameEvent', (data) => {
-      console.log(data.signal);
-      this.eventQueue.enqueue(data);
-    });
+        // initialize socket interface only after GET call occurs which
+        // should guarantee a CID cookie
+        this.sio = new SocketInterface(this.eventQueue, '127.0.0.1:3001');
+      });
 
     // define events for EventQueue/Reducer
     this.eventQueue.defineEvent('MOVE_ENTITY',
@@ -83,7 +78,7 @@ class Engine {
         if (entityId === this.playerEntityId) {
           // if entity moved is player, move camera also
           this.entityIdMap[0].move(dx, dy);
-          this.emitEvent({ signal: 'MOVE_ENTITY', params: [entityId, dx, dy] });
+          this.sio.emit('gameEvent', { signal: 'MOVE_ENTITY', params: [entityId, dx, dy] });
         }
       });
 
@@ -96,10 +91,11 @@ class Engine {
     this.eventQueue.defineEvent('PAINT_MAP',
       (entityId, tile) => {
         this.gameMap.set(this.entityIdMap[entityId].x, this.entityIdMap[entityId].y, tile);
-        this.emitEvent({ signal: 'RERENDER', params: [] });
+        this.emitEvent('gameEvent', { signal: 'RERENDER', params: [] });
       });
 
     this.eventQueue.defineEvent('RERENDER', () => { this.flagRerender = true; });
+    this.eventQueue.defineEvent('DEBUG_MSG', (msg) => { console.log(msg); });
   }
 
   gameLoop(delta) {
@@ -123,10 +119,6 @@ class Engine {
         }
       }
     }
-  }
-
-  emitEvent(event) {
-    this.socket.emit('gameEvent', event);
   }
 
   createEntity({
