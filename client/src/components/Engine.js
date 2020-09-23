@@ -98,6 +98,7 @@ class Engine {
       (entityId, tile) => {
         this.gameMap.set(this.entityIdMap[entityId].x, this.entityIdMap[entityId].y, tile);
         this.sio.emit('gameEvent', { signal: 'RERENDER', params: [] });
+        this.flagRerender = true;
       });
 
     this.eventQueue.defineEvent('RERENDER', () => { this.flagRerender = true; });
