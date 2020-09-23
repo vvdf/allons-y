@@ -29,11 +29,8 @@ app.get('/entity', (req, res) => {
   } else {
     // no player character OR no cid found, create and send one
     // TODO - build real generator functions for server
-    const name = `Apron${String.fromCharCode(Math.random * 120) + String.fromCharCode(Math.random * 120)}`;
-    const entityId = `EID${[name]
-      .map((char) => char.charCodeAt(0))
-      .reduce((val, acc) => `${val}${acc}`)}
-      ${String.fromCharCode(Math.random * 120) + String.fromCharCode(Math.random * 120)}`;
+    const name = `Apron${Math.random().toString(36).substring(6)}`;
+    const entityId = `EID${name.toUpperCase() + Math.random().toString(36).substring(6)}`;
     const playerEntityBase = {
       id: entityId,
       name,
@@ -90,13 +87,12 @@ app.get('/map/:mapName', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('USER CONNECTED VIA SOCKET');
+  // console.log(Object.keys(socket));
   socket.send('SEND ; HOWDY DOODY, CONNECTED');
 
-  socket.emit('gameEvent', { tag: 'MOVE ENTITY Or SMTH' });
-
-  socket.on('serverLog', (data) => {
-    socket.emit('gameEvent', 'MOVE TEST');
+  socket.on('gameEvent', (data) => {
+    // console.log(data);
+    socket.emit('gameEvent', data);
   });
 });
 

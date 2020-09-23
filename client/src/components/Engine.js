@@ -32,6 +32,7 @@ class Engine {
     this.gameMap.load();
     this.input = new Input(this.eventQueue);
     this.renderer = new Renderer(this.settings, this.constants, this.entities, this.gameMap);
+    this.flagRerender = false;
     targetEle.appendChild(this.renderer.getView());
     this.renderer.setup()
       .then(() => this.init());
@@ -61,19 +62,18 @@ class Engine {
       .then(() => {
         // initialize game loop and perform first render
         // after initialization of player/camera/etc
-        console.log('INIT GAME LOOP + FIRST RENDER');
         this.centerCamera(false);
         this.renderer.addToTicker((delta) => this.gameLoop(delta));
         this.renderer.render();
       });
 
     this.socket = io('127.0.0.1:3001');
-    this.socket.emit('serverLog', 'data of random text');
     this.socket.on('connect', () => {
-      console.log('Socket Connected on Client Side');
+      // this.socket.emit('register', {});
     });
     this.socket.on('gameEvent', (data) => {
-      console.log('GameEvent received via sockets: ', data);
+      console.log(data.signal);
+      this.eventQueue.enqueue(data);
     });
 
     // define events for EventQueue/Reducer
@@ -83,15 +83,23 @@ class Engine {
         if (entityId === this.playerEntityId) {
           // if entity moved is player, move camera also
           this.entityIdMap[0].move(dx, dy);
-          this.socket.emit('serverLog', `MOVED ${dx}, ${dy}`);
+          this.emitEvent({ signal: 'MOVE_ENTITY', params: [entityId, dx, dy] });
         }
+      });
+
+    this.eventQueue.defineEvent('NEW_ENTITY',
+      (name, textureKey, x, y, gameMap, id) => {
+        this.createEntity(name, textureKey, x, y, gameMap, id);
+        this.flagRerender = true;
       });
 
     this.eventQueue.defineEvent('PAINT_MAP',
       (entityId, tile) => {
         this.gameMap.set(this.entityIdMap[entityId].x, this.entityIdMap[entityId].y, tile);
-        this.renderer.render();
+        this.emitEvent({ signal: 'RERENDER', params: [] });
       });
+
+    this.eventQueue.defineEvent('RERENDER', () => { this.flagRerender = true; });
   }
 
   gameLoop(delta) {
@@ -108,9 +116,17 @@ class Engine {
       // console.log('EVENT COUNT: ', this.eventQueue.length);
       if (this.eventQueue.length < 1) {
         // if event queue is emptied, ie all potential state change is computed, re-render
-        this.renderer.update();
+        if (this.flagRerender) {
+          this.renderer.render();
+        } else {
+          this.renderer.update();
+        }
       }
     }
+  }
+
+  emitEvent(event) {
+    this.socket.emit('gameEvent', event);
   }
 
   createEntity({
@@ -121,25 +137,10 @@ class Engine {
     gameMap = this.gameMap,
     id = 1,
   }) {
-    const createdEntity = new Entity(name, textureKey, x, y, gameMap, id);
+    const createdEntity = new Entity(name, textureKey, x, y, this.gameMap, id);
     this.renderer.updateEntitySprite(id, textureKey);
     this.entities.push(createdEntity);
     this.entityIdMap[id] = createdEntity;
-  }
-
-  updateEntities(entityArr) {
-    // TODO - populate this with proper code
-    // this.entities = this.entities.slice(0, 2);
-    // for (let i = 1; i < entityArr.length; i += 1) {
-    //   const {
-    //     name,
-    //     textureKey,
-    //     x,
-    //     y,
-    //   } = entityArr[i];
-    //   this.createEntity(name, textureKey, x, y);
-    // }
-    // this.renderer.render();
   }
 
   centerCamera(updateView = true) {
