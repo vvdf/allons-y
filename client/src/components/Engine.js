@@ -48,8 +48,8 @@ class Engine {
       gameMap: this.gameMap,
       id: 0,
     });
-
-    axios.get('/entity')
+    axios.get('/registerClient')
+      .then(() => axios.get('/entity'))
       .then((response) => {
         console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
         for (let i = 0; i < response.data.length; i += 1) {
@@ -84,8 +84,14 @@ class Engine {
 
     this.eventQueue.defineEvent('NEW_ENTITY',
       (name, textureKey, x, y, gameMap, id) => {
-        this.createEntity(name, textureKey, x, y, gameMap, id);
-        this.flagRerender = true;
+        if (this.entityIdMap[id]) {
+          // if entity still exists in local storage
+          this.entityIdMap[id].setPos(x, y);
+        } else {
+          // otherwise add new entity
+          this.createEntity(name, textureKey, x, y, gameMap, id);
+          this.flagRerender = true;
+        }
       });
 
     this.eventQueue.defineEvent('PAINT_MAP',

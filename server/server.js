@@ -19,13 +19,19 @@ const entities = {};
 
 app.use('/', express.static(path.join(__dirname, '..', 'client', 'dist')));
 
+app.get('/registerClient', (req, res) => {
+  const { cid } = parseCookies(req.headers.cookie);
+  const clientId = cid || `CID${Math.random().toString(36).substring(6)}`;
+  res.cookie('cid', clientId).status(200).send('CID attached in cookie');
+});
+
 // load all entities, starting with player (will be empty if cid not found/registered)
 app.get('/entity', (req, res) => {
   const { cid } = parseCookies(req.headers.cookie);
   const entityList = [];
-  if (cid && clients[cid] && entities[clients[cid]]) {
+  if (cid && clients[cid] && clients[cid].eid) {
     // player character found, add to start of entity list
-    entityList.push(entities[clients[cid]]);
+    entityList.push(entities[clients[cid].eid]);
   } else {
     // no player character OR no cid found, create and send one
     // TODO - build real generator functions for server
@@ -40,13 +46,11 @@ app.get('/entity', (req, res) => {
       gameMap: 0,
     };
     entityList.push(playerEntityBase);
-
-    const clientId = `CID${Math.floor(Math.random() * 100000).toString() + name.toUpperCase()}`;
-    res.cookie('cid', clientId);
+    entities[entityId] = playerEntityBase;
+    clients[cid] = { eid: entityId };
   }
   Object.keys(entities).forEach((key) => {
-    // console.log(`${key} ${entities[key]}`);
-    if (key !== clients[cid]) {
+    if (key !== clients[cid].eid) {
       entityList.push(entities[key]);
     }
   });
@@ -87,12 +91,36 @@ app.get('/map/:mapName', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  // console.log(Object.keys(socket));
-  socket.send('SEND ; HOWDY DOODY, CONNECTED');
+  let clientId = '';
+  let entityId = '';
+
+  socket.on('register', ({ cookie }) => {
+    console.log('REGISTER DATA RECEIVED: ', cookie);
+    clientId = parseCookies(cookie).cid;
+
+    // TODO - generate a clientId if one doesn't exist
+    if (clientId && clients[clientId] && clients[clientId].eid) {
+      console.log('CLIENT ID FOUND, attached EID = ', clients[clientId].eid);
+      entityId = clients[clientId].eid;
+      const {
+        name, textureKey, x, y, gameMap, id,
+      } = entities[entityId];
+
+      clients[clientId].sid = socket.id;
+      io.to(clients[clientId].sid).emit('gameEvent', { signal: 'DEBUG_MSG', params: ['SID REGISTERED'] });
+      socket.to('/').emit('gameEvent', { signal: 'NEW_ENTITY', params: [name, textureKey, x, y, gameMap, id] });
+    } else {
+      // TODO - signal to reregister for a client ID
+      // NOTE - io.to broadcasts from server, socket.to broadcasts from (and not back to) sender
+    }
+  });
 
   socket.on('gameEvent', (data) => {
-    // console.log(data);
-    socket.emit('gameEvent', data);
+    if (data.signal === 'MOVE_ENTITY') {
+      entities[entityId].x += data.params[1];
+      entities[entityId].y += data.params[2];
+    }
+    socket.to('/').emit('gameEvent', data);
   });
 });
 
