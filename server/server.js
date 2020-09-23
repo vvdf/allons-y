@@ -91,8 +91,8 @@ app.get('/map/:mapName', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  let clientId = '';
-  let entityId = '';
+  let clientId;
+  let entityId;
 
   socket.on('register', ({ cookie }) => {
     console.log('REGISTER DATA RECEIVED: ', cookie);
@@ -116,7 +116,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('gameEvent', (data) => {
-    if (data.signal === 'MOVE_ENTITY') {
+    if (data.signal === 'MOVE_ENTITY' ** entityId) {
       entities[entityId].x += data.params[1];
       entities[entityId].y += data.params[2];
     }
