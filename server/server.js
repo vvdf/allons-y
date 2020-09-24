@@ -116,6 +116,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('gameEvent', (data) => {
+    console.log(clientId, data.signal);
     if (data.signal === 'MOVE_ENTITY' && entityId) {
       entities[entityId].x += data.params[1];
       entities[entityId].y += data.params[2];
