@@ -53,7 +53,6 @@ class Engine {
       .then((response) => {
         console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
         for (let i = 0; i < response.data.length; i += 1) {
-          console.log(response.data[i]);
           this.createEntity(response.data[i]);
         }
         this.playerEntityId = this.entities[1].id;
@@ -93,7 +92,9 @@ class Engine {
           this.entityIdMap[id].setPos(x, y);
         } else {
           // otherwise add new entity
-          this.createEntity(name, textureKey, x, y, gameMap, id);
+          this.createEntity({
+            name, textureKey, x, y, gameMap, id,
+          });
           this.flagRerender = true;
         }
       });
@@ -121,9 +122,6 @@ class Engine {
     // play state function
     if (this.eventQueue.length > 0) {
       this.eventQueue.next(delta);
-      if (this.entities.length > 2) {
-        console.log('ENTITY COUNT: ', this.entities.length);
-      }
       // console.log('EVENT COUNT: ', this.eventQueue.length);
       if (this.eventQueue.length < 1) {
         // if event queue is emptied, ie all potential state change is computed, re-render

@@ -16,7 +16,6 @@ class SocketInterface {
     });
 
     this.socket.on('gameEvent', (data) => {
-      console.log(data.signal);
       this.eventQueue.enqueue(data);
     });
   }
@@ -28,7 +27,6 @@ class SocketInterface {
   emitOnConnect(type, data) {
     this.socket.emit(type, data);
     this.onConnect.push([type, data]);
-    console.log('ON CONNECT LIST UPDATED: ', this.onConnect);
   }
 }
 
