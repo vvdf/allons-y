@@ -68,7 +68,11 @@ class Engine {
 
         // initialize socket interface only after GET call occurs which
         // should guarantee a CID cookie
+        const {
+          name, textureKey, x, y, gameMap, id,
+        } = this.entities[1];
         this.sio = new SocketInterface(this.eventQueue, '127.0.0.1:3001');
+        this.sio.emitOnConnect('gameEvent', { signal: 'NEW_ENTITY', params: [name, textureKey, x, y, gameMap, id] });
       });
 
     // define events for EventQueue/Reducer
