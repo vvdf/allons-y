@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server/server.js",
     "server-dev": "nodemon server/server.js",
-    "client-dev": "webpack --watch"
+    "client-dev": "webpack --watch",
+    "build": "webpack --mode=\"production\""
   },
   "keywords": [],
   "author": "",
