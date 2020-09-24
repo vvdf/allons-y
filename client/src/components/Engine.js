@@ -71,7 +71,7 @@ class Engine {
         const {
           name, textureKey, x, y, gameMap, id,
         } = this.entities[1];
-        this.sio = new SocketInterface(this.eventQueue, (process.env.SOCKET_URL || '127.0.0.1:3001'));
+        this.sio = new SocketInterface(this.eventQueue, `${window.location}:3001`);
         this.sio.emitOnConnect('gameEvent', { signal: 'NEW_ENTITY', params: [name, textureKey, x, y, gameMap, id] });
       });
 
