@@ -97,6 +97,7 @@ io.on('connection', (socket) => {
   socket.on('register', ({ cookie }) => {
     console.log('REGISTER DATA RECEIVED: ', cookie);
     clientId = parseCookies(cookie).cid;
+    socket.join('root');
 
     // TODO - generate a clientId if one doesn't exist
     if (clientId && clients[clientId] && clients[clientId].eid) {
@@ -116,12 +117,11 @@ io.on('connection', (socket) => {
   });
 
   socket.on('gameEvent', (data) => {
-    console.log(clientId, data.signal);
     if (data.signal === 'MOVE_ENTITY' && entityId) {
       entities[entityId].x += data.params[1];
       entities[entityId].y += data.params[2];
     }
-    socket.to('/').emit('gameEvent', data);
+    socket.to('root').emit('gameEvent', data);
   });
 });
 

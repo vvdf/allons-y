@@ -101,6 +101,10 @@ class Engine {
     this.eventQueue.defineEvent('PAINT_MAP',
       (entityId, tile) => {
         this.gameMap.set(this.entityIdMap[entityId].x, this.entityIdMap[entityId].y, tile);
+        if (entityId === this.playerEntityId) {
+          // only emit signal if you're the creator of it
+          this.sio.emit('gameEvent', { signal: 'PAINT_MAP', params: [entityId, tile] });
+        }
         this.sio.emit('gameEvent', { signal: 'RERENDER', params: [] });
         this.flagRerender = true;
       });
