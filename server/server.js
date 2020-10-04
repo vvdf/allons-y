@@ -117,6 +117,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('gameEvent', (data) => {
+    // TODO refactor move_entity handling to only allow and pass on legal movements
     if (data.signal === 'MOVE_ENTITY' && entityId) {
       entities[entityId].x += data.params[1];
       entities[entityId].y += data.params[2];

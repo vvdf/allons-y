@@ -182,6 +182,10 @@ class Renderer {
 
     this.game.stage.addChild(this.sprites.entities);
   }
+
+  renderUI() {
+    
+  }
 }
 
 export default Renderer;
