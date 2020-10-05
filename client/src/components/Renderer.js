@@ -130,6 +130,18 @@ class Renderer {
     }
   }
 
+  renderClearUI() {
+    if (this.sprites.UI) {
+      this.game.stage.removeChild(this.sprites.UI);
+      this.sprites.UI.destroy();
+    }
+  }
+
+  renderClearScreen() {
+    this.renderClear();
+    this.renderClearUI();
+  }
+
   renderMap() {
     this.sprites.map = new PIXI.Container();
     let waterStep = 0;
@@ -183,8 +195,53 @@ class Renderer {
     this.game.stage.addChild(this.sprites.entities);
   }
 
-  renderUI() {
-    // TODO build scene generators for all 3 UI interfaces
+  renderMainUI() {
+    // main menu screen, NEW OFFICER creation option -> officer creation + locale selection screen
+    this.renderClearScreen();
+    this.sprites.UI = new PIXI.Container();
+
+    // render backdrop
+    this.game.backgroundColor = 0x1d0047;
+    const colors = [0x000447, 0x000930];
+    const rand = (min, max, avoidVal) => {
+      const result = Math.floor((Math.random() * (max - min)) + min);
+      return !avoidVal || Math.abs(avoidVal - result) > 20
+        ? result
+        : Math.floor((Math.random() * (max - min)) + min);
+    };
+
+    for (let colorIdx = 0; colorIdx < colors.length; colorIdx += 1) {
+      const minHeight = this.settings.height * (0.4 - colorIdx * 0.2);
+      const maxHeight = this.settings.height * (0.8 - colorIdx * 0.3);
+      const minWidth = 40;
+      const maxWidth = 90;
+      let lastWidth = 0;
+      let lastHeight = 0;
+
+      for (let i = 0; i < this.settings.width; i += lastWidth) {
+        const building = PIXI.Sprite.from(PIXI.Texture.WHITE);
+        building.width = rand(minWidth, maxWidth);
+        building.height = rand(minHeight, maxHeight, lastHeight) - i / 8;
+        building.tint = colors[colorIdx];
+        building.x = i;
+        building.y = this.settings.height - building.height;
+        lastWidth = building.width;
+        lastHeight = building.height;
+        this.sprites.UI.addChild(building);
+      }
+    }
+
+    this.game.stage.addChild(this.sprites.UI);
+  }
+
+  renderBaseUI() {
+    // clear screen first
+    // base management/mission dispatch/loadout management etc UI
+    this.renderClear();
+  }
+
+  renderFieldUI() {
+    // field aka combat UI with equipment, actions, health, turns, etc
   }
 }
 

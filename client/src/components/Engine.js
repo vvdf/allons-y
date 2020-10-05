@@ -10,7 +10,7 @@ class Engine {
   constructor(targetEle) {
     // initialize game renderer, append as child to passed in element
     this.settings = {
-      backgroundColor: 0xf0c5e9,
+      backgroundColor: 0x1d0047,
       width: 800,
       height: 550,
       resolution: 1,
@@ -24,7 +24,7 @@ class Engine {
     };
 
     this.playerEntityId = 1;
-    this.state = this.play;
+    this.state = this.mainMenuStart;
     this.eventQueue = new EventQueue();
     this.entities = [];
     this.entityIdMap = {};
@@ -132,6 +132,16 @@ class Engine {
         }
       }
     }
+  }
+
+  mainMenuStart(delta) {
+    this.renderer.renderClearScreen();
+    this.renderer.renderMainUI();
+    this.state = this.mainMenuHold;
+  }
+
+  mainMenuSelect(delta) {
+    
   }
 
   createEntity({
