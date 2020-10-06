@@ -1,12 +1,12 @@
 import * as PIXI from 'pixi.js';
 import * as Anim from './Animations';
-console.log(Anim);
 
 class Renderer {
   constructor(settings, constants, entities, gameMap) {
     this.settings = settings;
     this.constants = constants;
     this.game = new PIXI.Application(this.settings);
+    this.render = this.renderMainUI;
     this.update = this.updateUI;
     this.entities = entities;
     this.entitySpriteMap = {};
@@ -94,7 +94,7 @@ class Renderer {
       + (this.constants.tileHeight * dx) + (this.constants.tileHeight * dy);
   }
 
-  render() {
+  renderField() {
     // clear and re-render everything from scratch
     this.updateCameraPos();
     this.renderClear();
@@ -157,6 +157,7 @@ class Renderer {
   renderClearScreen() {
     this.renderClearBG();
     this.renderClear();
+    this.renderClearUI();
     this.renderClearUI();
   }
 

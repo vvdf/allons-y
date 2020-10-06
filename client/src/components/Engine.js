@@ -151,12 +151,9 @@ class Engine {
 
   mainMenu(delta) {
     this.renderer.renderClearScreen();
-    this.renderer.renderMainUI();
+    this.renderer.render();
     this.ui.newMenu([() => { this.state = this.characterCreation; }]);
     this.state = this.play;
-  }
-
-  idle(delta) {
   }
 
   characterCreation(delta) {
