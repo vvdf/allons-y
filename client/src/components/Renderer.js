@@ -7,6 +7,7 @@ class Renderer {
     this.settings = settings;
     this.constants = constants;
     this.game = new PIXI.Application(this.settings);
+    this.update = this.updateUI;
     this.entities = entities;
     this.entitySpriteMap = {};
     this.lastCameraPos = { x: 0, y: 0 };
@@ -101,7 +102,10 @@ class Renderer {
     this.renderEntities();
   }
 
-  update() {
+  updateUI() {
+  }
+
+  updateField() {
     // if no major state changes (ie death)/new entities
     // just shift sprites around instead
     const cameraDx = this.lastCameraPos.x - this.entities[0].x;
@@ -270,10 +274,12 @@ class Renderer {
     this.sprites.ui.addChild(startGame);
 
     this.sprites.bg.alpha = 0;
+    this.sprites.title.alpha = 0;
     this.sprites.ui.alpha = 0;
 
-    this.animate(['bg'], 'fadeIn')
-      .then(() => this.animate(['ui', 'title'], 'fadeIn', 50));
+    this.animate(['bg'], 'fadeIn', 100)
+      .then(() => this.animate(['title'], 'fadeIn', 30))
+      .then(() => this.animate(['ui'], 'fadeIn', 50));
   }
 
   renderBaseUI() {

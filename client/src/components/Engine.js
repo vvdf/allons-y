@@ -5,6 +5,7 @@ import Input from './Input';
 import EventQueue from './EventQueue';
 import Renderer from './Renderer';
 import SocketInterface from './SocketInterface';
+import UI from './UI';
 
 class Engine {
   constructor(targetEle) {
@@ -24,54 +25,56 @@ class Engine {
     };
 
     this.playerEntityId = 1;
-    this.state = this.mainMenuStart;
+    this.state = this.mainMenu;
     this.eventQueue = new EventQueue();
     this.entities = [];
+    this.playerEntity = {};
     this.entityIdMap = {};
     this.gameMap = new GameMap(40, 40, 'w');
     this.gameMap.load();
     this.input = new Input(this.eventQueue);
+    this.ui = new UI();
     this.renderer = new Renderer(this.settings, this.constants, this.entities, this.gameMap);
     this.flagRerender = false;
     targetEle.appendChild(this.renderer.getView());
     this.renderer.setup()
       .then(() => this.init());
+    this.renderer.addToTicker((delta) => this.gameLoop(delta));
   }
 
   init() {
     // initialize game Engine variables/systems/assets
 
     // create game camera as focus entity
-    this.createEntity({
-      name: 'Camera',
-      textureKey: 'blank',
-      gameMap: this.gameMap,
-      id: 0,
-    });
-    axios.get('/registerClient')
-      .then(() => axios.get('/entity'))
-      .then((response) => {
-        console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
-        for (let i = 0; i < response.data.length; i += 1) {
-          this.createEntity(response.data[i]);
-        }
-        this.playerEntityId = this.entities[1].id;
-        this.input.setOwner(this.entities[1]);
-      })
-      .then(() => {
-        // initialize game loop and perform first render
-        // after initialization of player/camera/etc
-        this.centerCamera(false);
-        this.renderer.addToTicker((delta) => this.gameLoop(delta));
+    // this.createEntity({
+    //   name: 'Camera',
+    //   textureKey: 'blank',
+    //   gameMap: this.gameMap,
+    //   id: 0,
+    // });
+    // axios.get('/registerClient')
+    //   .then(() => axios.get('/entity'))
+    //   .then((response) => {
+    //     console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
+    //     for (let i = 0; i < response.data.length; i += 1) {
+    //       this.createEntity(response.data[i]);
+    //     }
+    //     this.playerEntityId = this.entities[1].id;
+    //     this.input.setOwner(this.entities[1]);
+    //   })
+    //   .then(() => {
+    //     // initialize game loop and perform first render
+    //     // after initialization of player/camera/etc
+    //     this.centerCamera(false);
 
-        // initialize socket interface only after GET call occurs which
-        // should guarantee a CID cookie
-        const {
-          name, textureKey, x, y, gameMap, id,
-        } = this.entities[1];
-        this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
-        this.sio.emitOnConnect('gameEvent', { signal: 'NEW_ENTITY', params: [name, textureKey, x, y, gameMap, id] });
-      });
+    //     // initialize socket interface only after GET call occurs which
+    //     // should guarantee a CID cookie
+    //     const {
+    //       name, textureKey, x, y, gameMap, id,
+    //     } = this.entities[1];
+    //     this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
+    //     this.sio.emitOnConnect('gameEvent', { signal: 'NEW_ENTITY', params: [name, textureKey, x, y, gameMap, id] });
+    //   });
 
     // define events for EventQueue/Reducer
     this.eventQueue.defineEvent('MOVE_ENTITY',
@@ -111,6 +114,19 @@ class Engine {
 
     this.eventQueue.defineEvent('RERENDER', () => { this.flagRerender = true; });
     this.eventQueue.defineEvent('DEBUG_MSG', (msg) => { console.log(msg); });
+
+    this.eventQueue.defineEvent('UI_COMMAND', (input) => {
+      if (input > 0) {
+        console.log('NEXT OPTION');
+        this.ui.next();
+      } else if (input < 0) {
+        console.log('PREV OPTION');
+        this.ui.prev();
+      } else {
+        console.log('SELECTING');
+        this.ui.select();
+      }
+    });
   }
 
   gameLoop(delta) {
@@ -133,14 +149,18 @@ class Engine {
     }
   }
 
-  mainMenuStart(delta) {
+  mainMenu(delta) {
     this.renderer.renderClearScreen();
     this.renderer.renderMainUI();
-    this.state = this.mainMenuSelect;
+    this.ui.newMenu([() => { this.state = this.characterCreation; }]);
+    this.state = this.play;
   }
 
-  mainMenuSelect(delta) {
+  idle(delta) {
+  }
 
+  characterCreation(delta) {
+    console.log('ENTERING CHAR CREATION MODE');
   }
 
   createEntity({
