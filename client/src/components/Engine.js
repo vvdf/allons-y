@@ -10,7 +10,7 @@ class Engine {
   constructor(targetEle) {
     // initialize game renderer, append as child to passed in element
     this.settings = {
-      backgroundColor: 0x1d0047,
+      backgroundColor: 0x030305,
       width: 800,
       height: 550,
       resolution: 1,
@@ -63,7 +63,6 @@ class Engine {
         // after initialization of player/camera/etc
         this.centerCamera(false);
         this.renderer.addToTicker((delta) => this.gameLoop(delta));
-        this.renderer.render();
 
         // initialize socket interface only after GET call occurs which
         // should guarantee a CID cookie
@@ -137,11 +136,11 @@ class Engine {
   mainMenuStart(delta) {
     this.renderer.renderClearScreen();
     this.renderer.renderMainUI();
-    this.state = this.mainMenuHold;
+    this.state = this.mainMenuSelect;
   }
 
   mainMenuSelect(delta) {
-    
+
   }
 
   createEntity({

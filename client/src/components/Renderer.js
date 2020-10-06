@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js';
+import * as Anim from './Animations';
+console.log(Anim);
 
 class Renderer {
   constructor(settings, constants, entities, gameMap) {
@@ -12,6 +14,7 @@ class Renderer {
     this.sprites = {};
     this.textures = {};
     this.loader = PIXI.Loader.shared;
+    this.tickerIdMap = [];
   }
 
   setup() {
@@ -56,8 +59,12 @@ class Renderer {
     });
   }
 
-  addToTicker(gameLoopCallback) {
-    this.game.ticker.add(gameLoopCallback);
+  addToTicker(callback) {
+    this.game.ticker.add(callback);
+  }
+
+  removeFromTicker(callback) {
+    this.game.ticker.remove(callback);
   }
 
   updateEntitySprite(id, textureKey) {
@@ -131,13 +138,20 @@ class Renderer {
   }
 
   renderClearUI() {
-    if (this.sprites.UI) {
-      this.game.stage.removeChild(this.sprites.UI);
-      this.sprites.UI.destroy();
+    if (this.sprites.ui) {
+      this.game.stage.removeChild(this.sprites.ui);
+      this.sprites.ui.destroy();
+    }
+  }
+
+  renderClearBG() {
+    if (this.sprites.bg) {
+      this.sprites.bg.destroy({ children: true });
     }
   }
 
   renderClearScreen() {
+    this.renderClearBG();
     this.renderClear();
     this.renderClearUI();
   }
@@ -198,10 +212,17 @@ class Renderer {
   renderMainUI() {
     // main menu screen, NEW OFFICER creation option -> officer creation + locale selection screen
     this.renderClearScreen();
-    this.sprites.UI = new PIXI.Container();
+    this.sprites.title = new PIXI.Container();
+    this.sprites.ui = new PIXI.Container();
+    this.sprites.bg = new PIXI.Container();
 
     // render backdrop
-    this.game.backgroundColor = 0x1d0047;
+    const background = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    background.width = this.settings.width;
+    background.height = this.settings.height;
+    background.tint = 0x1d0047;
+    this.sprites.bg.addChild(background);
+
     const colors = [0x000447, 0x000930];
     const rand = (min, max, avoidVal) => {
       const result = Math.floor((Math.random() * (max - min)) + min);
@@ -227,11 +248,32 @@ class Renderer {
         building.y = this.settings.height - building.height;
         lastWidth = building.width;
         lastHeight = building.height;
-        this.sprites.UI.addChild(building);
+        this.sprites.bg.addChild(building);
       }
     }
 
-    this.game.stage.addChild(this.sprites.UI);
+    const title = new PIXI.Text('[ paranormal divide ]', {
+      fontFamily: 'sans-serif', fontSize: 36, fill: 0xe0e0e5, align: 'center',
+    });
+
+    title.x = this.settings.width / 2 - title.width / 2;
+    title.y = 25;
+
+    const startGame = new PIXI.Text('[ new officer ]', {
+      fontFamily: 'sans-serif', fontSize: 18, fill: 0xe07900, align: 'center',
+    });
+
+    startGame.x = this.settings.width / 2 - startGame.width / 2;
+    startGame.y = this.settings.height - 75;
+
+    this.sprites.title.addChild(title);
+    this.sprites.ui.addChild(startGame);
+
+    this.sprites.bg.alpha = 0;
+    this.sprites.ui.alpha = 0;
+
+    this.animate(['bg'], 'fadeIn')
+      .then(() => this.animate(['ui', 'title'], 'fadeIn', 50));
   }
 
   renderBaseUI() {
@@ -242,6 +284,23 @@ class Renderer {
 
   renderFieldUI() {
     // field aka combat UI with equipment, actions, health, turns, etc
+  }
+
+  animate(spriteKeyArr, animFuncKey, delay = 200) {
+    const animPromises = [];
+    for (let i = 0; i < spriteKeyArr.length; i += 1) {
+      animPromises.push(new Promise((resolve) => {
+        this.game.stage.addChild(this.sprites[spriteKeyArr[i]]);
+        const animTick = (delta) => {
+          Anim[animFuncKey](delta, this.sprites[spriteKeyArr[i]], delay, () => {
+            this.removeFromTicker(animTick);
+            resolve();
+          });
+        };
+        this.addToTicker(animTick);
+      }));
+    }
+    return Promise.all(animPromises);
   }
 }
 
