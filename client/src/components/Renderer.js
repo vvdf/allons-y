@@ -154,11 +154,17 @@ class Renderer {
     }
   }
 
+  renderClearTitle() {
+    if (this.sprites.title) {
+      this.sprites.title.destroy();
+    }
+  }
+
   renderClearScreen() {
     this.renderClearBG();
     this.renderClear();
     this.renderClearUI();
-    this.renderClearUI();
+    this.renderClearTitle();
   }
 
   renderMap() {

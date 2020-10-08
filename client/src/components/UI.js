@@ -2,6 +2,7 @@ import { clamp } from './Utility';
 
 class UI {
   constructor(uiSelectionsArr = [() => {}]) {
+    this.textInput = '';
     this.newMenu(uiSelectionsArr);
   }
 

@@ -125,6 +125,7 @@ class Engine {
       } else {
         console.log('SELECTING');
         this.ui.select();
+        this.renderer.animate(['ui'], 'blinkOut', 50);
       }
     });
   }
@@ -158,6 +159,8 @@ class Engine {
 
   characterCreation(delta) {
     console.log('ENTERING CHAR CREATION MODE');
+    this.renderer.renderClearScreen();
+    
   }
 
   createEntity({
@@ -170,7 +173,7 @@ class Engine {
   }) {
     const createdEntity = new Entity(name, textureKey, x, y, this.gameMap, id);
     this.renderer.updateEntitySprite(id, textureKey);
-    this.entities.push(createdEntity);
+    this.entities.push(createdEntity);1
     this.entityIdMap[id] = createdEntity;
   }
 
