@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import * as Anim from './Animations';
 
 class Renderer {
-  constructor(settings, constants, entities, gameMap) {
+  constructor(settings, constants, entities, gameMap, ui) {
     this.settings = settings;
     this.constants = constants;
     this.game = new PIXI.Application(this.settings);
@@ -12,6 +12,7 @@ class Renderer {
     this.entitySpriteMap = {};
     this.lastCameraPos = { x: 0, y: 0 };
     this.gameMap = gameMap;
+    this.ui = ui;
     this.sprites = {};
     this.textures = {};
     this.loader = PIXI.Loader.shared;
@@ -105,6 +106,10 @@ class Renderer {
   updateUI() {
   }
 
+  updateConsole() {
+    this.ui.getText();
+  }
+
   updateField() {
     // if no major state changes (ie death)/new entities
     // just shift sprites around instead
@@ -150,12 +155,14 @@ class Renderer {
 
   renderClearBG() {
     if (this.sprites.bg) {
+      this.game.stage.removeChild(this.sprites.bg);
       this.sprites.bg.destroy({ children: true });
     }
   }
 
   renderClearTitle() {
     if (this.sprites.title) {
+      this.game.stage.removeChild(this.sprites.title);
       this.sprites.title.destroy();
     }
   }
@@ -284,9 +291,9 @@ class Renderer {
     this.sprites.title.alpha = 0;
     this.sprites.ui.alpha = 0;
 
-    this.animate(['bg'], 'fadeIn', 100)
-      .then(() => this.animate(['title'], 'fadeIn', 30))
-      .then(() => this.animate(['ui'], 'fadeIn', 50));
+    this.animate(['bg'], 'fadeIn', 50)
+      .then(() => this.animate(['title'], 'fadeIn', 20))
+      .then(() => this.animate(['ui'], 'fadeIn', 30));
   }
 
   renderBaseUI() {
@@ -297,6 +304,51 @@ class Renderer {
 
   renderFieldUI() {
     // field aka combat UI with equipment, actions, health, turns, etc
+  }
+
+  renderConsole(textArr) {
+    if (this.sprites.console) {
+      this.game.stage.removeChild(this.sprites.console);
+      this.sprites.console.destroy({ children: true });
+    }
+
+    if (this.sprites.consoleText) {
+      this.game.stage.removeChild(this.sprites.consoleText);
+      this.sprites.consoleText.destroy({ children: true });
+    }
+
+    this.sprites.console = new PIXI.Container();
+    this.sprites.consoleText = new PIXI.Container();
+
+    const rect = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    rect.x = this.settings.width / 10;
+    rect.y = this.settings.height / 10;
+    rect.width = this.settings.width - rect.x * 2;
+    rect.height = this.settings.height - rect.y * 2;
+    rect.tint = 0x030303;
+
+    this.sprites.console.addChild(rect);
+
+    for (let i = 0; i < textArr.length; i += 1) {
+      const textLine = new PIXI.Text(textArr[i], {
+        fontFamily: 'terminus', fontSize: 20, fill: 0xa0a0a0, align: 'left',
+      });
+
+      textLine.x = rect.x + 5;
+      textLine.y = rect.y + 5 + i * 18;
+      this.sprites.consoleText.addChild(textLine);
+    }
+
+    this.game.stage.addChild(this.sprites.console);
+    this.game.stage.addChild(this.sprites.consoleText);
+    this.update = this.updateConsoleText;
+  }
+
+  updateConsoleText() {
+    if (this.sprites.consoleText) {
+      this.game.stage.removeChild(this.sprites.consoleText);
+      this.sprites.consoleText.destroy({ children: true });
+    }
   }
 
   animate(spriteKeyArr, animFuncKey, delay = 200) {

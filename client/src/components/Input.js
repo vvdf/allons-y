@@ -2,7 +2,7 @@ class Input {
   constructor(targetEventQueue, ownerEntity) {
     this.eventQueue = targetEventQueue;
     this.owner = ownerEntity;
-    this.mode = 'ui'; // ui menu, textinput, combat or field
+    this.mode = 'ui'; // ui menu, text (input), combat or field
     this.key = {};
     this.keyMap = {};
     this.init();
@@ -15,7 +15,7 @@ class Input {
 
     // initialize key listener
     window.addEventListener('keydown', ({ keyCode }) => {
-      if (this.keyMap[this.mode][keyCode]) {
+      if ({}.hasOwnProperty.call(this.keyMap[this.mode], keyCode)) {
         this.sendEvent(this.keyMap[this.mode][keyCode]);
       } else {
         // unlisted key for given mode
@@ -38,6 +38,9 @@ class Input {
     this.key.moveLeft = '37'; // arrow left
     this.key.moveRight = '39'; // arrow right
     this.key.select = '13'; // enter
+    this.key.back = '8'; // backspace
+    this.key.space = '32'; // space
+    this.key.minus = '173'; // space
 
     // debug key assignments
     // paint floor tiles
@@ -45,16 +48,33 @@ class Input {
     this.key.paintDirt = '68'; // 'D'
     this.key.paintRoad = '82'; // 'R'
     this.key.paintWater = '87'; // 'W'
+
+    for (let i = 0; i < 26; i += 1) {
+      this.key[String.fromCharCode(97 + i)] = 65 + i;
+    }
   }
 
   mapKeys() {
     // ui menu mappings
     this.keyMap.ui = {};
-    this.keyMap.ui[this.key.moveUp] = { signal: 'UI_COMMAND', params: [-1] };
-    this.keyMap.ui[this.key.moveDown] = { signal: 'UI_COMMAND', params: [1] };
-    this.keyMap.ui[this.key.moveLeft] = { signal: 'UI_COMMAND', params: [-1] };
-    this.keyMap.ui[this.key.moveRight] = { signal: 'UI_COMMAND', params: [1] };
-    this.keyMap.ui[this.key.select] = { signal: 'UI_COMMAND', params: [0] };
+    this.keyMap.ui[this.key.moveUp] = { signal: 'UI_SELECT', params: [1] };
+    this.keyMap.ui[this.key.moveDown] = { signal: 'UI_SELECT', params: [2] };
+    this.keyMap.ui[this.key.moveLeft] = { signal: 'UI_SELECT', params: [3] };
+    this.keyMap.ui[this.key.moveRight] = { signal: 'UI_SELECT', params: [4] };
+    this.keyMap.ui[this.key.select] = { signal: 'UI_SELECT', params: [0] };
+
+    // text input controls
+    this.keyMap.text = {};
+    this.keyMap.text[this.key.moveLeft] = { signal: 'UI_INPUT', params: [1] };
+    this.keyMap.text[this.key.moveRight] = { signal: 'UI_INPUT', params: [2] };
+    this.keyMap.text[this.key.select] = { signal: 'UI_INPUT', params: [0] };
+    this.keyMap.text[this.key.back] = { signal: 'UI_INPUT', params: [-1] };
+    this.keyMap.text[this.key.space] = { signal: 'UI_INPUT', params: [' '] };
+    this.keyMap.text[this.key.minus] = { signal: 'UI_INPUT', params: ['-'] };
+    for (let i = 0; i < 26; i += 1) {
+      const char = String.fromCharCode(97 + i);
+      this.keyMap.text[this.key[char]] = { signal: 'UI_INPUT', params: [char] };
+    }
 
     // field key mapping, only allow if an owner entity is set
     if (this.owner) {

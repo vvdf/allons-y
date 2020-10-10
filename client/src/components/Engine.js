@@ -115,17 +115,32 @@ class Engine {
     this.eventQueue.defineEvent('RERENDER', () => { this.flagRerender = true; });
     this.eventQueue.defineEvent('DEBUG_MSG', (msg) => { console.log(msg); });
 
-    this.eventQueue.defineEvent('UI_COMMAND', (input) => {
-      if (input > 0) {
+    this.eventQueue.defineEvent('UI_SELECT', (input) => {
+      if (input === 2) {
         console.log('NEXT OPTION');
         this.ui.next();
-      } else if (input < 0) {
+      } else if (input === 1) {
         console.log('PREV OPTION');
         this.ui.prev();
       } else {
         console.log('SELECTING');
-        this.ui.select();
-        this.renderer.animate(['ui'], 'blinkOut', 50);
+        this.renderer.animate(['ui'], 'blinkOut', 50)
+        .then(() => this.ui.select());
+      }
+    });
+
+    this.eventQueue.defineEvent('UI_INPUT', (input) => {
+      if (typeof input === 'string') {
+        this.ui.add(input);
+      } else if (input === 1) {
+        this.ui.prev();
+      } else if (input === 2) {
+        this.ui.next();
+      } else if (input === -1) {
+        this.ui.delete();
+      } else {
+        console.log('ENTER');
+        // this.ui.select();
       }
     });
   }
@@ -134,6 +149,7 @@ class Engine {
     this.state(delta);
   }
 
+  // play states: play, mainMenu, characterCreation, waitForTextInput
   play(delta) {
     // play state function
     if (this.eventQueue.length > 0) {
@@ -159,8 +175,12 @@ class Engine {
 
   characterCreation(delta) {
     console.log('ENTERING CHAR CREATION MODE');
-    this.renderer.renderClearScreen();
-    
+    // this.renderer.renderClearScreen();
+    this.renderer.renderConsole(['NEW OFFICER NAME:', '>']);
+    this.input.setMode('text');
+    this.ui.setMode('text');
+    this.renderer.
+    this.state = this.play;
   }
 
   createEntity({
