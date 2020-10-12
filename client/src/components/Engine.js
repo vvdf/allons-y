@@ -126,13 +126,10 @@ class Engine {
 
     this.eventQueue.defineEvent('UI_SELECT', (input) => {
       if (input === 2) {
-        console.log('NEXT OPTION');
         this.ui.next();
       } else if (input === 1) {
-        console.log('PREV OPTION');
         this.ui.prev();
       } else {
-        console.log('SELECTING');
         this.renderer.animate(['ui'], 'blinkOut', 100)
           .then(() => this.ui.select());
       }
@@ -150,7 +147,6 @@ class Engine {
         this.ui.delete();
         this.messageLog.consoleInput = this.ui.getText();
       } else {
-        console.log('ENTER');
         this.ui.select();
       }
     });
@@ -180,7 +176,7 @@ class Engine {
   }
 
   mainMenu(delta) {
-    this.renderer.renderClearScreen();
+    this.renderer.clear();
     this.renderer.render();
     this.ui.newMenu([() => {
       this.state = this.characterCreation;

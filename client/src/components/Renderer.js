@@ -95,10 +95,23 @@ class Renderer {
       + (this.constants.tileHeight * dx) + (this.constants.tileHeight * dy);
   }
 
+  clear(...args) {
+    if (args.length > 0) {
+      args.forEach((renderModuleStr) => {
+        if (this.sprites[renderModuleStr]) {
+          this.game.stage.removeChild(this.sprites[renderModuleStr]);
+          this.sprites[renderModuleStr].destroy({ children: true });
+        }
+      });
+    } else {
+      this.clear('title', 'console', 'consoleText', 'ui', 'entities', 'map', 'bg');
+    }
+  }
+
   renderField() {
     // clear and re-render everything from scratch
     this.updateCameraPos();
-    this.renderClear();
+    this.clear('map', 'entities');
     this.renderMap();
     this.renderEntities();
   }
@@ -130,48 +143,6 @@ class Renderer {
   updateMapPos(dx, dy) {
     this.sprites.map.x += (this.constants.tileWidth * dx) - (this.constants.tileWidth * dy);
     this.sprites.map.y += (this.constants.tileHeight * dx) + (this.constants.tileHeight * dy);
-  }
-
-  renderClear() {
-    if (this.sprites.map) {
-      // clear map sprites, incl children of map container
-      this.game.stage.removeChild(this.sprites.map);
-      this.sprites.map.destroy({ children: true });
-    }
-
-    if (this.sprites.entities) {
-      // clear entity sprites
-      this.game.stage.removeChild(this.sprites.entities);
-      this.sprites.entities.destroy();
-    }
-  }
-
-  renderClearUI() {
-    if (this.sprites.ui) {
-      this.game.stage.removeChild(this.sprites.ui);
-      this.sprites.ui.destroy();
-    }
-  }
-
-  renderClearBG() {
-    if (this.sprites.bg) {
-      this.game.stage.removeChild(this.sprites.bg);
-      this.sprites.bg.destroy({ children: true });
-    }
-  }
-
-  renderClearTitle() {
-    if (this.sprites.title) {
-      this.game.stage.removeChild(this.sprites.title);
-      this.sprites.title.destroy();
-    }
-  }
-
-  renderClearScreen() {
-    this.renderClearBG();
-    this.renderClear();
-    this.renderClearUI();
-    this.renderClearTitle();
   }
 
   renderMap() {
@@ -229,7 +200,7 @@ class Renderer {
 
   renderMainUI() {
     // main menu screen, NEW OFFICER creation option -> officer creation + locale selection screen
-    this.renderClearScreen();
+    this.clear();
     this.sprites.title = new PIXI.Container();
     this.sprites.ui = new PIXI.Container();
     this.sprites.bg = new PIXI.Container();
@@ -300,7 +271,6 @@ class Renderer {
   renderBaseUI() {
     // clear screen first
     // base management/mission dispatch/loadout management etc UI
-    this.renderClear();
   }
 
   renderFieldUI() {
@@ -308,19 +278,9 @@ class Renderer {
   }
 
   renderConsole() {
-    if (this.sprites.console) {
-      this.game.stage.removeChild(this.sprites.console);
-      this.sprites.console.destroy({ children: true });
-    }
-
-    if (this.sprites.consoleText) {
-      this.game.stage.removeChild(this.sprites.consoleText);
-      this.sprites.consoleText.destroy({ children: true });
-    }
-
+    this.clear('console', 'consoleText');
     this.sprites.console = new PIXI.Container();
     this.sprites.consoleText = new PIXI.Container();
-
     const rect = PIXI.Sprite.from(PIXI.Texture.WHITE);
     rect.x = this.settings.width / 15;
     rect.y = this.settings.height / 15;
@@ -347,11 +307,7 @@ class Renderer {
   }
 
   updateConsoleText() {
-    if (this.sprites.consoleText) {
-      this.game.stage.removeChild(this.sprites.consoleText);
-      this.sprites.consoleText.destroy({ children: true });
-    }
-
+    this.clear('consoleText');
     this.sprites.consoleText = new PIXI.Container();
 
     const textLines = this.messageLog.consoleText.split('\n');
