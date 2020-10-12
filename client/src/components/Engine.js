@@ -24,17 +24,26 @@ class Engine {
       tileDepth: 10,
     };
 
+    this.playerName = '';
+    this.playerAreaName = '';
     this.playerEntityId = 1;
     this.state = this.mainMenu;
     this.eventQueue = new EventQueue();
     this.entities = [];
     this.playerEntity = {};
     this.entityIdMap = {};
+    this.messageLog = {}; // TODO - build a proper module for handling message in/out
     this.gameMap = new GameMap(40, 40, 'w');
     this.gameMap.load();
     this.input = new Input(this.eventQueue);
     this.ui = new UI();
-    this.renderer = new Renderer(this.settings, this.constants, this.entities, this.gameMap);
+    this.renderer = new Renderer(
+      this.settings,
+      this.constants,
+      this.entities,
+      this.gameMap,
+      this.messageLog,
+    );
     this.flagRerender = false;
     targetEle.appendChild(this.renderer.getView());
     this.renderer.setup()
@@ -124,23 +133,25 @@ class Engine {
         this.ui.prev();
       } else {
         console.log('SELECTING');
-        this.renderer.animate(['ui'], 'blinkOut', 50)
-        .then(() => this.ui.select());
+        this.renderer.animate(['ui'], 'blinkOut', 100)
+          .then(() => this.ui.select());
       }
     });
 
     this.eventQueue.defineEvent('UI_INPUT', (input) => {
       if (typeof input === 'string') {
         this.ui.add(input);
+        this.messageLog.consoleInput = this.ui.getText();
       } else if (input === 1) {
         this.ui.prev();
       } else if (input === 2) {
         this.ui.next();
       } else if (input === -1) {
         this.ui.delete();
+        this.messageLog.consoleInput = this.ui.getText();
       } else {
         console.log('ENTER');
-        // this.ui.select();
+        this.ui.select();
       }
     });
   }
@@ -169,18 +180,52 @@ class Engine {
   mainMenu(delta) {
     this.renderer.renderClearScreen();
     this.renderer.render();
-    this.ui.newMenu([() => { this.state = this.characterCreation; }]);
+    this.ui.newMenu([() => {
+      this.state = this.characterCreation;
+      this.ui.clear();
+    }]);
     this.state = this.play;
   }
 
   characterCreation(delta) {
-    console.log('ENTERING CHAR CREATION MODE');
-    // this.renderer.renderClearScreen();
-    this.renderer.renderConsole(['NEW OFFICER NAME:', '>']);
+    this.messageLog.consoleText = '> NEW OFFICER NAME:\n> '; // initializations
+    this.messageLog.consoleInput = '';
+    this.renderer.renderConsole();
     this.input.setMode('text');
+    let creationStep = 0;
+    this.ui.newMenu([() => {
+      const textLines = this.messageLog.consoleText.split('\n');
+      if (textLines > 24) {
+        this.messageLog.consoleText = textLines.slice(textLines.length - 24).join('\n');
+      }
+      let nextStepPromptText = '';
+
+      if (this.messageLog.consoleInput.length > 0) {
+        // acceptable input submitted
+        if (creationStep < 1) {
+          this.playerName = this.ui.getText();
+          nextStepPromptText = `AREA WHERE OFFICER [${this.playerName}] IS STATIONED:\n> `;
+        } else if (creationStep === 1) {
+          this.playerAreaName = this.ui.getText();
+          nextStepPromptText = `WELCOME, OFFICER [${this.playerName}] OF THE [${this.playerAreaName}] `
+          + `${this.playerName.length + this.playerAreaName.length > 24 ? '\n' : ''}DIVISION`;
+          this.ui.clear();
+          // this.state = this.startGame;
+        }
+        creationStep += 1;
+      }
+
+      this.messageLog.consoleText = `${this.messageLog.consoleText}`
+        + `${this.messageLog.consoleInput}\n> ${nextStepPromptText}`;
+      this.messageLog.consoleInput = '';
+      this.ui.clearInput();
+    }]);
     this.ui.setMode('text');
-    this.renderer.
     this.state = this.play;
+  }
+
+  startGame(delta) {
+
   }
 
   createEntity({
@@ -193,7 +238,7 @@ class Engine {
   }) {
     const createdEntity = new Entity(name, textureKey, x, y, this.gameMap, id);
     this.renderer.updateEntitySprite(id, textureKey);
-    this.entities.push(createdEntity);1
+    this.entities.push(createdEntity);
     this.entityIdMap[id] = createdEntity;
   }
 

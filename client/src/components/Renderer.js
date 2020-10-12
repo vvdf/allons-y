@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import * as Anim from './Animations';
 
 class Renderer {
-  constructor(settings, constants, entities, gameMap, ui) {
+  constructor(settings, constants, entities, gameMap, messageLog) {
     this.settings = settings;
     this.constants = constants;
     this.game = new PIXI.Application(this.settings);
@@ -12,7 +12,7 @@ class Renderer {
     this.entitySpriteMap = {};
     this.lastCameraPos = { x: 0, y: 0 };
     this.gameMap = gameMap;
-    this.ui = ui;
+    this.messageLog = messageLog;
     this.sprites = {};
     this.textures = {};
     this.loader = PIXI.Loader.shared;
@@ -235,6 +235,7 @@ class Renderer {
     this.sprites.bg = new PIXI.Container();
 
     // render backdrop
+    // TODO - expand on the procedural city generation and interaction
     const background = PIXI.Sprite.from(PIXI.Texture.WHITE);
     background.width = this.settings.width;
     background.height = this.settings.height;
@@ -306,7 +307,7 @@ class Renderer {
     // field aka combat UI with equipment, actions, health, turns, etc
   }
 
-  renderConsole(textArr) {
+  renderConsole() {
     if (this.sprites.console) {
       this.game.stage.removeChild(this.sprites.console);
       this.sprites.console.destroy({ children: true });
@@ -321,16 +322,17 @@ class Renderer {
     this.sprites.consoleText = new PIXI.Container();
 
     const rect = PIXI.Sprite.from(PIXI.Texture.WHITE);
-    rect.x = this.settings.width / 10;
-    rect.y = this.settings.height / 10;
+    rect.x = this.settings.width / 15;
+    rect.y = this.settings.height / 15;
     rect.width = this.settings.width - rect.x * 2;
     rect.height = this.settings.height - rect.y * 2;
     rect.tint = 0x030303;
 
     this.sprites.console.addChild(rect);
 
-    for (let i = 0; i < textArr.length; i += 1) {
-      const textLine = new PIXI.Text(textArr[i], {
+    const textLines = this.messageLog.consoleText.split('\n');
+    for (let i = 0; i < textLines.length; i += 1) {
+      const textLine = new PIXI.Text(textLines[i], {
         fontFamily: 'terminus', fontSize: 20, fill: 0xa0a0a0, align: 'left',
       });
 
@@ -349,6 +351,23 @@ class Renderer {
       this.game.stage.removeChild(this.sprites.consoleText);
       this.sprites.consoleText.destroy({ children: true });
     }
+
+    this.sprites.consoleText = new PIXI.Container();
+
+    const textLines = this.messageLog.consoleText.split('\n');
+    const startLine = textLines.length >= 24 ? textLines.length - 24 : 0;
+    for (let i = startLine; i < textLines.length; i += 1) {
+      const text = `${textLines[i]}${i === textLines.length - 1 ? this.messageLog.consoleInput : ''}`;
+      const textRender = new PIXI.Text(text, {
+        fontFamily: 'terminus', fontSize: 20, fill: 0xa0a0a0, align: 'left',
+      });
+
+      textRender.x = this.sprites.console.getChildAt(0).x + 5;
+      textRender.y = this.sprites.console.getChildAt(0).y + 5 + (i - startLine) * 18;
+      this.sprites.consoleText.addChild(textRender);
+    }
+
+    this.game.stage.addChild(this.sprites.consoleText);
   }
 
   animate(spriteKeyArr, animFuncKey, delay = 200) {
