@@ -160,7 +160,9 @@ class Engine {
     this.state(delta);
   }
 
-  // play states: play, mainMenu, characterCreation, waitForTextInput
+  // ----------------------------------
+  // game states
+  // ----------------------------------
   play(delta) {
     // play state function
     if (this.eventQueue.length > 0) {
@@ -228,6 +230,9 @@ class Engine {
 
   }
 
+  // ----------------------------------
+  // engine helper methods
+  // ----------------------------------
   createEntity({
     name = 'Generic Entity',
     textureKey = 'blank',
