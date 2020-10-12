@@ -1,9 +1,9 @@
 import { clamp } from './Utility';
 
 class UI {
-  constructor(uiSelectionsArr = [() => {}]) {
-    this.mode = 'menu'; // menu or text (input)
-    this.textMaxLength = 24;
+  constructor(uiSelectionsArr = [() => {}], mode = 'menu') {
+    this.mode = mode; // menu or text (input), default is menu
+    this.textMaxLength = 16;
     this.textInput = '';
     this.textIdx = -1;
     this.newMenu(uiSelectionsArr);
@@ -15,6 +15,12 @@ class UI {
     }
   }
 
+  newMenu(uiSelectionsArr, mode = 'menu') {
+    this.mode = mode;
+    this.menuOptions = uiSelectionsArr;
+    this.selectorIdx = 0;
+  }
+
   clear() {
     this.menuOptions = [() => {}];
     this.selectorIdx = 0;
@@ -23,9 +29,10 @@ class UI {
     this.mode = 'menu';
   }
 
-  newMenu(uiSelectionsArr) {
-    this.menuOptions = uiSelectionsArr;
+  clearInput() {
     this.selectorIdx = 0;
+    this.textInput = '';
+    this.textIdx = -1;
   }
 
   next() {
@@ -46,7 +53,7 @@ class UI {
 
   select() {
     this.menuOptions[this.selectorIdx]();
-    this.clear();
+    // this.clear();
   }
 
   delete() {
