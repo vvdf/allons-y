@@ -223,7 +223,8 @@ class Engine {
   }
 
   startGame(delta) {
-
+    // code to load game into base management screen
+    // TODO - possibly build a state change/clear function?
   }
 
   // ----------------------------------
