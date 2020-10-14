@@ -33,8 +33,8 @@ class Engine {
     this.playerEntity = {};
     this.entityIdMap = {};
     this.messageLog = {}; // TODO - build a proper module for handling message in/out
-    this.gameMap = new GameMap(40, 40, 'w');
-    this.gameMap.load();
+    this.gameMap = new GameMap(40, 40, 'g');
+    // this.gameMap.load();
     this.input = new Input(this.eventQueue);
     this.ui = new UI();
     this.renderer = new Renderer(
@@ -47,44 +47,11 @@ class Engine {
     this.flagRerender = false;
     targetEle.appendChild(this.renderer.getView());
     this.renderer.setup()
-      .then(() => this.init());
+      .then(() => this.initEvents());
     this.renderer.addToTicker((delta) => this.gameLoop(delta));
   }
 
-  init() {
-    // initialize game Engine variables/systems/assets
-
-    // create game camera as focus entity
-    // this.createEntity({
-    //   name: 'Camera',
-    //   textureKey: 'blank',
-    //   gameMap: this.gameMap,
-    //   id: 0,
-    // });
-    // axios.get('/registerClient')
-    //   .then(() => axios.get('/entity'))
-    //   .then((response) => {
-    //     console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
-    //     for (let i = 0; i < response.data.length; i += 1) {
-    //       this.createEntity(response.data[i]);
-    //     }
-    //     this.playerEntityId = this.entities[1].id;
-    //     this.input.setOwner(this.entities[1]);
-    //   })
-    //   .then(() => {
-    //     // initialize game loop and perform first render
-    //     // after initialization of player/camera/etc
-    //     this.centerCamera(false);
-
-    //     // initialize socket interface only after GET call occurs which
-    //     // should guarantee a CID cookie
-    //     const {
-    //       name, textureKey, x, y, gameMap, id,
-    //     } = this.entities[1];
-    //     this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
-    //     this.sio.emitOnConnect('gameEvent', { signal: 'NEW_ENTITY', params: [name, textureKey, x, y, gameMap, id] });
-    //   });
-
+  initEvents() {
     // define events for EventQueue/Reducer
     this.eventQueue.defineEvent('MOVE_ENTITY',
       (entityId, dx = 0, dy = 0) => {
@@ -152,6 +119,47 @@ class Engine {
     });
   }
 
+  initGame() {
+    // TODO - possibly build a state change/clear function?
+    // initialize game Engine variables/systems/assets
+
+    // create game camera as focus entity
+    this.createEntity({
+      name: 'Camera',
+      textureKey: 'blank',
+      gameMap: this.gameMap,
+      id: 0,
+    });
+
+    // TODO -- submit a character creation request to server to register character and location
+    // then assign to a guild/create guild if necessary
+
+    // change this to POST request with character name/location
+    axios.get('/registerClient')
+      .then(() => axios.get('/entity'))
+      .then((response) => {
+        console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
+        for (let i = 0; i < response.data.length; i += 1) {
+          this.createEntity(response.data[i]);
+        }
+        this.playerEntityId = this.entities[1].id;
+        this.input.setOwner(this.entities[1]);
+      })
+      .then(() => {
+        // initialize game loop and perform first render
+        // after initialization of player/camera/etc
+        this.centerCamera(false);
+
+        // initialize socket interface only after GET call occurs which
+        // should guarantee a CID cookie
+        const {
+          name, textureKey, x, y, gameMap, id,
+        } = this.entities[1];
+        this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
+        this.sio.emitOnConnect('gameEvent', { signal: 'NEW_ENTITY', params: [name, textureKey, x, y, gameMap, id] });
+      });
+  }
+
   gameLoop(delta) {
     this.state(delta);
   }
@@ -208,7 +216,8 @@ class Engine {
           nextStepPromptText = `WELCOME, OFFICER [${this.playerName}] OF THE [${this.playerAreaName}] `
           + `${this.playerName.length + this.playerAreaName.length > 24 ? '\n' : ''}DIVISION`;
           this.ui.clear();
-          // this.state = this.startGame;
+          // initGame();
+          // this.state = this.openMenu;
         }
         creationStep += 1;
       }
@@ -222,9 +231,8 @@ class Engine {
     this.state = this.play;
   }
 
-  startGame(delta) {
+  baseMenu(delta) {
     // code to load game into base management screen
-    // TODO - possibly build a state change/clear function?
   }
 
   // ----------------------------------
