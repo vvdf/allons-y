@@ -24,10 +24,11 @@ class Engine {
       tileDepth: 10,
     };
 
+    this.userID = '';
     this.playerName = '';
     this.playerAreaName = '';
     this.playerEntityId = 1;
-    this.state = this.mainMenu;
+    this.state = this.startGame;
     this.eventQueue = new EventQueue();
     this.entities = [];
     this.playerEntity = {};
@@ -37,6 +38,7 @@ class Engine {
     // this.gameMap.load();
     this.input = new Input(this.eventQueue);
     this.ui = new UI();
+    this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
     this.renderer = new Renderer(
       this.settings,
       this.constants,
@@ -47,8 +49,8 @@ class Engine {
     this.flagRerender = false;
     targetEle.appendChild(this.renderer.getView());
     this.renderer.setup()
-      .then(() => this.initEvents());
-    this.renderer.addToTicker((delta) => this.gameLoop(delta));
+      .then(() => this.initEvents())
+      .then(() => this.renderer.addToTicker((delta) => this.gameLoop(delta)));
   }
 
   initEvents() {
@@ -127,7 +129,6 @@ class Engine {
     this.createEntity({
       name: 'Camera',
       textureKey: 'blank',
-      gameMap: this.gameMap,
       id: 0,
     });
 
@@ -135,7 +136,7 @@ class Engine {
     // then assign to a guild/create guild if necessary
 
     // change this to POST request with character name/location
-    axios.get('/registerClient')
+    axios.post('/client', { name: this.playerName, area: this.playerAreaName })
       .then(() => axios.get('/entity'))
       .then((response) => {
         console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
@@ -146,7 +147,6 @@ class Engine {
         this.input.setOwner(this.entities[1]);
       })
       .then(() => {
-        // initialize game loop and perform first render
         // after initialization of player/camera/etc
         this.centerCamera(false);
 
@@ -183,6 +183,31 @@ class Engine {
     }
   }
 
+  startGame(delta) {
+    // determine if game is loading or enters main menu
+    axios.get('/client')
+      .then((clientData) => {
+        if (clientData.found) {
+          // user id AND living entity found, jump to base menu
+          axios.get('/entity')
+            .then(({ data }) => {
+              this.createEntity({ name: 'Camera', id: 0 });
+              this.createEntity(data);
+              if (data.gameMap === 'world') {
+                this.state = this.baseMenu;
+              } else {
+                this.state = this.fieldMode;
+              }
+            });
+        } else {
+          // user id not found, new user id assigned, go to main menu
+          this.state = this.mainMenu;
+        }
+        this.userID = clientData.userID;
+      });
+    this.state = this.play;
+  }
+
   mainMenu(delta) {
     this.renderer.clear();
     this.renderer.render();
@@ -194,6 +219,8 @@ class Engine {
   }
 
   characterCreation(delta) {
+    let playerName = '';
+    let playerAreaName = '';
     this.messageLog.consoleText = '> NEW OFFICER NAME:\n> '; // initializations
     this.messageLog.consoleInput = '';
     this.renderer.renderConsole();
@@ -209,15 +236,27 @@ class Engine {
       if (this.messageLog.consoleInput.length > 0) {
         // acceptable input submitted
         if (creationStep < 1) {
-          this.playerName = this.ui.getText();
-          nextStepPromptText = `AREA WHERE OFFICER [${this.playerName}] IS STATIONED:\n> `;
+          playerName = this.ui.getText();
+          nextStepPromptText = `AREA WHERE OFFICER [${playerName}] IS STATIONED:\n> `;
         } else if (creationStep === 1) {
-          this.playerAreaName = this.ui.getText();
-          nextStepPromptText = `WELCOME, OFFICER [${this.playerName}] OF THE [${this.playerAreaName}] `
-          + `${this.playerName.length + this.playerAreaName.length > 24 ? '\n' : ''}DIVISION`;
+          playerAreaName = this.ui.getText();
+          nextStepPromptText = `WELCOME, OFFICER [${playerName}] OF THE [${playerAreaName}] `
+          + `${playerName.length + playerAreaName.length > 24 ? '\n' : ''}DIVISION`;
           this.ui.clear();
-          // initGame();
-          // this.state = this.openMenu;
+          axios.post('/entity', { name: playerName, area: playerAreaName })
+            .then(() => {
+              axios.get('/entity')
+                .then(({ data }) => {
+                  this.createEntity({ name: 'Camera', id: 0 });
+                  this.createEntity(data);
+                  console.log(this.entities);
+                  if (data.gameMap === 'world') {
+                    this.state = this.baseMenu;
+                  } else {
+                    this.state = this.fieldMode;
+                  }
+                });
+            });
         }
         creationStep += 1;
       }
@@ -235,6 +274,10 @@ class Engine {
     // code to load game into base management screen
   }
 
+  fieldMode(delta) {
+    // code to load game into field
+  }
+
   // ----------------------------------
   // engine helper methods
   // ----------------------------------
@@ -243,7 +286,6 @@ class Engine {
     textureKey = 'blank',
     x = 0,
     y = 0,
-    gameMap = this.gameMap,
     id = 1,
   }) {
     const createdEntity = new Entity(name, textureKey, x, y, this.gameMap, id);

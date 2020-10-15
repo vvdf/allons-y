@@ -13,48 +13,80 @@ app.use(express.json());
 
 // client id : entity id map
 // TODO - to be reformatted into DBMS
+// TODO - refactor for UserID and SessionID management once a proper
+//   login/register interface is implemented on the front end
+// TODO - build character, uid, etc generation utility methods
 const clients = {};
 const mapCache = {};
 const entities = {};
 
 app.use('/', express.static(path.join(__dirname, '..', 'client', 'dist')));
 
-app.get('/registerClient', (req, res) => {
+app.get('/client', (req, res) => {
   const { cid } = parseCookies(req.headers.cookie);
   const clientId = cid || `CID${Math.random().toString(36).substring(6)}`;
-  res.cookie('cid', clientId).status(200).send('CID attached in cookie');
+  const responseData = {
+    found: {}.hasOwnProperty.call(clients, clientId) // ret true if client exists
+      && {}.hasOwnProperty.call(clients[clientId], 'eid'), // AND client has entity
+    userID: clientId,
+  };
+  res.cookie('cid', clientId).status(200).send(responseData);
+});
+
+app.post('/entity', (req, res) => {
+  const { cid } = parseCookies(req.headers.cookie);
+  const eid = `EID${req.body.name.toUpperCase() + Math.random().toString(36).substring(6)}`;
+  console.log(req.body);
+  const playerEntity = {
+    id: eid,
+    name: req.body.name,
+    textureKey: 'player',
+    x: 0,
+    y: 0,
+    gameMap: 'world',
+    guild: req.body.area,
+  };
+
+  if (!{}.hasOwnProperty.call(clients, cid)) {
+    clients[cid] = {};
+  }
+  clients[cid].eid = eid;
+  entities[eid] = playerEntity;
+  res.status(200).send();
 });
 
 // load all entities, starting with player (will be empty if cid not found/registered)
 app.get('/entity', (req, res) => {
   const { cid } = parseCookies(req.headers.cookie);
-  const entityList = [];
-  if (cid && clients[cid] && clients[cid].eid) {
-    // player character found, add to start of entity list
-    entityList.push(entities[clients[cid].eid]);
-  } else {
-    // no player character OR no cid found, create and send one
-    // TODO - build real generator functions for server
-    const name = `Apron${Math.random().toString(36).substring(6)}`;
-    const entityId = `EID${name.toUpperCase() + Math.random().toString(36).substring(6)}`;
-    const playerEntityBase = {
-      id: entityId,
-      name,
-      textureKey: 'player',
-      x: 0,
-      y: 0,
-      gameMap: 0,
-    };
-    entityList.push(playerEntityBase);
-    entities[entityId] = playerEntityBase;
-    clients[cid] = { eid: entityId };
-  }
-  Object.keys(entities).forEach((key) => {
-    if (key !== clients[cid].eid) {
-      entityList.push(entities[key]);
-    }
-  });
-  res.status(200).send(entityList);
+  // TODO - read map of current entity and return list of all visible entities
+  res.status(200).send(entities[clients[cid].eid]);
+  // const entityList = [];
+  // if (cid && clients[cid] && clients[cid].eid) {
+  //   // player character found, add to start of entity list
+  //   entityList.push(entities[clients[cid].eid]);
+  // } else {
+  //   // no player character OR no cid found, create and send one
+  //   // TODO - build real generator functions for server
+  //   const name = `Apron${Math.random().toString(36).substring(6)}`;
+  //   const entityId = `EID${name.toUpperCase() + Math.random().toString(36).substring(6)}`;
+  //   const playerEntityBase = {
+  //     id: entityId,
+  //     name,
+  //     textureKey: 'player',
+  //     x: 0,
+  //     y: 0,
+  //     gameMap: 0,
+  //   };
+  //   entityList.push(playerEntityBase);
+  //   entities[entityId] = playerEntityBase;
+  //   clients[cid] = { eid: entityId };
+  // }
+  // Object.keys(entities).forEach((key) => {
+  //   if (key !== clients[cid].eid) {
+  //     entityList.push(entities[key]);
+  //   }
+  // });
+  // res.status(200).send(entityList);
 });
 
 // map saving
