@@ -25,6 +25,10 @@ app.use('/', express.static(path.join(__dirname, '..', 'client', 'dist')));
 app.get('/client', (req, res) => {
   const { cid } = parseCookies(req.headers.cookie);
   const clientId = cid || `CID${Math.random().toString(36).substring(6)}`;
+  console.log(clientId, Object.keys(clients));
+  if (clients[clientId]) {
+    console.log(clients[clientId]);
+  }
   const responseData = {
     found: {}.hasOwnProperty.call(clients, clientId) // ret true if client exists
       && {}.hasOwnProperty.call(clients[clientId], 'eid'), // AND client has entity
@@ -35,15 +39,17 @@ app.get('/client', (req, res) => {
 
 app.post('/entity', (req, res) => {
   const { cid } = parseCookies(req.headers.cookie);
+  console.log('REGISTERING NEW ENTITY FOR CLIENT: ', cid);
+  const obj = parseCookies(req.headers.cookie);
+  console.log(obj);
   const eid = `EID${req.body.name.toUpperCase() + Math.random().toString(36).substring(6)}`;
-  console.log(req.body);
   const playerEntity = {
     id: eid,
     name: req.body.name,
     textureKey: 'player',
     x: 0,
     y: 0,
-    gameMap: 'world',
+    map: 'world',
     guild: req.body.area,
   };
 
@@ -52,6 +58,7 @@ app.post('/entity', (req, res) => {
   }
   clients[cid].eid = eid;
   entities[eid] = playerEntity;
+  console.log(clients);
   res.status(200).send();
 });
 

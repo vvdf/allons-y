@@ -7,7 +7,7 @@ class Renderer {
     this.constants = constants;
     this.game = new PIXI.Application(this.settings);
     this.render = this.renderMainUI;
-    this.update = this.updateUI;
+    this.update = this.updateMainUI;
     this.entities = entities;
     this.entitySpriteMap = {};
     this.lastCameraPos = { x: 0, y: 0 };
@@ -59,6 +59,11 @@ class Renderer {
           }
         });
     });
+  }
+
+  setMode(modeStr) {
+    this.render = this[`render${modeStr}`];
+    this.update = this[`update${modeStr}`];
   }
 
   addToTicker(callback) {
@@ -116,7 +121,10 @@ class Renderer {
     this.renderEntities();
   }
 
-  updateUI() {
+  updateMainUI() {
+  }
+
+  updateBaseUI() {
   }
 
   updateConsole() {

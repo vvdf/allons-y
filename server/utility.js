@@ -1,6 +1,7 @@
 const parseCookies = (cookieString = '') => {
   const result = {};
-  cookieString.split(';').forEach((val) => {
+  const cookieStringFixed = cookieString.replace(' ', '');
+  cookieStringFixed.split(';').forEach((val) => {
     const [name, value] = val.split('=');
     result[name] = value;
   });

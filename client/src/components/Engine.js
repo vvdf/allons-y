@@ -25,15 +25,13 @@ class Engine {
     };
 
     this.userID = '';
-    this.playerName = '';
-    this.playerAreaName = '';
-    this.playerEntityId = 1;
     this.state = this.startGame;
     this.eventQueue = new EventQueue();
     this.entities = [];
     this.playerEntity = {};
     this.entityIdMap = {};
     this.messageLog = {}; // TODO - build a proper module for handling message in/out
+    this.currentMap = 'world';
     this.gameMap = new GameMap(40, 40, 'g');
     // this.gameMap.load();
     this.input = new Input(this.eventQueue);
@@ -58,7 +56,7 @@ class Engine {
     this.eventQueue.defineEvent('MOVE_ENTITY',
       (entityId, dx = 0, dy = 0) => {
         this.entityIdMap[entityId].move(dx, dy);
-        if (entityId === this.playerEntityId) {
+        if (entityId === this.entities[1].id) {
           // if entity moved is player, move camera also
           this.entityIdMap[0].move(dx, dy);
           this.sio.emit('gameEvent', { signal: 'MOVE_ENTITY', params: [entityId, dx, dy] });
@@ -82,7 +80,7 @@ class Engine {
     this.eventQueue.defineEvent('PAINT_MAP',
       (entityId, tile) => {
         this.gameMap.set(this.entityIdMap[entityId].x, this.entityIdMap[entityId].y, tile);
-        if (entityId === this.playerEntityId) {
+        if (entityId === this.entities[1].id) {
           // only emit signal if you're the creator of it
           this.sio.emit('gameEvent', { signal: 'PAINT_MAP', params: [entityId, tile] });
         }
@@ -187,14 +185,17 @@ class Engine {
     // determine if game is loading or enters main menu
     axios.get('/client')
       .then((clientData) => {
-        if (clientData.found) {
+        if (clientData.data.found) {
           // user id AND living entity found, jump to base menu
           axios.get('/entity')
             .then(({ data }) => {
               this.createEntity({ name: 'Camera', id: 0 });
               this.createEntity(data);
-              if (data.gameMap === 'world') {
-                this.state = this.baseMenu;
+              this.currentMap = data.map;
+              this.input.setOwner(this.entities[1]);
+              if (data.map === 'world') {
+                this.state = this.worldMap;
+                // this.state = this.baseMenu;
               } else {
                 this.state = this.fieldMode;
               }
@@ -249,12 +250,20 @@ class Engine {
                 .then(({ data }) => {
                   this.createEntity({ name: 'Camera', id: 0 });
                   this.createEntity(data);
-                  console.log(this.entities);
-                  if (data.gameMap === 'world') {
-                    this.state = this.baseMenu;
-                  } else {
-                    this.state = this.fieldMode;
-                  }
+                  this.currentMap = data.map;
+                  this.input.setOwner(this.entities[1]);
+                  this.ui.clear();
+                  this.ui.newMenu([() => {
+                    if (this.currentMap === 'world') {
+                      console.log('Entering World');
+                      this.state = this.worldMap;
+                      // this.state = this.baseMenu;
+                    } else {
+                      console.log('Entering Field');
+                      this.state = this.fieldMode;
+                    }
+                    this.ui.clear();
+                  }]);
                 });
             });
         }
@@ -272,6 +281,15 @@ class Engine {
 
   baseMenu(delta) {
     // code to load game into base management screen
+  }
+
+  worldMap(delta) {
+    this.renderer.setMode('Field');
+    this.renderer.clear();
+    this.renderer.render();
+    this.input.setMode('field');
+    this.centerCamera();
+    this.state = this.play;
   }
 
   fieldMode(delta) {
