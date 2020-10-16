@@ -36,7 +36,6 @@ class Engine {
     // this.gameMap.load();
     this.input = new Input(this.eventQueue);
     this.ui = new UI();
-    this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
     this.renderer = new Renderer(
       this.settings,
       this.constants,
@@ -193,6 +192,7 @@ class Engine {
               this.createEntity(data);
               this.currentMap = data.map;
               this.input.setOwner(this.entities[1]);
+              this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
               if (data.map === 'world') {
                 this.state = this.worldMap;
                 // this.state = this.baseMenu;
@@ -252,6 +252,7 @@ class Engine {
                   this.createEntity(data);
                   this.currentMap = data.map;
                   this.input.setOwner(this.entities[1]);
+                  this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
                   this.ui.clear();
                   this.ui.newMenu([() => {
                     if (this.currentMap === 'world') {
