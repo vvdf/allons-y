@@ -289,12 +289,7 @@ class Renderer {
     this.clear('console', 'consoleText');
     this.sprites.console = new PIXI.Container();
     this.sprites.consoleText = new PIXI.Container();
-    const rect = PIXI.Sprite.from(PIXI.Texture.WHITE);
-    rect.x = this.settings.width / 15;
-    rect.y = this.settings.height / 15;
-    rect.width = this.settings.width - rect.x * 2;
-    rect.height = this.settings.height - rect.y * 2;
-    rect.tint = 0x030303;
+    const rect = this.createSubRect(0x030303, this.settings.width / 20, 0.5);
 
     this.sprites.console.addChild(rect);
 
@@ -332,6 +327,19 @@ class Renderer {
     }
 
     this.game.stage.addChild(this.sprites.consoleText);
+  }
+
+  createSubRect(color = 0xFFFFFF, pixelMargin = 0, alpha = 1) {
+    // create a simple subordinate rectangle using a passed in px margin
+    // as compared to the main window
+    const rect = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    rect.x = pixelMargin;
+    rect.y = pixelMargin;
+    rect.width = this.settings.width - rect.x * 2;
+    rect.height = this.settings.height - rect.y * 2;
+    rect.tint = color;
+    rect.alpha = alpha;
+    return rect;
   }
 
   animate(spriteKeyArr, animFuncKey, delay = 200) {
