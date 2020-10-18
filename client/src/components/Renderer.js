@@ -279,6 +279,12 @@ class Renderer {
   renderBaseUI() {
     // clear screen first
     // base management/mission dispatch/loadout management etc UI
+    this.clear('ui');
+    this.sprites.ui = new PIXI.Container();
+    const rect = this.createSubRect(0x020202, this.settings.width / 30, 0.8);
+
+    this.sprites.ui.addChild(rect);
+    this.game.stage.addChild(this.sprites.ui);
   }
 
   renderFieldUI() {
