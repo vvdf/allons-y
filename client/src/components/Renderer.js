@@ -73,11 +73,7 @@ class Renderer {
   removeFromTicker(callback) {
     this.game.ticker.remove(callback);
   }
-
-  updateEntitySprite(id, textureKey) {
-    this.entitySpriteMap[id] = new PIXI.Sprite(this.textures[textureKey]);
-  }
-
+  
   getView() {
     return this.game.view;
   }
@@ -113,6 +109,18 @@ class Renderer {
     }
   }
 
+  hide(...args) {
+    if (args.length > 0) {
+      args.forEach((renderModuleStr) => {
+        if (this.sprites[renderModuleStr]) {
+          this.sprites[renderModuleStr].alpha = 0;
+        }
+      });
+    } else {
+      this.hide('title', 'console', 'consoleText', 'ui', 'entities', 'map', 'bg');
+    }
+  }
+
   renderField() {
     // clear and re-render everything from scratch
     this.updateCameraPos();
@@ -138,7 +146,7 @@ class Renderer {
     const cameraDy = this.lastCameraPos.y - this.entities[0].y;
     this.updateCameraPos();
     this.updateMapPos(cameraDx, cameraDy);
-    this.renderEntities();
+    this.updateEntities();
   }
 
   updateCameraPos() {
@@ -155,6 +163,7 @@ class Renderer {
 
   renderMap() {
     this.sprites.map = new PIXI.Container();
+    // using frame steps to stagger water animations when rendering multiple
     let waterStep = 0;
     for (let y = 0; y < this.gameMap.height; y += 1) {
       for (let x = 0; x < this.gameMap.width; x += 1) {
@@ -194,16 +203,29 @@ class Renderer {
     this.sprites.entities = new PIXI.Container();
     for (let i = 1; i < this.entities.length; i += 1) {
       // start at 1, as camera is 0 and is always blank
-      const sprite = this.entitySpriteMap[this.entities[i].id];
+      // const sprite = this.entitySpriteMap[this.entities[i].id];
+      // TODO - add validity check to assure key exists, else blank or default
+      const sprite = new PIXI.Sprite(this.textures[this.entities[i].textureKey]);
       const dx = this.entities[i].x - this.entities[0].x;
       const dy = this.entities[i].y - this.entities[0].y;
       sprite.x = this.gridToViewX(sprite, dx, dy);
       sprite.y = this.gridToViewY(sprite, dx, dy, true);
+      delete this.entities[i].sprite;
+      this.entities[i].sprite = sprite;
 
       this.sprites.entities.addChild(sprite);
     }
 
     this.game.stage.addChild(this.sprites.entities);
+  }
+
+  updateEntities() {
+    for (let i = 1; i < this.entities.length; i += 1) {
+      const dx = this.entities[i].x - this.entities[0].x;
+      const dy = this.entities[i].y - this.entities[0].y;
+      this.entities[i].sprite.x = this.gridToViewX(this.entities[i].sprite, dx, dy);
+      this.entities[i].sprite.y = this.gridToViewY(this.entities[i].sprite, dx, dy, true);
+    }
   }
 
   renderMainUI() {
@@ -351,10 +373,15 @@ class Renderer {
   animate(spriteKeyArr, animFuncKey, delay = 200) {
     const animPromises = [];
     for (let i = 0; i < spriteKeyArr.length; i += 1) {
+      const spriteKeys = spriteKeyArr[i].split('/');
+      const spriteLayer = spriteKeys.length > 1
+        ? this.sprites[spriteKeys[0]][spriteKeys[1]]
+        : this.sprites[spriteKeys[0]];
+      console.log(spriteKeys);
       animPromises.push(new Promise((resolve) => {
-        this.game.stage.addChild(this.sprites[spriteKeyArr[i]]);
+        this.game.stage.addChild(spriteLayer);
         const animTick = (delta) => {
-          Anim[animFuncKey](delta, this.sprites[spriteKeyArr[i]], delay, () => {
+          Anim[animFuncKey](delta, spriteLayer, delay, () => {
             this.removeFromTicker(animTick);
             resolve();
           });

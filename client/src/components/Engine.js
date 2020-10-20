@@ -118,45 +118,6 @@ class Engine {
     });
   }
 
-  initGame() {
-    // TODO - possibly build a state change/clear function?
-    // initialize game Engine variables/systems/assets
-
-    // create game camera as focus entity
-    this.createEntity({
-      name: 'Camera',
-      textureKey: 'blank',
-      id: 0,
-    });
-
-    // TODO -- submit a character creation request to server to register character and location
-    // then assign to a guild/create guild if necessary
-
-    // change this to POST request with character name/location
-    axios.post('/client', { name: this.playerName, area: this.playerAreaName })
-      .then(() => axios.get('/entity'))
-      .then((response) => {
-        console.log('TOTAL ENTITIES RECEIVED: ', response.data.length);
-        for (let i = 0; i < response.data.length; i += 1) {
-          this.createEntity(response.data[i]);
-        }
-        this.playerEntityId = this.entities[1].id;
-        this.input.setOwner(this.entities[1]);
-      })
-      .then(() => {
-        // after initialization of player/camera/etc
-        this.centerCamera(false);
-
-        // initialize socket interface only after GET call occurs which
-        // should guarantee a CID cookie
-        const {
-          name, textureKey, x, y, gameMap, id,
-        } = this.entities[1];
-        this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
-        this.sio.emitOnConnect('gameEvent', { signal: 'NEW_ENTITY', params: [name, textureKey, x, y, gameMap, id] });
-      });
-  }
-
   gameLoop(delta) {
     this.state(delta);
   }
@@ -288,6 +249,12 @@ class Engine {
     this.renderer.setMode('Field');
     this.renderer.clear();
     this.renderer.render();
+    this.renderer.hide('map', 'entities');
+    console.log(this.renderer.sprites.map, this.renderer.sprites.entities);
+    this.renderer.animate(['map', 'entities'], 'fadeIn', 500)
+      .then(() => {
+        console.log(this.renderer.sprites.map, this.renderer.sprites.entities);
+      });
     this.input.setMode('field');
     this.centerCamera();
     this.state = this.play;
@@ -308,7 +275,6 @@ class Engine {
     id = 1,
   }) {
     const createdEntity = new Entity(name, textureKey, x, y, this.gameMap, id);
-    this.renderer.updateEntitySprite(id, textureKey);
     this.entities.push(createdEntity);
     this.entityIdMap[id] = createdEntity;
   }
