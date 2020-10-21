@@ -73,7 +73,7 @@ class Renderer {
   removeFromTicker(callback) {
     this.game.ticker.remove(callback);
   }
-  
+
   getView() {
     return this.game.view;
   }
@@ -129,16 +129,6 @@ class Renderer {
     this.renderEntities();
   }
 
-  updateMainUI() {
-  }
-
-  updateBaseUI() {
-  }
-
-  updateConsole() {
-    this.ui.getText();
-  }
-
   updateField() {
     // if no major state changes (ie death)/new entities
     // just shift sprites around instead
@@ -149,16 +139,17 @@ class Renderer {
     this.updateEntities();
   }
 
+  updateMainUI() {
+  }
+
+  updateBaseUI() {
+  }
+
   updateCameraPos() {
     this.lastCameraPos = {
       x: this.entities[0].x,
       y: this.entities[0].y,
     };
-  }
-
-  updateMapPos(dx, dy) {
-    this.sprites.map.x += (this.constants.tileWidth * dx) - (this.constants.tileWidth * dy);
-    this.sprites.map.y += (this.constants.tileHeight * dx) + (this.constants.tileHeight * dy);
   }
 
   renderMap() {
