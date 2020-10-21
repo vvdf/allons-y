@@ -6,8 +6,8 @@ class Renderer {
     this.settings = settings;
     this.constants = constants;
     this.game = new PIXI.Application(this.settings);
-    this.render = this.renderMainUI;
-    this.update = this.updateMainUI;
+    this.render = this.mainUIRender;
+    this.update = this.mainUIUpdate;
     this.entities = entities;
     this.entitySpriteMap = {};
     this.lastCameraPos = { x: 0, y: 0 };
@@ -61,9 +61,12 @@ class Renderer {
     });
   }
 
+  // ----------------------------------
+  // renderer helper methods
+  // ----------------------------------
   setMode(modeStr) {
-    this.render = this[`render${modeStr}`];
-    this.update = this[`update${modeStr}`];
+    this.render = this[`${modeStr}Render`];
+    this.update = this[`${modeStr}Update`];
   }
 
   addToTicker(callback) {
@@ -121,30 +124,6 @@ class Renderer {
     }
   }
 
-  renderField() {
-    // clear and re-render everything from scratch
-    this.updateCameraPos();
-    this.clear('map', 'entities');
-    this.renderMap();
-    this.renderEntities();
-  }
-
-  updateField() {
-    // if no major state changes (ie death)/new entities
-    // just shift sprites around instead
-    const cameraDx = this.lastCameraPos.x - this.entities[0].x;
-    const cameraDy = this.lastCameraPos.y - this.entities[0].y;
-    this.updateCameraPos();
-    this.updateMapPos(cameraDx, cameraDy);
-    this.updateEntities();
-  }
-
-  updateMainUI() {
-  }
-
-  updateBaseUI() {
-  }
-
   updateCameraPos() {
     this.lastCameraPos = {
       x: this.entities[0].x,
@@ -152,74 +131,49 @@ class Renderer {
     };
   }
 
-  renderMap() {
-    this.sprites.map = new PIXI.Container();
-    // using frame steps to stagger water animations when rendering multiple
-    let waterStep = 0;
-    for (let y = 0; y < this.gameMap.height; y += 1) {
-      for (let x = 0; x < this.gameMap.width; x += 1) {
-        const dx = x - this.entities[0].x;
-        const dy = y - this.entities[0].y;
-        let tile;
-        if (this.gameMap.get(x, y) === 'g') {
-          tile = new PIXI.Sprite(this.textures.grass);
-        } else if (this.gameMap.get(x, y) === 'r') {
-          tile = new PIXI.Sprite(this.textures.road);
-        } else if (this.gameMap.get(x, y) === 'd') {
-          tile = new PIXI.Sprite(this.textures.dirt);
-        } else if (this.gameMap.get(x, y) === 'w') {
-          if (waterStep === 0) {
-            tile = new PIXI.AnimatedSprite(this.textures.water1);
-          } else if (waterStep === 1) {
-            tile = new PIXI.AnimatedSprite(this.textures.water2);
-          } else {
-            tile = new PIXI.AnimatedSprite(this.textures.water3);
-          }
-          waterStep = (waterStep + 3) % 7;
-          tile.animationSpeed = 0.05;
-          tile.play();
-        }
-
-        tile.x = this.gridToViewX(tile, dx, dy);
-        tile.y = this.gridToViewY(tile, dx, dy);
-
-        this.sprites.map.addChild(tile);
-      }
-    }
-
-    this.game.stage.addChild(this.sprites.map);
+  updateMapPos(dx, dy) {
+    this.sprites.map.x += (this.constants.tileWidth * dx) - (this.constants.tileWidth * dy);
+    this.sprites.map.y += (this.constants.tileHeight * dx) + (this.constants.tileHeight * dy);
   }
 
-  renderEntities() {
-    this.sprites.entities = new PIXI.Container();
-    for (let i = 1; i < this.entities.length; i += 1) {
-      // start at 1, as camera is 0 and is always blank
-      // const sprite = this.entitySpriteMap[this.entities[i].id];
-      // TODO - add validity check to assure key exists, else blank or default
-      const sprite = new PIXI.Sprite(this.textures[this.entities[i].textureKey]);
-      const dx = this.entities[i].x - this.entities[0].x;
-      const dy = this.entities[i].y - this.entities[0].y;
-      sprite.x = this.gridToViewX(sprite, dx, dy);
-      sprite.y = this.gridToViewY(sprite, dx, dy, true);
-      delete this.entities[i].sprite;
-      this.entities[i].sprite = sprite;
-
-      this.sprites.entities.addChild(sprite);
-    }
-
-    this.game.stage.addChild(this.sprites.entities);
+  createSubRect(color = 0xFFFFFF, pixelMargin = 0, alpha = 1) {
+    // create a simple subordinate rectangle using a passed in px margin
+    // as compared to the main window
+    const rect = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    rect.x = pixelMargin;
+    rect.y = pixelMargin;
+    rect.width = this.settings.width - rect.x * 2;
+    rect.height = this.settings.height - rect.y * 2;
+    rect.tint = color;
+    rect.alpha = alpha;
+    return rect;
   }
 
-  updateEntities() {
-    for (let i = 1; i < this.entities.length; i += 1) {
-      const dx = this.entities[i].x - this.entities[0].x;
-      const dy = this.entities[i].y - this.entities[0].y;
-      this.entities[i].sprite.x = this.gridToViewX(this.entities[i].sprite, dx, dy);
-      this.entities[i].sprite.y = this.gridToViewY(this.entities[i].sprite, dx, dy, true);
+  animate(spriteKeyArr, animFuncKey, delay = 200) {
+    const animPromises = [];
+    for (let i = 0; i < spriteKeyArr.length; i += 1) {
+      const spriteKeys = spriteKeyArr[i].split('/');
+      const spriteLayer = spriteKeys.length > 1
+        ? this.sprites[spriteKeys[0]][spriteKeys[1]]
+        : this.sprites[spriteKeys[0]];
+      animPromises.push(new Promise((resolve) => {
+        this.game.stage.addChild(spriteLayer);
+        const animTick = (delta) => {
+          Anim[animFuncKey](delta, spriteLayer, delay, () => {
+            this.removeFromTicker(animTick);
+            resolve();
+          });
+        };
+        this.addToTicker(animTick);
+      }));
     }
+    return Promise.all(animPromises);
   }
 
-  renderMainUI() {
+  // ----------------------------------
+  // render/update logic for game states
+  // ----------------------------------
+  mainUIRender() {
     // main menu screen, NEW OFFICER creation option -> officer creation + locale selection screen
     this.clear();
     this.sprites.title = new PIXI.Container();
@@ -289,7 +243,11 @@ class Renderer {
       .then(() => this.animate(['ui'], 'fadeIn', 30));
   }
 
-  renderBaseUI() {
+  mainUIUpdate() {
+    console.log('test');
+  }
+
+  baseUIRender() {
     // clear screen first
     // base management/mission dispatch/loadout management etc UI
     this.clear('ui');
@@ -300,11 +258,104 @@ class Renderer {
     this.game.stage.addChild(this.sprites.ui);
   }
 
-  renderFieldUI() {
-    // field aka combat UI with equipment, actions, health, turns, etc
+  baseUIUpdate() {
   }
 
-  renderConsole() {
+  fieldUIRender() {
+  }
+
+  fieldUIUpdate() {
+  }
+
+  fieldRender() {
+    // clear and re-render everything from scratch
+    this.updateCameraPos();
+    this.clear('map', 'entities');
+    this.mapRender();
+    this.entitiesRender();
+  }
+
+  fieldUpdate() {
+    // if no major state changes (ie death)/new entities
+    // just shift sprites around instead
+    const cameraDx = this.lastCameraPos.x - this.entities[0].x;
+    const cameraDy = this.lastCameraPos.y - this.entities[0].y;
+    this.updateCameraPos();
+    this.updateMapPos(cameraDx, cameraDy);
+    this.entitiesUpdate();
+  }
+
+  // ----------------------------------
+  // render/update logic for game components
+  // ----------------------------------
+  mapRender() {
+    this.sprites.map = new PIXI.Container();
+    // using frame steps to stagger water animations when rendering multiple
+    let waterStep = 0;
+    for (let y = 0; y < this.gameMap.height; y += 1) {
+      for (let x = 0; x < this.gameMap.width; x += 1) {
+        const dx = x - this.entities[0].x;
+        const dy = y - this.entities[0].y;
+        let tile;
+        if (this.gameMap.get(x, y) === 'g') {
+          tile = new PIXI.Sprite(this.textures.grass);
+        } else if (this.gameMap.get(x, y) === 'r') {
+          tile = new PIXI.Sprite(this.textures.road);
+        } else if (this.gameMap.get(x, y) === 'd') {
+          tile = new PIXI.Sprite(this.textures.dirt);
+        } else if (this.gameMap.get(x, y) === 'w') {
+          if (waterStep === 0) {
+            tile = new PIXI.AnimatedSprite(this.textures.water1);
+          } else if (waterStep === 1) {
+            tile = new PIXI.AnimatedSprite(this.textures.water2);
+          } else {
+            tile = new PIXI.AnimatedSprite(this.textures.water3);
+          }
+          waterStep = (waterStep + 3) % 7;
+          tile.animationSpeed = 0.05;
+          tile.play();
+        }
+
+        tile.x = this.gridToViewX(tile, dx, dy);
+        tile.y = this.gridToViewY(tile, dx, dy);
+
+        this.sprites.map.addChild(tile);
+      }
+    }
+
+    this.game.stage.addChild(this.sprites.map);
+  }
+
+  entitiesRender() {
+    this.sprites.entities = new PIXI.Container();
+    for (let i = 1; i < this.entities.length; i += 1) {
+      // start at 1, as camera is 0 and is always blank
+      // const sprite = this.entitySpriteMap[this.entities[i].id];
+      // TODO - add validity check to assure key exists, else blank or default
+      const sprite = new PIXI.Sprite(this.textures[this.entities[i].textureKey]);
+      const dx = this.entities[i].x - this.entities[0].x;
+      const dy = this.entities[i].y - this.entities[0].y;
+      sprite.x = this.gridToViewX(sprite, dx, dy);
+      sprite.y = this.gridToViewY(sprite, dx, dy, true);
+      delete this.entities[i].sprite;
+      this.entities[i].sprite = sprite;
+
+      this.sprites.entities.addChild(sprite);
+    }
+
+    this.game.stage.addChild(this.sprites.entities);
+  }
+
+  entitiesUpdate() {
+    for (let i = 1; i < this.entities.length; i += 1) {
+      const dx = this.entities[i].x - this.entities[0].x;
+      const dy = this.entities[i].y - this.entities[0].y;
+      this.entities[i].sprite.x = this.gridToViewX(this.entities[i].sprite, dx, dy);
+      this.entities[i].sprite.y = this.gridToViewY(this.entities[i].sprite, dx, dy, true);
+    }
+  }
+
+  consoleRender() {
     this.clear('console', 'consoleText');
     this.sprites.console = new PIXI.Container();
     this.sprites.consoleText = new PIXI.Container();
@@ -325,10 +376,10 @@ class Renderer {
 
     this.game.stage.addChild(this.sprites.console);
     this.game.stage.addChild(this.sprites.consoleText);
-    this.update = this.updateConsoleText;
+    this.update = this.consoleTextUpdate;
   }
 
-  updateConsoleText() {
+  consoleTextUpdate() {
     this.clear('consoleText');
     this.sprites.consoleText = new PIXI.Container();
 
@@ -346,41 +397,6 @@ class Renderer {
     }
 
     this.game.stage.addChild(this.sprites.consoleText);
-  }
-
-  createSubRect(color = 0xFFFFFF, pixelMargin = 0, alpha = 1) {
-    // create a simple subordinate rectangle using a passed in px margin
-    // as compared to the main window
-    const rect = PIXI.Sprite.from(PIXI.Texture.WHITE);
-    rect.x = pixelMargin;
-    rect.y = pixelMargin;
-    rect.width = this.settings.width - rect.x * 2;
-    rect.height = this.settings.height - rect.y * 2;
-    rect.tint = color;
-    rect.alpha = alpha;
-    return rect;
-  }
-
-  animate(spriteKeyArr, animFuncKey, delay = 200) {
-    const animPromises = [];
-    for (let i = 0; i < spriteKeyArr.length; i += 1) {
-      const spriteKeys = spriteKeyArr[i].split('/');
-      const spriteLayer = spriteKeys.length > 1
-        ? this.sprites[spriteKeys[0]][spriteKeys[1]]
-        : this.sprites[spriteKeys[0]];
-      console.log(spriteKeys);
-      animPromises.push(new Promise((resolve) => {
-        this.game.stage.addChild(spriteLayer);
-        const animTick = (delta) => {
-          Anim[animFuncKey](delta, spriteLayer, delay, () => {
-            this.removeFromTicker(animTick);
-            resolve();
-          });
-        };
-        this.addToTicker(animTick);
-      }));
-    }
-    return Promise.all(animPromises);
   }
 }
 

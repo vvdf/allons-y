@@ -185,7 +185,7 @@ class Engine {
     let playerAreaName = '';
     this.messageLog.consoleText = '> NEW OFFICER NAME:\n> '; // initializations
     this.messageLog.consoleInput = '';
-    this.renderer.renderConsole();
+    this.renderer.consoleRender();
     this.input.setMode('text');
     let creationStep = 0;
     this.ui.newMenu([() => {
@@ -246,15 +246,11 @@ class Engine {
   }
 
   worldMap(delta) {
-    this.renderer.setMode('Field');
+    this.renderer.setMode('field');
     this.renderer.clear();
     this.renderer.render();
     this.renderer.hide('map', 'entities');
-    console.log(this.renderer.sprites.map, this.renderer.sprites.entities);
-    this.renderer.animate(['map', 'entities'], 'fadeIn', 500)
-      .then(() => {
-        console.log(this.renderer.sprites.map, this.renderer.sprites.entities);
-      });
+    this.renderer.animate(['map', 'entities'], 'fadeIn', 500);
     this.input.setMode('field');
     this.centerCamera();
     this.state = this.play;
