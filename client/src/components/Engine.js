@@ -241,10 +241,6 @@ class Engine {
     this.state = this.play;
   }
 
-  baseMenu(delta) {
-    // code to load game into base management screen
-  }
-
   worldMap(delta) {
     this.renderer.setMode('field');
     this.renderer.clear();
@@ -254,6 +250,10 @@ class Engine {
     this.input.setMode('field');
     this.centerCamera();
     this.state = this.play;
+  }
+
+  baseMenu(delta) {
+    // code to load game into base management screen
   }
 
   fieldMode(delta) {
