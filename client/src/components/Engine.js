@@ -242,6 +242,7 @@ class Engine {
   }
 
   worldMap(delta) {
+    // code to render world map before switching to base menu navigation
     this.renderer.setMode('field');
     this.renderer.clear();
     this.renderer.render();
