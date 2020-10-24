@@ -250,7 +250,7 @@ class Engine {
     this.renderer.animate(['map', 'entities'], 'fadeIn', 500);
     this.input.setMode('field');
     this.centerCamera();
-    this.state = this.play;
+    this.state = this.baseMenu;
   }
 
   baseMenu(delta) {
