@@ -255,6 +255,9 @@ class Engine {
 
   baseMenu(delta) {
     // code to load game into base management screen
+    // TODO - need to setup UI and renderer
+    this.renderer.clear('ui');
+    this.state = this.play;
   }
 
   fieldMode(delta) {
