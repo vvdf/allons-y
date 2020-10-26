@@ -243,6 +243,8 @@ class Engine {
 
   worldMap(delta) {
     // code to render world map before switching to base menu navigation
+    // TODO - specify/seperate the code for 'field' maps and 'world' maps
+    // prioritized after building base menu functionality
     this.renderer.setMode('field');
     this.renderer.clear();
     this.renderer.render();
@@ -256,7 +258,10 @@ class Engine {
   baseMenu(delta) {
     // code to load game into base management screen
     // TODO - need to setup UI and renderer
-    this.renderer.clear('ui');
+    this.renderer.setMode('baseUI');
+    this.renderer.render();
+    // TODO - add cool scifi slide in/load animation here
+    this.input.setMode('ui');
     this.state = this.play;
   }
 
