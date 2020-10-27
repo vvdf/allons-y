@@ -244,7 +244,6 @@ class Renderer {
   }
 
   mainUIUpdate() {
-    console.log('test');
   }
 
   baseUIRender() {
@@ -270,7 +269,8 @@ class Renderer {
   fieldRender() {
     // clear and re-render everything from scratch
     this.updateCameraPos();
-    this.clear('map', 'entities');
+    this.clear('map', 'entities', 'bg');
+    this.bgRender();
     this.mapRender();
     this.entitiesRender();
   }
@@ -288,6 +288,14 @@ class Renderer {
   // ----------------------------------
   // render/update logic for game components
   // ----------------------------------
+  bgRender(bgColor = 0x131225) {
+    this.sprites.bg = new PIXI.Container();
+    const rect = this.createSubRect(bgColor);
+
+    this.sprites.bg.addChild(rect);
+    this.game.stage.addChild(this.sprites.bg);
+  }
+
   mapRender() {
     this.sprites.map = new PIXI.Container();
     // using frame steps to stagger water animations when rendering multiple
