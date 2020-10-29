@@ -262,6 +262,12 @@ class Engine {
     this.renderer.render();
     // TODO - add cool scifi slide in/load animation here
     this.input.setMode('ui');
+    this.ui.newMenu([() => { console.log('DEPLOY'); },
+      () => { console.log('CASE FILES'); },
+      () => { console.log('PERSONNEL'); },
+      () => { console.log('RESEARCH'); },
+      () => { console.log('ARMORY'); },
+      () => { console.log('CAFETERIA'); }]);
     this.state = this.play;
   }
 
