@@ -84,7 +84,7 @@ class UI {
   }
 
   getCurrentOption() {
-    return this.menuOptions[this.selectorIdx];
+    return this.menuOptions[this.selectorIdx].text;
   }
 }
 
