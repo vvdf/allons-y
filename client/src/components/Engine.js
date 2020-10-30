@@ -173,9 +173,12 @@ class Engine {
   mainMenu(delta) {
     this.renderer.clear();
     this.renderer.render();
-    this.ui.newMenu([() => {
-      this.state = this.characterCreation;
-      this.ui.clear();
+    this.ui.newMenu([{
+      text: 'new officer',
+      onSelect: () => {
+        this.state = this.characterCreation;
+        this.ui.clear();
+      },
     }]);
     this.state = this.play;
   }
@@ -188,54 +191,60 @@ class Engine {
     this.renderer.consoleRender();
     this.input.setMode('text');
     let creationStep = 0;
-    this.ui.newMenu([() => {
-      const textLines = this.messageLog.consoleText.split('\n');
-      if (textLines > 24) {
-        this.messageLog.consoleText = textLines.slice(textLines.length - 24).join('\n');
-      }
-      let nextStepPromptText = '';
-
-      if (this.messageLog.consoleInput.length > 0) {
-        // acceptable input submitted
-        if (creationStep < 1) {
-          playerName = this.ui.getText();
-          nextStepPromptText = `AREA WHERE OFFICER [${playerName}] IS STATIONED:\n> `;
-        } else if (creationStep === 1) {
-          playerAreaName = this.ui.getText();
-          nextStepPromptText = `WELCOME, OFFICER [${playerName}] OF THE [${playerAreaName}] `
-          + `${playerName.length + playerAreaName.length > 24 ? '\n' : ''}DIVISION`;
-          this.ui.clear();
-          axios.post('/entity', { name: playerName, area: playerAreaName })
-            .then(() => {
-              axios.get('/entity')
-                .then(({ data }) => {
-                  this.createEntity({ name: 'Camera', id: 0 });
-                  this.createEntity(data);
-                  this.currentMap = data.map;
-                  this.input.setOwner(this.entities[1]);
-                  this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
-                  this.ui.clear();
-                  this.ui.newMenu([() => {
-                    if (this.currentMap === 'world') {
-                      console.log('Entering World');
-                      this.state = this.worldMap;
-                      // this.state = this.baseMenu;
-                    } else {
-                      console.log('Entering Field');
-                      this.state = this.fieldMode;
-                    }
-                    this.ui.clear();
-                  }]);
-                });
-            });
+    this.ui.newMenu([{
+      text: 'create officer',
+      onSelect: () => {
+        const textLines = this.messageLog.consoleText.split('\n');
+        if (textLines > 24) {
+          this.messageLog.consoleText = textLines.slice(textLines.length - 24).join('\n');
         }
-        creationStep += 1;
-      }
+        let nextStepPromptText = '';
 
-      this.messageLog.consoleText = `${this.messageLog.consoleText}`
-        + `${this.messageLog.consoleInput}\n> ${nextStepPromptText}`;
-      this.messageLog.consoleInput = '';
-      this.ui.clearInput();
+        if (this.messageLog.consoleInput.length > 0) {
+          // acceptable input submitted
+          if (creationStep < 1) {
+            playerName = this.ui.getText();
+            nextStepPromptText = `AREA WHERE OFFICER [${playerName}] IS STATIONED:\n> `;
+          } else if (creationStep === 1) {
+            playerAreaName = this.ui.getText();
+            nextStepPromptText = `WELCOME, OFFICER [${playerName}] OF THE [${playerAreaName}] `
+            + `${playerName.length + playerAreaName.length > 24 ? '\n' : ''}DIVISION`;
+            this.ui.clear();
+            axios.post('/entity', { name: playerName, area: playerAreaName })
+              .then(() => {
+                axios.get('/entity')
+                  .then(({ data }) => {
+                    this.createEntity({ name: 'Camera', id: 0 });
+                    this.createEntity(data);
+                    this.currentMap = data.map;
+                    this.input.setOwner(this.entities[1]);
+                    this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
+                    this.ui.clear();
+                    this.ui.newMenu([{
+                      text: 'start game',
+                      onSelect: () => {
+                        if (this.currentMap === 'world') {
+                          console.log('Entering World');
+                          this.state = this.worldMap;
+                          // this.state = this.baseMenu;
+                        } else {
+                          console.log('Entering Field');
+                          this.state = this.fieldMode;
+                        }
+                        this.ui.clear();
+                      },
+                    }]);
+                  });
+              });
+          }
+          creationStep += 1;
+        }
+
+        this.messageLog.consoleText = `${this.messageLog.consoleText}`
+          + `${this.messageLog.consoleInput}\n> ${nextStepPromptText}`;
+        this.messageLog.consoleInput = '';
+        this.ui.clearInput();
+      },
     }]);
     this.ui.setMode('text');
     this.state = this.play;
@@ -262,13 +271,18 @@ class Engine {
     this.renderer.render();
     // TODO - add cool scifi slide in/load animation here
     this.input.setMode('ui');
-    this.ui.newMenu([() => { console.log('DEPLOY'); },
-      () => { console.log('CASE FILES'); },
-      () => { console.log('PERSONNEL'); },
-      () => { console.log('RESEARCH'); },
-      () => { console.log('ARMORY'); },
-      () => { console.log('CAFETERIA'); }]);
+    const debugUiPrint = () => {
+      console.log(this.ui.getCurrentOption());
+    };
+    this.ui.newMenu([{ text: 'deploy', onSelect: () => { debugUiPrint(); } },
+      { text: 'case files', onSelect: () => { debugUiPrint(); } },
+      { text: 'personnel', onSelect: () => { debugUiPrint(); } },
+      { text: 'r&d', onSelect: () => { debugUiPrint(); } },
+      { text: 'armory', onSelect: () => { debugUiPrint(); } },
+      { text: 'cafeteria', onSelect: () => { debugUiPrint(); } },
+    ]);
     this.state = this.play;
+    // TODO - expand UI OPTION to have both text AND response callback
   }
 
   fieldMode(delta) {

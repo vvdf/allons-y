@@ -1,12 +1,12 @@
 import { clamp } from './Utility';
 
 class UI {
-  constructor(uiSelectionsArr = [() => {}], mode = 'menu') {
+  constructor(uiOptionsArr = [{ text: 'empty', onSelect: () => {} }], mode = 'menu') {
     this.mode = mode; // menu or text (input), default is menu
     this.textMaxLength = 16;
     this.textInput = '';
     this.textIdx = -1;
-    this.newMenu(uiSelectionsArr);
+    this.newMenu(uiOptionsArr);
   }
 
   setMode(newMode) {
@@ -15,14 +15,15 @@ class UI {
     }
   }
 
-  newMenu(uiSelectionsArr, mode = 'menu') {
+  newMenu(uiOptionsArr = [{ text: 'empty', onSelect: () => {} }], mode = 'menu') {
+    // options are defined as: { text: option_text, onSelect: callback func }
     this.mode = mode;
-    this.menuOptions = uiSelectionsArr;
+    this.menuOptions = uiOptionsArr;
     this.selectorIdx = 0;
   }
 
   clear() {
-    this.menuOptions = [() => {}];
+    this.menuOptions = [{ text: 'empty', onSelect: () => {} }];
     this.selectorIdx = 0;
     this.textInput = '';
     this.textIdx = -1;
@@ -52,7 +53,7 @@ class UI {
   }
 
   select() {
-    this.menuOptions[this.selectorIdx]();
+    this.menuOptions[this.selectorIdx].onSelect();
     // this.clear();
   }
 
@@ -72,6 +73,18 @@ class UI {
 
   getText() {
     return this.textInput;
+  }
+
+  getOptionText() {
+    return this.menuOptions.map((uiOptionObj) => uiOptionObj.text);
+  }
+
+  getCurrentSelection() {
+    return this.selectorIdx;
+  }
+
+  getCurrentOption() {
+    return this.menuOptions[this.selectorIdx];
   }
 }
 
