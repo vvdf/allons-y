@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import * as Anim from './Animations';
 
 class Renderer {
-  constructor(settings, constants, entities, gameMap, messageLog) {
+  constructor(settings, constants, entities, gameMap, ui, messageLog) {
     this.settings = settings;
     this.constants = constants;
     this.game = new PIXI.Application(this.settings);
@@ -12,6 +12,7 @@ class Renderer {
     this.entitySpriteMap = {};
     this.lastCameraPos = { x: 0, y: 0 };
     this.gameMap = gameMap;
+    this.ui = ui;
     this.messageLog = messageLog;
     this.sprites = {};
     this.textures = {};
@@ -224,7 +225,7 @@ class Renderer {
     title.x = this.settings.width / 2 - title.width / 2;
     title.y = 25;
 
-    const startGame = new PIXI.Text('[ new officer ]', {
+    const startGame = new PIXI.Text(`[ ${this.ui.getCurrentOption()} ]`, {
       fontFamily: 'sans-serif', fontSize: 18, fill: 0xe07900, align: 'center',
     });
 
@@ -251,13 +252,32 @@ class Renderer {
     // base management/mission dispatch/loadout management etc UI
     this.clear('ui');
     this.sprites.ui = new PIXI.Container();
-    const rect = this.createSubRect(0x020202, this.settings.width / 30, 0.8);
+    const margin = this.settings.width / 30;
+    const innerMargin = 30;
+    const padding = 10;
+    const menuBackdrop = this.createSubRect(0x020202, margin, 0.8);
+    this.sprites.ui.addChild(menuBackdrop);
+    const menuOptions = this.ui.getOptionText();
+    const menuSelection = this.ui.getCurrentSelection();
 
-    this.sprites.ui.addChild(rect);
+    for (let i = 0; i < menuOptions.length; i += 1) {
+      // highlight if currently selected
+      const textColor = i === menuSelection ? 0xe07900 : 0xe0e0e5;
+      const menuOption = new PIXI.Text(`${menuOptions[i]}`, {
+        fontFamily: 'sans-serif', fontSize: 24, fill: textColor, align: 'center',
+      });
+      menuOption.x = margin + innerMargin;
+      menuOption.y = margin + innerMargin * (i + 1) + (padding * i);
+
+      this.sprites.ui.addChild(menuOption);
+    }
+
+    // this.sprites.ui.addChild(menuBackdrop);
     this.game.stage.addChild(this.sprites.ui);
   }
 
   baseUIUpdate() {
+    this.baseUIRender();
   }
 
   fieldUIRender() {

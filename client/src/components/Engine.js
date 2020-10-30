@@ -30,7 +30,7 @@ class Engine {
     this.entities = [];
     this.playerEntity = {};
     this.entityIdMap = {};
-    this.messageLog = {}; // TODO - build a proper module for handling message in/out
+    this.messageLog = {}; // TODO - build a proper module handling message I/O (likely part of UI?)
     this.currentMap = 'world';
     this.gameMap = new GameMap(40, 40, 'g');
     // this.gameMap.load();
@@ -41,6 +41,7 @@ class Engine {
       this.constants,
       this.entities,
       this.gameMap,
+      this.ui,
       this.messageLog,
     );
     this.flagRerender = false;
@@ -96,8 +97,9 @@ class Engine {
       } else if (input === 1) {
         this.ui.prev();
       } else {
-        this.renderer.animate(['ui'], 'blinkOut', 100)
-          .then(() => this.ui.select());
+        // this.renderer.animate(['ui'], 'blinkOut', 100)
+        //   .then(() => this.ui.select());
+        this.ui.select();
       }
     });
 
@@ -171,8 +173,6 @@ class Engine {
   }
 
   mainMenu(delta) {
-    this.renderer.clear();
-    this.renderer.render();
     this.ui.newMenu([{
       text: 'new officer',
       onSelect: () => {
@@ -180,6 +180,8 @@ class Engine {
         this.ui.clear();
       },
     }]);
+    this.renderer.clear();
+    this.renderer.render();
     this.state = this.play;
   }
 
@@ -189,6 +191,8 @@ class Engine {
     this.messageLog.consoleText = '> NEW OFFICER NAME:\n> '; // initializations
     this.messageLog.consoleInput = '';
     this.renderer.consoleRender();
+    this.renderer.hide('console', 'consoleText');
+    this.renderer.animate(['console', 'consoleText'], 'fadeIn', 20);
     this.input.setMode('text');
     let creationStep = 0;
     this.ui.newMenu([{
@@ -268,7 +272,6 @@ class Engine {
     // code to load game into base management screen
     // TODO - need to setup UI and renderer
     this.renderer.setMode('baseUI');
-    this.renderer.render();
     // TODO - add cool scifi slide in/load animation here
     this.input.setMode('ui');
     const debugUiPrint = () => {
@@ -281,6 +284,9 @@ class Engine {
       { text: 'armory', onSelect: () => { debugUiPrint(); } },
       { text: 'cafeteria', onSelect: () => { debugUiPrint(); } },
     ]);
+    this.renderer.render();
+    this.renderer.hide('ui');
+    this.renderer.animate(['ui'], 'fadeIn', 50);
     this.state = this.play;
     // TODO - expand UI OPTION to have both text AND response callback
   }

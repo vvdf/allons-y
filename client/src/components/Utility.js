@@ -1,5 +1,14 @@
 // helper functions
 export const clamp = (value, min, max) => Math.max(Math.min(value, max), min);
+export const clampLoop = (value, min, max) => {
+  if (value > max) {
+    return min;
+  }
+  if (value < min) {
+    return max;
+  }
+  return value;
+};
 
 export const formatNoun = (str) => {
   const multipleWords = str.split(' ');

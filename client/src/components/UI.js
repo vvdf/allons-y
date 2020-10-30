@@ -1,4 +1,4 @@
-import { clamp } from './Utility';
+import { clampLoop } from './Utility';
 
 class UI {
   constructor(uiOptionsArr = [{ text: 'empty', onSelect: () => {} }], mode = 'menu') {
@@ -38,17 +38,17 @@ class UI {
 
   next() {
     if (this.mode === 'menu') {
-      this.selectorIdx = clamp(this.selectorIdx + 1, 0, this.menuOptions.length - 1);
+      this.selectorIdx = clampLoop(this.selectorIdx + 1, 0, this.menuOptions.length - 1);
     } else if (this.mode === 'text') {
-      this.textIdx = clamp(this.textIdx + 1, 0, this.textInput.length - 1);
+      this.textIdx = clampLoop(this.textIdx + 1, 0, this.textInput.length - 1);
     }
   }
 
   prev() {
     if (this.mode === 'menu') {
-      this.selectorIdx = clamp(this.selectorIdx - 1, 0, this.menuOptions.length - 1);
+      this.selectorIdx = clampLoop(this.selectorIdx - 1, 0, this.menuOptions.length - 1);
     } else if (this.mode === 'text') {
-      this.textIdx = clamp(this.textIdx - 1, 0, this.textInput.length - 1);
+      this.textIdx = clampLoop(this.textIdx - 1, 0, this.textInput.length - 1);
     }
   }
 
