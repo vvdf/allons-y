@@ -17,6 +17,7 @@ app.use(express.json());
 //   login/register interface is implemented on the front end
 // TODO - build character, uid, etc generation utility methods
 const clients = {};
+const guilds = {}; // comprised of Seed, PlayerEntities, OpenMaps, progression info
 const mapCache = {};
 const entities = {};
 
@@ -39,25 +40,38 @@ app.get('/client', (req, res) => {
 
 app.post('/entity', (req, res) => {
   const { cid } = parseCookies(req.headers.cookie);
+  const { name, area } = req.body;
   console.log('REGISTERING NEW ENTITY FOR CLIENT: ', cid);
   const obj = parseCookies(req.headers.cookie);
-  console.log(obj);
   const eid = `EID${req.body.name.toUpperCase() + Math.random().toString(36).substring(6)}`;
   const playerEntity = {
     id: eid,
-    name: req.body.name,
+    name,
     textureKey: 'player',
     x: 0,
     y: 0,
     map: 'world',
-    guild: req.body.area,
+    guild: area, // TODO - edit to use guild name gen
   };
+
+  if (!{}.hasOwnProperty.call(guilds, area)) {
+    // if the guild has yet to be established, create
+    guilds[area] = {
+      name: area, // TODO - edit like above to use guild name gen
+      entities: [],
+      maps: {},
+      stats: {},
+    };
+  }
 
   if (!{}.hasOwnProperty.call(clients, cid)) {
     clients[cid] = {};
   }
+
   clients[cid].eid = eid;
+  clients[cid].area = area;
   entities[eid] = playerEntity;
+  guilds[area].entities.push(playerEntity);
   console.log(clients);
   res.status(200).send();
 });
