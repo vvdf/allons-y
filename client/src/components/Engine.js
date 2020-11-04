@@ -294,6 +294,7 @@ class Engine {
   fieldMode(delta) {
     // code to load game into field
     // TODO - build code to load field content including potential other players
+    // ALSO build code to facilitate multiplayer content
   }
 
   // ----------------------------------
