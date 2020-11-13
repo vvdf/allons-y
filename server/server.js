@@ -42,7 +42,6 @@ app.post('/entity', (req, res) => {
   const { cid } = parseCookies(req.headers.cookie);
   const { name, area } = req.body;
   console.log('REGISTERING NEW ENTITY FOR CLIENT: ', cid);
-  const obj = parseCookies(req.headers.cookie);
   const eid = `EID${req.body.name.toUpperCase() + Math.random().toString(36).substring(6)}`;
   const playerEntity = {
     id: eid,
