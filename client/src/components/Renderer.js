@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import * as Anim from './Animations';
+import tiles from './Tiles';
 
 class Renderer {
   constructor(settings, constants, entities, gameMap, ui, messageLog) {
@@ -325,13 +326,13 @@ class Renderer {
         const dx = x - this.entities[0].x;
         const dy = y - this.entities[0].y;
         let tile;
-        if (this.gameMap.get(x, y) === ',') {
+        if (this.gameMap.get(x, y) === tiles.GRASS) {
           tile = new PIXI.Sprite(this.textures.grass);
-        } else if (this.gameMap.get(x, y) === '_') {
+        } else if (this.gameMap.get(x, y) === tiles.ROAD) {
           tile = new PIXI.Sprite(this.textures.road);
-        } else if (this.gameMap.get(x, y) === '.') {
+        } else if (this.gameMap.get(x, y) === tiles.DIRT) {
           tile = new PIXI.Sprite(this.textures.dirt);
-        } else if (this.gameMap.get(x, y) === '~') {
+        } else if (this.gameMap.get(x, y) === tiles.WATER) {
           if (waterStep === 0) {
             tile = new PIXI.AnimatedSprite(this.textures.water1);
           } else if (waterStep === 1) {

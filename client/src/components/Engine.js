@@ -32,7 +32,7 @@ class Engine {
     this.entityIdMap = {};
     this.messageLog = {}; // TODO - build a proper module handling message I/O (likely part of UI?)
     this.currentMap = 'world';
-    this.gameMap = new GameMap(40, 40);
+    this.gameMap = new GameMap();
     // this.gameMap.load();
     this.input = new Input(this.eventQueue);
     this.ui = new UI();
