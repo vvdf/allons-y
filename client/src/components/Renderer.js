@@ -325,13 +325,13 @@ class Renderer {
         const dx = x - this.entities[0].x;
         const dy = y - this.entities[0].y;
         let tile;
-        if (this.gameMap.get(x, y) === 'g') {
+        if (this.gameMap.get(x, y) === ',') {
           tile = new PIXI.Sprite(this.textures.grass);
-        } else if (this.gameMap.get(x, y) === 'r') {
+        } else if (this.gameMap.get(x, y) === '_') {
           tile = new PIXI.Sprite(this.textures.road);
-        } else if (this.gameMap.get(x, y) === 'd') {
+        } else if (this.gameMap.get(x, y) === '.') {
           tile = new PIXI.Sprite(this.textures.dirt);
-        } else if (this.gameMap.get(x, y) === 'w') {
+        } else if (this.gameMap.get(x, y) === '~') {
           if (waterStep === 0) {
             tile = new PIXI.AnimatedSprite(this.textures.water1);
           } else if (waterStep === 1) {

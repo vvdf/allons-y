@@ -1,7 +1,16 @@
 const axios = require('axios');
 
+const tile = {
+  WALL: '#',
+  WATER: '~',
+  ROAD: '_',
+  DIRT: '.',
+  GRASS: ',',
+  TREE: 'T',
+};
+
 class GameMap {
-  constructor(width = 20, height = 20, defaultTile = 'g') {
+  constructor(width = 20, height = 20, defaultTile = tile.GRASS) {
     this.width = width;
     this.height = height;
     this.grid = [];
