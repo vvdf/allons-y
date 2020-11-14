@@ -5,11 +5,15 @@ const path = require('path');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+const GameMap = require('./GameMap');
 const { parseCookies } = require('./utility');
 
 const REST_PORT = 3000;
 const SOCK_PORT = 3001;
 app.use(express.json());
+
+const map = new GameMap();
+console.log(map.toString());
 
 // client id : entity id map
 // TODO - to be reformatted into DBMS

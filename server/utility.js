@@ -8,6 +8,9 @@ const parseCookies = (cookieString = '') => {
   return result;
 };
 
+const rng = (min, max) => Math.round(Math.random() * (max - min) + min);
+
 module.exports = {
   parseCookies,
+  rng,
 };
