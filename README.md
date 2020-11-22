@@ -14,7 +14,8 @@
 
 ## Development Roadmap
   High Priority
-  * Build main page/login page
+  * Build main page
+  * Build proper login page
   * Connect dungeon/map generation on server to current gameplay flow
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
     (Utilizing placeholder simple art assets for the base screen)
@@ -24,7 +25,10 @@
   placeholder sprites)
 
   Med Priority
-  * Possible expansion into options during character creation
+  * Possible expansion into options during character creation (also possible external page for character
+    creation)
+  * Character management page
+  * Improve general page look
 
   Low Priority
   * Development of more art assets
