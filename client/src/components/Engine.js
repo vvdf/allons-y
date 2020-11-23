@@ -257,6 +257,7 @@ class Engine {
   worldMap(delta) {
     // code to render world map before switching to base menu navigation
     // prioritized after building base menu functionality
+    // TODO - come up with proper worldmap screen, possibly just base map in background
     this.renderer.setMode('field');
     this.renderer.clear();
     this.renderer.render();
@@ -265,6 +266,7 @@ class Engine {
     this.input.setMode('field');
     this.centerCamera();
     this.state = this.baseMenu;
+    // TODO - for character creation go straight to dungeon/map rather than base menu
   }
 
   baseMenu(delta) {
@@ -276,7 +278,15 @@ class Engine {
     const debugUiPrint = () => {
       console.log(this.ui.getCurrentOption());
     };
-    this.ui.newMenu([{ text: 'deploy', onSelect: () => { debugUiPrint(); } },
+    this.ui.newMenu([
+      {
+        text: 'deploy',
+        onSelect: () => {
+          debugUiPrint();
+          this.state = this.fieldMode;
+          this.ui.clear();
+        },
+      },
       { text: 'case files', onSelect: () => { debugUiPrint(); } },
       { text: 'personnel', onSelect: () => { debugUiPrint(); } },
       { text: 'r&d', onSelect: () => { debugUiPrint(); } },
@@ -287,7 +297,6 @@ class Engine {
     this.renderer.hide('ui');
     this.renderer.animate(['ui'], 'fadeIn', 50);
     this.state = this.play;
-    // TODO - expand UI OPTION to have both text AND response callback
   }
 
   fieldMode(delta) {
@@ -295,6 +304,19 @@ class Engine {
     // TODO - build code to load field content including potential other players
     // ALSO build code to facilitate multiplayer content
     // determine which multiplayer system to use for a turn based active game
+
+    // get request for current map selected
+    this.gameMap.load()
+      .then(() => {
+        this.renderer.setMode('field');
+        this.renderer.clear();
+        this.renderer.render();
+        this.renderer.hide('map', 'entities');
+        this.renderer.animate(['map', 'entities'], 'fadeIn', 500);
+        this.input.setMode('field');
+        this.centerCamera();
+        this.state = this.play;
+      });
   }
 
   // ----------------------------------

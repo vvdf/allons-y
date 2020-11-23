@@ -12,9 +12,6 @@ const REST_PORT = 3000;
 const SOCK_PORT = 3001;
 app.use(express.json());
 
-const map = new GameMap();
-console.log(map.toString());
-
 // client id : entity id map
 // TODO - to be reformatted into DBMS
 // TODO - refactor for UserID and SessionID management once a proper
@@ -131,18 +128,29 @@ app.get('/map/:mapName', (req, res) => {
   console.log(`Loading Map, "${req.params.mapName}"`);
   if (mapCache[req.params.mapName]) {
     // load from cache if available
+    console.log(`Loaded Map, "${req.params.mapName}"`);
     res.status(200).send({ mapFound: true, mapData: mapCache[req.params.mapName] });
   } else {
-    // otherwise, load from file
-    fs.readFile(path.join(__dirname, '..', 'maps', `${req.params.mapName}.map`), 'utf8',
-      (err, data) => {
-        if (err) {
-          console.log(err);
-          res.status(200).send({ mapFound: false });
-        } else {
-          res.status(200).send({ mapFound: true, mapData: data });
-        }
-      });
+    // otherwise, load from file TODO changed to generate
+    // fs.readFile(path.join(__dirname, '..', 'maps', `${req.params.mapName}.map`), 'utf8',
+    //   (err, data) => {
+    //     if (err) {
+    //       console.log(err);
+    //       res.status(200).send({ mapFound: false });
+    //     } else {
+    //       res.status(200).send({ mapFound: true, mapData: data });
+    //     }
+    //   });
+    console.log(`Generating Map, "${req.params.mapName}"`);
+    const mapData = new GameMap();
+    mapData.generate('rogue', ',', '~');
+    console.log(mapData.toString());
+    res.status(200).send({
+      mapFound: true,
+      mapData: mapData.toString(),
+      width: mapData.width,
+      height: mapData.height,
+    });
   }
 });
 
@@ -174,6 +182,8 @@ io.on('connection', (socket) => {
 
   socket.on('gameEvent', (data) => {
     // TODO refactor move_entity handling to only allow and pass on legal movements
+    // AND proper handling of rooms for instanced maps between players
+    // TODO refactor signal responses into a response hashmap/object for ease of use/speed
     if (data.signal === 'MOVE_ENTITY' && entityId) {
       entities[entityId].x += data.params[1];
       entities[entityId].y += data.params[2];

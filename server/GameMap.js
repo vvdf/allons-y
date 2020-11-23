@@ -18,19 +18,19 @@ class GameMap {
     this.generate(type);
   }
 
-  clear() {
+  clear(wallTile = '#') {
     this.grid = [];
     for (let i = 0; i < this.height; i += 1) {
       const newArr = [];
       for (let j = 0; j < this.width; j += 1) {
-        newArr.push(tiles.WALL);
+        newArr.push(wallTile);
       }
       this.grid.push(newArr);
     }
   }
 
-  generate(type = 'rogue') {
-    this.clear();
+  generate(type = 'rogue', floorTile = '.', wallTile = '#') {
+    this.clear(wallTile);
     if (type === 'rogue') {
       const ROOM_MAX = Math.floor((this.width * this.height) / 100);
       let roomCount = 0;
@@ -40,9 +40,9 @@ class GameMap {
         const roomHeight = rng(2, 8);
         const startX = rng(1, (this.width - roomWidth) - 1);
         const startY = rng(1, (this.height - roomHeight) - 1);
-        if (this.grid[startY][startX] === tiles.WALL) {
+        if (this.grid[startY][startX] === wallTile) {
           roomCount += 1;
-          this.fillRect(tiles.DIRT, roomWidth, roomHeight, startX, startY);
+          this.fillRect(floorTile, roomWidth, roomHeight, startX, startY);
           rooms.push({
             x: Math.floor(startX + roomWidth / 2),
             y: Math.floor(startY + roomHeight / 2),
@@ -68,7 +68,7 @@ class GameMap {
             }
           }
         }
-        this.drawDrunkLine(tiles.DIRT, rooms[currentRoomIdx].x, rooms[currentRoomIdx].y,
+        this.drawDrunkLine(floorTile, rooms[currentRoomIdx].x, rooms[currentRoomIdx].y,
           rooms[nearestRoomIdx].x, rooms[nearestRoomIdx].y);
         if (rooms[currentRoomIdx].connected || rooms[nearestRoomIdx].connected) {
           rooms[currentRoomIdx].connected = true;
@@ -76,7 +76,7 @@ class GameMap {
         }
       }
       // forcibly connect remaining unconnected rooms
-      this.forceConnections();
+      this.forceConnections(floorTile);
     }
   }
 
@@ -109,7 +109,7 @@ class GameMap {
     }
   }
 
-  forceConnections() {
+  forceConnections(floorTile = '.') {
     // create a map to determine where we can explore and
     // where we HAVE explored
     // 0 = unexplorable, 1 = explorable, 2 = explored
@@ -126,7 +126,7 @@ class GameMap {
     while (mapTools.findFirst(exploreMap, 1).exists) {
       const origin = mapTools.findFirst(exploreMap, 1);
       const nearest = mapTools.findNearest(exploreMap, 2, origin.x, origin.y);
-      this.drawDrunkLine(tiles.DIRT, origin.x, origin.y, nearest.x, nearest.y);
+      this.drawDrunkLine(floorTile, origin.x, origin.y, nearest.x, nearest.y);
 
       // update explorationMap and re-explore it
       exploreMap = mapTools.copyMap(this.grid, exploredMapDictionary);
