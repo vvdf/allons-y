@@ -51,6 +51,8 @@ class GameMap {
         .then((res) => {
           console.log('Load attempted for: ', mapName, res);
           if (res.data.mapFound) {
+            this.height = res.data.height;
+            this.width = res.data.width;
             this.loadFromString(res.data.mapData);
             resolve('Map Loaded');
           } else {
