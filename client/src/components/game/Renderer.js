@@ -31,7 +31,8 @@ class Renderer {
         .add('assets/643212_floor_tiles.json')
         .load(() => {
           this.textures.player = this.loader.resources['assets/96x48_rally_police_girl.png'].texture;
-          this.textures.blank = PIXI.utils.TextureCache['blank.png'];
+          this.textures.wall = PIXI.utils.TextureCache['wall.png'];
+          // this.textures.blank = PIXI.utils.TextureCache['blank.png'];
           this.textures.grass = PIXI.utils.TextureCache['grass.png'];
           this.textures.road = PIXI.utils.TextureCache['road.png'];
           this.textures.dirt = PIXI.utils.TextureCache['dirt.png'];
@@ -51,12 +52,13 @@ class Renderer {
             PIXI.utils.TextureCache['water_02.png'],
           ];
 
-          this.sprites.blank = new PIXI.Sprite(this.textures.blank);
+          this.sprites.blank = new PIXI.Sprite(this.textures.wall);
 
           if (errorsCounted < 1) {
             res();
           } else {
             console.log('ERRORS LOADING RESOURCES:', errorsCounted, ' ERRORS');
+            console.log(this.textures);
             rej();
           }
         });
@@ -320,13 +322,17 @@ class Renderer {
   mapRender() {
     this.sprites.map = new PIXI.Container();
     // using frame steps to stagger water animations when rendering multiple
+    // TODO refactor this to use an object dictionary for conversions rather
+    // than a long if/else statement
     let waterStep = 0;
     for (let y = 0; y < this.gameMap.height; y += 1) {
       for (let x = 0; x < this.gameMap.width; x += 1) {
         const dx = x - this.entities[0].x;
         const dy = y - this.entities[0].y;
         let tile;
-        if (this.gameMap.get(x, y) === tiles.GRASS) {
+        if (this.gameMap.get(x, y) === tiles.WALL) {
+          tile = new PIXI.Sprite(this.textures.wall);
+        } else if (this.gameMap.get(x, y) === tiles.GRASS) {
           tile = new PIXI.Sprite(this.textures.grass);
         } else if (this.gameMap.get(x, y) === tiles.ROAD) {
           tile = new PIXI.Sprite(this.textures.road);
