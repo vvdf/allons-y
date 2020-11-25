@@ -8,7 +8,6 @@ class App extends React.Component {
   render() {
     return (
       <div className="main">
-        ALLONS-Y, ALONSO!
         <Game />
       </div>
     );
