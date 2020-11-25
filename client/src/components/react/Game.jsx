@@ -1,5 +1,5 @@
 import React from 'react';
-import Engine from './Engine';
+import Engine from '../game/Engine';
 
 class Game extends React.Component {
   componentDidMount() {

@@ -27,6 +27,8 @@
   * Player UI while on field map screen
   * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with
   placeholder sprites)
+  * Update/rebuild client entity module
+  * Update/rebuild client gamemap module
 
   Med Priority
   * Possible expansion into options during character creation (also possible external page for character

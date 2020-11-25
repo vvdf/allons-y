@@ -15,6 +15,7 @@ class GameMap {
     this.width = width;
     this.height = height;
     this.grid = [];
+    this.spawn = { x: -1, y: -1 };
     this.generate(type);
   }
 
@@ -78,6 +79,18 @@ class GameMap {
       // forcibly connect remaining unconnected rooms
       this.forceConnections(floorTile);
     }
+
+    // establish viable spawn location
+    this.findNextSpawn(floorTile);
+  }
+
+  findNextSpawn(floorTile = '.') {
+    this.spawn = mapTools.findNearest(
+      this.grid,
+      floorTile,
+      rng(0, this.width - 1),
+      rng(0, this.height - 1),
+    );
   }
 
   fillRect(tile, width, height, startX, startY) {

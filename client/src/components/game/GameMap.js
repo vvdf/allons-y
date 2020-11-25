@@ -2,10 +2,11 @@ const axios = require('axios');
 const tiles = require('./Tiles');
 
 class GameMap {
-  constructor(width = 20, height = 20, defaultTile = ',') {
+  constructor(width = 20, height = 20, defaultTile = '.') {
     this.width = width;
     this.height = height;
     this.grid = [];
+    this.spawn = { x: 0, y: 0 };
     for (let y = 0; y < height; y += 1) {
       this.grid[y] = [];
       for (let x = 0; x < width; x += 1) {
@@ -54,6 +55,7 @@ class GameMap {
             this.height = res.data.height;
             this.width = res.data.width;
             this.loadFromString(res.data.mapData);
+            this.spawn = res.data.spawn;
             resolve('Map Loaded');
           } else {
             reject();

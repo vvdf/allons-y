@@ -144,13 +144,14 @@ app.get('/map/:mapName', (req, res) => {
     console.log(`Generating Map, "${req.params.mapName}"`);
     const mapData = new GameMap();
     mapData.generate('rogue', ',', '~');
-    console.log(mapData.toString());
     res.status(200).send({
       mapFound: true,
       mapData: mapData.toString(),
       width: mapData.width,
       height: mapData.height,
+      spawn: mapData.spawn,
     });
+    console.log(mapData.spawn);
   }
 });
 

@@ -44,6 +44,7 @@ const findNearest = (map2dArr, target, x, y) => {
   const result = {
     x,
     y,
+    exists: false,
   };
 
   let delta = Infinity;
@@ -57,6 +58,7 @@ const findNearest = (map2dArr, target, x, y) => {
           delta = deltaX + deltaY;
           result.x = j;
           result.y = i;
+          result.exists = true;
         }
       }
     }

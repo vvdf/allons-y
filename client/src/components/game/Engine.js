@@ -33,7 +33,6 @@ class Engine {
     this.messageLog = {}; // TODO - build a proper module handling message I/O (likely part of UI?)
     this.currentMap = 'world';
     this.gameMap = new GameMap();
-    // this.gameMap.load();
     this.input = new Input(this.eventQueue);
     this.ui = new UI();
     this.renderer = new Renderer(
@@ -314,6 +313,8 @@ class Engine {
         this.renderer.hide('map', 'entities');
         this.renderer.animate(['map', 'entities'], 'fadeIn', 500);
         this.input.setMode('field');
+
+        this.entities[1].setPos(this.gameMap.spawn.x, this.gameMap.spawn.y);
         this.centerCamera();
         this.state = this.play;
       });
