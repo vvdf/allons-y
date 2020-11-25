@@ -261,7 +261,7 @@ class Engine {
     this.renderer.clear();
     this.renderer.render();
     this.renderer.hide('map', 'entities');
-    this.renderer.animate(['map', 'entities'], 'fadeIn', 500);
+    // this.renderer.animate(['map', 'entities'], 'fadeIn', 100);
     this.input.setMode('field');
     this.centerCamera();
     this.state = this.baseMenu;
@@ -283,7 +283,10 @@ class Engine {
         onSelect: () => {
           debugUiPrint();
           this.state = this.fieldMode;
-          this.ui.clear();
+          this.renderer.animate(['ui'], 'fadeOut', 200)
+            .then(() => {
+              this.ui.clear();
+            });
         },
       },
       { text: 'case files', onSelect: () => { debugUiPrint(); } },
@@ -311,13 +314,13 @@ class Engine {
         this.renderer.clear();
         this.renderer.render();
         this.renderer.hide('map', 'entities');
-        this.renderer.animate(['map', 'entities'], 'fadeIn', 500);
+        this.renderer.animate(['map', 'entities'], 'fadeIn', 80);
         this.input.setMode('field');
 
         this.entities[1].setPos(this.gameMap.spawn.x, this.gameMap.spawn.y);
         this.centerCamera();
-        this.state = this.play;
       });
+    this.state = this.play;
   }
 
   // ----------------------------------
