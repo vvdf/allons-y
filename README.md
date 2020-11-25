@@ -27,8 +27,9 @@
   * Player UI while on field map screen
   * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with
   placeholder sprites)
-  * Update/rebuild client entity module
+  * Update/rebuild client entity module (particular x,y coords to be a pos object containing x/y)
   * Update/rebuild client gamemap module
+  * Handle proper zIndexing for tiles
 
   Med Priority
   * Possible expansion into options during character creation (also possible external page for character
@@ -38,6 +39,8 @@
 
   Low Priority
   * Development of more art assets
+    * Eventual blending of tiles based on adjacencies (ie on edge of tile, one ground tile like sand should
+      blend in with dirt, or some similar effect)
   * Implementation of animations
   * Option for terminal-style aesthetics for a more traditional roguelike experience
   * Improve opening splash screen generated detail
