@@ -14,12 +14,13 @@
 
 ## Development Roadmap
   High Priority
-  (Main site)
+  
+  Main Site
   * Build main page
   * Build sidebar
   * Build proper login page
 
-  (Game)
+  Game
   * Connect dungeon/map generation on server to current gameplay flow
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
     (Utilizing placeholder simple art assets for the base screen)
