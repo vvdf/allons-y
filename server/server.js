@@ -143,7 +143,7 @@ app.get('/map/:mapName', (req, res) => {
     //   });
     console.log(`Generating Map, "${req.params.mapName}"`);
     const mapData = new GameMap();
-    mapData.generate('rogue', ',', '~');
+    mapData.generate('rogue', ',', '#');
     res.status(200).send({
       mapFound: true,
       mapData: mapData.toString(),
