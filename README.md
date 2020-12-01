@@ -21,16 +21,15 @@
   * Build proper login page
 
   Game
+  * Player UI while on field map screen
   * Connect dungeon/map generation on server to current gameplay flow
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
     (Utilizing placeholder simple art assets for the base screen)
   * Back-end validation of player actions
-  * Player UI while on field map screen
-  * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with
-  placeholder sprites)
+  * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with placeholder sprites)
   * Update/rebuild client entity module (particular x,y coords to be a pos object containing x/y)
   * Update/rebuild client gamemap module
-  * Handle proper zIndexing for tiles
+  * Handle proper zIndexing for tiles (notably walls/entities)
 
   Med Priority
   * Possible expansion into options during character creation (also possible external page for character
