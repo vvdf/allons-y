@@ -21,6 +21,7 @@
   * Build proper login page
 
   Game
+  * Player input blocking on illegal actions/movements
   * Player UI while on field map screen
   * Connect dungeon/map generation on server to current gameplay flow
   * Build complete flow between character creation, base management screen, and entering a dungeon/map

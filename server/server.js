@@ -151,7 +151,7 @@ app.get('/map/:mapName', (req, res) => {
       height: mapData.height,
       spawn: mapData.spawn,
     });
-    console.log(mapData.spawn);
+    console.log('Spawn location found for generated map: ', mapData.spawn);
   }
 });
 
