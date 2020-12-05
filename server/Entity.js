@@ -6,10 +6,10 @@ class Entity {
     this.name = name;
     this.textureKey = textureKey;
     this.visible = textureKey !== 'blank'; // default to hidden if texture blank
-    this.pos = {}; // TODO - refactor to use a 'pos' object as opposed to x/y, and 
-      // get rid of reference to gameMap objects on client/server, but rather have 'map'
-      // refer to a name/key representing a reference to the specific base/guild's
-      // generated map(s)
+    this.pos = {}; // TODO - refactor to use a 'pos' object as opposed to x/y, and
+    // get rid of reference to gameMap objects on client/server, but rather have 'map'
+    // refer to a name/key representing a reference to the specific base/guild's
+    // generated map(s)
     if (!Number.isNaN(x) && !Number.isNaN(y) && gameMap) {
       this.x = x;
       this.y = y;
