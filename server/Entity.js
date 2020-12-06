@@ -17,14 +17,30 @@ class Entity {
     }
   }
 
+  init(x, y, mapName) {
+    this.pos.x = x;
+    this.pos.y = y;
+    this.pos.map = mapName;
+  }
+
   move(dx, dy) {
     this.x = clamp(this.x + dx, 0, this.gameMap.width - 1);
     this.y = clamp(this.y + dy, 0, this.gameMap.height - 1);
   }
 
+  hasPos() {
+    return this.pos.
+  }
+
   setPos(x, y) {
-    this.x = x;
-    this.y = y;
+    this.pos.x = x;
+    this.pos.y = y;
+    // this.x = x;
+    // this.y = y;
+  }
+
+  clearPos() {
+    this.pos = {};
   }
 
   show() {
