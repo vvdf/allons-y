@@ -313,8 +313,8 @@ class Engine {
         this.renderer.setMode('field');
         this.renderer.clear();
         this.renderer.render();
-        this.renderer.hide('map', 'entities');
-        this.renderer.animate(['map', 'entities'], 'fadeIn', 80);
+        this.renderer.hide('map', 'entities', 'ui');
+        this.renderer.animate(['map', 'entities', 'ui'], 'fadeIn', 80);
         this.input.setMode('field');
 
         this.entities[1].setPos(this.gameMap.spawn.x, this.gameMap.spawn.y);
@@ -322,7 +322,6 @@ class Engine {
       });
     this.state = this.play;
   }
-
   // ----------------------------------
   // engine helper methods
   // ----------------------------------

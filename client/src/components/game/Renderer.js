@@ -284,6 +284,19 @@ class Renderer {
   }
 
   fieldUIRender() {
+    // draw out some basic  rectangles and text as placeholders
+    // field UI consists of, health bar, energy bar, (enemy health), item/action selection display,
+    // game/chat log
+    this.clear('ui');
+
+    // to be broken into sub components so you can manage which sub item displays at all
+    //  also to modularly display things, like location text could pop up and dissappear
+    // (location text)
+    // (enemy health)
+    // health bar
+    // energy bar
+    // items/actions
+    // logs
   }
 
   fieldUIUpdate() {
