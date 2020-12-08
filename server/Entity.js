@@ -29,7 +29,7 @@ class Entity {
   }
 
   hasPos() {
-    return this.pos.
+    return this.pos;
   }
 
   setPos(x, y) {
