@@ -13,7 +13,7 @@ class Engine {
     this.settings = {
       backgroundColor: 0x030305,
       width: 800,
-      height: 550,
+      height: 600,
       resolution: 1,
     };
 
@@ -260,7 +260,7 @@ class Engine {
     this.renderer.setMode('field');
     this.renderer.clear();
     this.renderer.render();
-    this.renderer.hide('map', 'entities');
+    this.renderer.hide('map', 'entities', 'ui');
     // this.renderer.animate(['map', 'entities'], 'fadeIn', 100);
     this.input.setMode('field');
     this.centerCamera();
@@ -313,7 +313,7 @@ class Engine {
         this.renderer.setMode('field');
         this.renderer.clear();
         this.renderer.render();
-        this.renderer.hide('map', 'entities', 'ui');
+        this.renderer.hide('map', 'entities');
         this.renderer.animate(['map', 'entities', 'ui'], 'fadeIn', 80);
         this.input.setMode('field');
 
