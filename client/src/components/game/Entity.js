@@ -6,6 +6,10 @@ class Entity {
     this.name = name;
     this.textureKey = textureKey;
     this.visible = textureKey !== 'blank'; // default to hidden if texture blank
+    // TODO - pos object to replace below
+    // ref to gameMap to be deprecated, as the engine should handle interfacing
+    // position changes/calculations with operations to the gamemap, in particular
+    // as their will only ever be one game map
     if (!Number.isNaN(x) && !Number.isNaN(y) && gameMap) {
       this.x = x;
       this.y = y;
