@@ -21,8 +21,9 @@
   * Build proper login page
 
   Game
-  * Player input blocking on illegal actions/movements
+  * Refactor to utilize 'position' module for entities, and decouple interactions between gameMap and entities
   * Player UI while on field map screen
+  * Player input blocking on illegal actions/movements
   * Connect dungeon/map generation on server to current gameplay flow
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
     (Utilizing placeholder simple art assets for the base screen)
