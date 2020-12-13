@@ -54,9 +54,11 @@ class Engine {
     // define events for EventQueue/Reducer
     this.eventQueue.defineEvent('MOVE_ENTITY',
       (entityId, dx = 0, dy = 0) => {
+        // if (this.entityIdMap[entityId].pos)
         this.entityIdMap[entityId].move(dx, dy);
         if (entityId === this.entities[1].id) {
           // if entity moved is player, move camera also
+          // restrict movement, no need to broadcast 'attempts' at moving into a wall
           this.entityIdMap[0].move(dx, dy);
           this.sio.emit('gameEvent', { signal: 'MOVE_ENTITY', params: [entityId, dx, dy] });
         }
