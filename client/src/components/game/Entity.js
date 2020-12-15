@@ -1,30 +1,33 @@
-import { clamp } from './Utility';
+import Position from './Position';
 
 class Entity {
-  constructor(name, textureKey, x, y, gameMap, id = 0) {
+  constructor(name, textureKey, x, y, gameMap, id) {
     this.id = id;
     this.name = name;
     this.textureKey = textureKey;
     this.visible = textureKey !== 'blank'; // default to hidden if texture blank
-    // TODO - pos object to replace below
-    // ref to gameMap to be deprecated, as the engine should handle interfacing
-    // position changes/calculations with operations to the gamemap, in particular
-    // as their will only ever be one game map
-    if (!Number.isNaN(x) && !Number.isNaN(y) && gameMap) {
-      this.x = x;
-      this.y = y;
-      this.gameMap = gameMap;
-    }
+    this.pos = new Position(
+      x,
+      y,
+      gameMap ? gameMap.width - 1 : 100,
+      gameMap ? gameMap.height - 1 : 100,
+    );
   }
 
   move(dx, dy) {
-    this.x = clamp(this.x + dx, 0, this.gameMap.width - 1);
-    this.y = clamp(this.y + dy, 0, this.gameMap.height - 1);
+    this.pos.move(dx, dy);
+  }
+
+  nextPos(dx, dy) {
+    return this.pos.moveTest(dx, dy);
   }
 
   setPos(x, y) {
-    this.x = x;
-    this.y = y;
+    this.pos.set(x, y);
+  }
+
+  newMap(x, y, gameMap) {
+    this.pos.init(x, y, gameMap ? gameMap.width - 1 : 100, gameMap ? gameMap.height - 1 : 100);
   }
 
   show() {

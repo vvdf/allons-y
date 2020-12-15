@@ -1,5 +1,5 @@
-const axios = require('axios');
-const tiles = require('./Tiles');
+import axios from 'axios';
+import tiles from './Tiles';
 
 class GameMap {
   constructor(width = 20, height = 20, defaultTile = '.') {
@@ -74,6 +74,17 @@ class GameMap {
 
   get(x, y) {
     return this.grid[y][x];
+  }
+
+  getByPos({ x, y }) {
+    return this.grid[y][x];
+  }
+
+  isWalkable({ x, y }) {
+    // TODO - expand these to use a tile walkable.property check map eventually
+    // so client can easily discern IF you should be allowed to walk on water etc
+    console.log("WALKABLE TEST: ", this.get(x, y), tiles.WALL, tiles.WATER, tiles);
+    return !(this.get(x, y) === tiles.WALL || this.get(x, y) === tiles.WATER);
   }
 
   set(x, y, tile) {

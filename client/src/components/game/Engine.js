@@ -54,13 +54,18 @@ class Engine {
     // define events for EventQueue/Reducer
     this.eventQueue.defineEvent('MOVE_ENTITY',
       (entityId, dx = 0, dy = 0) => {
-        // if (this.entityIdMap[entityId].pos)
-        this.entityIdMap[entityId].move(dx, dy);
-        if (entityId === this.entities[1].id) {
-          // if entity moved is player, move camera also
-          // restrict movement, no need to broadcast 'attempts' at moving into a wall
-          this.entityIdMap[0].move(dx, dy);
-          this.sio.emit('gameEvent', { signal: 'MOVE_ENTITY', params: [entityId, dx, dy] });
+        // test to determine if target cell is movable before processing at all
+        console.log(this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy)));
+        console.log(this.entityIdMap[entityId].nextPos(dx, dy));
+        if (this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy))) {
+          console.log('legal move');
+          this.entityIdMap[entityId].move(dx, dy);
+          if (entityId === this.entities[1].id) {
+            // if entity moved is player, move camera also
+            // restrict movement, no need to broadcast 'attempts' at moving into a wall
+            this.entityIdMap[0].move(dx, dy);
+            this.sio.emit('gameEvent', { signal: 'MOVE_ENTITY', params: [entityId, dx, dy] });
+          }
         }
       });
 
@@ -80,7 +85,7 @@ class Engine {
 
     this.eventQueue.defineEvent('PAINT_MAP',
       (entityId, tile) => {
-        this.gameMap.set(this.entityIdMap[entityId].x, this.entityIdMap[entityId].y, tile);
+        this.gameMap.set(this.entityIdMap[entityId].pos.x, this.entityIdMap[entityId].pos.y, tile);
         if (entityId === this.entities[1].id) {
           // only emit signal if you're the creator of it
           this.sio.emit('gameEvent', { signal: 'PAINT_MAP', params: [entityId, tile] });
@@ -324,6 +329,7 @@ class Engine {
       });
     this.state = this.play;
   }
+
   // ----------------------------------
   // engine helper methods
   // ----------------------------------
@@ -340,7 +346,7 @@ class Engine {
   }
 
   centerCamera(updateView = true) {
-    this.entities[0].setPos(this.entities[1].x, this.entities[1].y);
+    this.entities[0].setPos(this.entities[1].pos.x, this.entities[1].pos.y);
     if (updateView) {
       this.renderer.update();
     }

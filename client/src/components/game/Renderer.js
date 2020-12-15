@@ -130,8 +130,8 @@ class Renderer {
 
   updateCameraPos() {
     this.lastCameraPos = {
-      x: this.entities[0].x,
-      y: this.entities[0].y,
+      x: this.entities[0].pos.x,
+      y: this.entities[0].pos.y,
     };
   }
 
@@ -394,8 +394,8 @@ class Renderer {
   fieldUpdate() {
     // if no major state changes (ie death)/new entities
     // just shift sprites around instead
-    const cameraDx = this.lastCameraPos.x - this.entities[0].x;
-    const cameraDy = this.lastCameraPos.y - this.entities[0].y;
+    const cameraDx = this.lastCameraPos.x - this.entities[0].pos.x;
+    const cameraDy = this.lastCameraPos.y - this.entities[0].pos.y;
     this.updateCameraPos();
     this.updateMapPos(cameraDx, cameraDy);
     this.entitiesUpdate();
@@ -421,8 +421,8 @@ class Renderer {
     let waterStep = 0;
     for (let y = 0; y < this.gameMap.height; y += 1) {
       for (let x = 0; x < this.gameMap.width; x += 1) {
-        const dx = x - this.entities[0].x;
-        const dy = y - this.entities[0].y;
+        const dx = x - this.entities[0].pos.x;
+        const dy = y - this.entities[0].pos.y;
         let tile;
         if (this.gameMap.get(x, y) === tiles.WALL) {
           tile = new PIXI.Sprite(this.textures.wall);
@@ -462,8 +462,8 @@ class Renderer {
       // const sprite = this.entitySpriteMap[this.entities[i].id];
       // TODO - add validity check to assure key exists, else blank or default
       const sprite = new PIXI.Sprite(this.textures[this.entities[i].textureKey]);
-      const dx = this.entities[i].x - this.entities[0].x;
-      const dy = this.entities[i].y - this.entities[0].y;
+      const dx = this.entities[i].pos.x - this.entities[0].pos.x;
+      const dy = this.entities[i].pos.y - this.entities[0].pos.y;
       sprite.x = this.gridToViewX(sprite, dx, dy);
       sprite.y = this.gridToViewY(sprite, dx, dy, true);
       delete this.entities[i].sprite;
@@ -476,9 +476,11 @@ class Renderer {
   }
 
   entitiesUpdate() {
+    // TODO - fix to utilize entitySpriteMap rather than mutating entities by adding
+    // a sprite property
     for (let i = 1; i < this.entities.length; i += 1) {
-      const dx = this.entities[i].x - this.entities[0].x;
-      const dy = this.entities[i].y - this.entities[0].y;
+      const dx = this.entities[i].pos.x - this.entities[0].pos.x;
+      const dy = this.entities[i].pos.y - this.entities[0].pos.y;
       this.entities[i].sprite.x = this.gridToViewX(this.entities[i].sprite, dx, dy);
       this.entities[i].sprite.y = this.gridToViewY(this.entities[i].sprite, dx, dy, true);
     }
