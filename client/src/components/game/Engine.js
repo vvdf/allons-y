@@ -58,7 +58,6 @@ class Engine {
         console.log(this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy)));
         console.log(this.entityIdMap[entityId].nextPos(dx, dy));
         if (this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy))) {
-          console.log('legal move');
           this.entityIdMap[entityId].move(dx, dy);
           if (entityId === this.entities[1].id) {
             // if entity moved is player, move camera also
