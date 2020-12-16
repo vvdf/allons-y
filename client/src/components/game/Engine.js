@@ -55,9 +55,9 @@ class Engine {
     this.eventQueue.defineEvent('MOVE_ENTITY',
       (entityId, dx = 0, dy = 0) => {
         // test to determine if target cell is movable before processing at all
-        console.log(this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy)));
-        console.log(this.entityIdMap[entityId].nextPos(dx, dy));
-        if (this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy))) {
+        const moveIsValid = this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy));
+        if (moveIsValid) {
+          console.log("move is valid");
           this.entityIdMap[entityId].move(dx, dy);
           if (entityId === this.entities[1].id) {
             // if entity moved is player, move camera also
@@ -316,6 +316,7 @@ class Engine {
     // get request for current map selected
     this.gameMap.load()
       .then(() => {
+
         this.renderer.setMode('field');
         this.renderer.clear();
         this.renderer.render();

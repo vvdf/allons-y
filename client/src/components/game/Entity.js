@@ -1,33 +1,24 @@
-import Position from './Position';
-
 class Entity {
   constructor(name, textureKey, x, y, gameMap, id) {
     this.id = id;
     this.name = name;
     this.textureKey = textureKey;
     this.visible = textureKey !== 'blank'; // default to hidden if texture blank
-    this.pos = new Position(
-      x,
-      y,
-      gameMap ? gameMap.width - 1 : 100,
-      gameMap ? gameMap.height - 1 : 100,
-    );
+    this.pos = { x: 0, y: 0 };
   }
 
   move(dx, dy) {
-    this.pos.move(dx, dy);
-  }
-
-  nextPos(dx, dy) {
-    return this.pos.moveTest(dx, dy);
+    this.pos.x += dx;
+    this.pos.y += dy;
   }
 
   setPos(x, y) {
-    this.pos.set(x, y);
+    this.pos.x = x;
+    this.pos.y = y;
   }
 
-  newMap(x, y, gameMap) {
-    this.pos.init(x, y, gameMap ? gameMap.width - 1 : 100, gameMap ? gameMap.height - 1 : 100);
+  nextPos(dx, dy) {
+    return { x: this.pos.x + dx, y: this.pos.y + dy };
   }
 
   show() {
