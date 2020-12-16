@@ -82,8 +82,7 @@ class GameMap {
 
   isWalkable({ x, y }) {
     // TODO - expand these to use a tile walkable.property check map eventually
-    // so client can easily discern IF you should be allowed to walk on water etc
-    console.log("WALKABLE TEST: ", this.get(x, y), tiles.WALL, tiles.WATER, tiles);
+    // so client can dynamically discern IF you should be allowed to walk on water etc
     return !(this.get(x, y) === tiles.WALL || this.get(x, y) === tiles.WATER);
   }
 
