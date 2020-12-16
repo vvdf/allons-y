@@ -21,6 +21,10 @@ class Entity {
     return { x: this.pos.x + dx, y: this.pos.y + dy };
   }
 
+  equalsPos({ x, y }) {
+    return this.pos.x === x && this.pos.y === y;
+  }
+
   show() {
     this.visible = true;
   }
