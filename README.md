@@ -21,13 +21,15 @@
   * Build proper login page
 
   Game
-  * Refactor to utilize 'position' module for entities, and decouple interactions between gameMap and entities
+  ~~* Refactor to utilize 'position' module for entities, and decouple interactions between gameMap and entities~~
   * Player UI while on field map screen
   * Player input blocking on illegal actions/movements
   * Connect dungeon/map generation on server to current gameplay flow
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
     (Utilizing placeholder simple art assets for the base screen)
   * Back-end validation of player actions
+  * Implement loading of nearby entities during player action validation
+  * Build interaction layer between entities/player
   * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with placeholder sprites)
   * Update/rebuild client entity module (particular x,y coords to be a pos object containing x/y)
   * Update/rebuild client gamemap module
