@@ -69,14 +69,14 @@ class Engine {
       });
 
     this.eventQueue.defineEvent('NEW_ENTITY',
-      (name, textureKey, x, y, gameMap, id) => {
+      (name, textureKey, x, y, id) => {
         if (this.entityIdMap[id]) {
           // if entity still exists in local storage
           this.entityIdMap[id].setPos(x, y);
         } else {
           // otherwise add new entity
           this.createEntity({
-            name, textureKey, x, y, gameMap, id,
+            name, textureKey, x, y, id,
           });
           this.flagRerender = true;
         }
@@ -340,7 +340,7 @@ class Engine {
     y = 0,
     id = 1,
   }) {
-    const createdEntity = new Entity(name, textureKey, x, y, this.gameMap, id);
+    const createdEntity = new Entity(name, textureKey, x, y, id);
     this.entities.push(createdEntity);
     this.entityIdMap[id] = createdEntity;
   }

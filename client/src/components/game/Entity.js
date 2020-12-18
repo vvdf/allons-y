@@ -1,5 +1,5 @@
 class Entity {
-  constructor(name, textureKey, x, y, gameMap, id) {
+  constructor(name, textureKey, x, y, id) {
     this.id = id;
     this.name = name;
     this.textureKey = textureKey;
