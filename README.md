@@ -38,6 +38,7 @@
   * Handle proper zIndexing for tiles (notably walls/entities)
 
   Med Priority
+  * Improve dungeon generation
   * Possible expansion into options during character creation (also possible external page for character
     creation)
   * Character management page
