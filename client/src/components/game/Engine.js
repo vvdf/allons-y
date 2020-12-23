@@ -93,8 +93,23 @@ class Engine {
         this.flagRerender = true;
       });
 
-    this.eventQueue.defineEvent('RERENDER', () => { this.flagRerender = true; });
+    this.eventQueue.defineEvent('RERENDER', (type) => {
+      if (type === 'full') {
+        this.fieldRefresh();
+      } else {
+        this.flagRerender = true;
+      }
+    });
+
     this.eventQueue.defineEvent('DEBUG_MSG', (msg) => { console.log(msg); });
+    this.eventQueue.defineEvent('TOGGLE_UI', () => { 
+      this.ui.hidden = !this.ui.hidden;
+      if (this.ui.hidden) {
+        this.renderer.animate(['ui'], 'fadeOut', 50);
+      } else {
+        this.renderer.animate(['ui'], 'fadeIn', 50);
+      }
+    });
 
     this.eventQueue.defineEvent('UI_SELECT', (input) => {
       if (input === 2) {
@@ -102,8 +117,6 @@ class Engine {
       } else if (input === 1) {
         this.ui.prev();
       } else {
-        // this.renderer.animate(['ui'], 'blinkOut', 100)
-        //   .then(() => this.ui.select());
         this.ui.select();
       }
     });
@@ -307,6 +320,13 @@ class Engine {
     this.state = this.play;
   }
 
+  fieldRefresh() {
+    this.renderer.clear();
+    this.renderer.render();
+    this.renderer.hide('map', 'entities', 'ui');
+    this.renderer.animate(['map', 'entities', 'ui'], 'fadeIn', 80);
+  }
+
   fieldMode(delta) {
     // code to load game into field
     // TODO - build code to load field content including potential other players
@@ -318,10 +338,7 @@ class Engine {
       .then(() => {
 
         this.renderer.setMode('field');
-        this.renderer.clear();
-        this.renderer.render();
-        this.renderer.hide('map', 'entities');
-        this.renderer.animate(['map', 'entities', 'ui'], 'fadeIn', 80);
+        this.fieldRefresh();
         this.input.setMode('field');
 
         this.entities[1].setPos(this.gameMap.spawn.x, this.gameMap.spawn.y);

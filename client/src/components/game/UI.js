@@ -3,6 +3,7 @@ import { clampLoop } from './Utility';
 class UI {
   constructor(uiOptionsArr = [{ text: 'empty', onSelect: () => {} }], mode = 'menu') {
     this.mode = mode; // menu or text (input), default is menu
+    this.hidden = false;
     this.textMaxLength = 16;
     this.textInput = '';
     this.textIdx = -1;

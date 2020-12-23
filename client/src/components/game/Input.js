@@ -49,6 +49,9 @@ class Input {
     this.key.paintRoad = '82'; // 'R'
     this.key.paintWater = '87'; // 'W'
 
+    this.key.refresh = '192'; // tilde
+    this.key.toggleUI = '85'; // 'U'
+
     for (let i = 0; i < 26; i += 1) {
       this.key[String.fromCharCode(97 + i)] = 65 + i;
     }
@@ -79,12 +82,16 @@ class Input {
     // field key mapping, only allow if an owner entity is set
     if (this.owner) {
       this.keyMap.field = {};
+      // player actions
       this.keyMap.field[this.key.moveUp] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 0, -1] };
       this.keyMap.field[this.key.moveDown] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 0, 1] };
       this.keyMap.field[this.key.moveLeft] = { signal: 'MOVE_ENTITY', params: [this.owner.id, -1, 0] };
       this.keyMap.field[this.key.moveRight] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 1, 0] };
 
+      this.keyMap.field[this.key.toggleUI] = { signal: 'TOGGLE_UI', params: [] };
+
       // debug field key mapping
+      this.keyMap.field[this.key.refresh] = { signal: 'RERENDER', params: ['full'] };
       this.keyMap.field[this.key.paintGrass] = { signal: 'PAINT_MAP', params: [this.owner.id, 'g'] };
       this.keyMap.field[this.key.paintDirt] = { signal: 'PAINT_MAP', params: [this.owner.id, 'd'] };
       this.keyMap.field[this.key.paintRoad] = { signal: 'PAINT_MAP', params: [this.owner.id, 'r'] };
