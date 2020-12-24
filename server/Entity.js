@@ -52,4 +52,4 @@ class Entity {
   }
 }
 
-export default Entity;
+module.exports = Entity;
