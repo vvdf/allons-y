@@ -15,8 +15,22 @@ class GameMap {
     this.width = width;
     this.height = height;
     this.grid = [];
+    this.entities = {};
     this.spawn = { x: -1, y: -1 };
     this.generate(type);
+  }
+
+  addEntity(entity) {
+    this.entities.push(entity);
+  }
+
+  removeEntity(eid) {
+    for (let i = 0; i < this.entities.length; i += 1) {
+      if (this.entities[i].eid === eid) {
+        this.entities.splice(i, 1);
+        break;
+      }
+    }
   }
 
   clear(wallTile = '#') {
