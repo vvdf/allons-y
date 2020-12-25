@@ -5,8 +5,8 @@ const path = require('path');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const GameMap = require('./GameMap');
-const { parseCookies } = require('./utility');
+const Guild = require('./Guild');
+const { parseCookies, generateID } = require('./utility');
 
 const REST_PORT = 3000;
 const SOCK_PORT = 3001;
@@ -20,13 +20,14 @@ app.use(express.json());
 const clients = {};
 const guilds = {}; // comprised of Seed, PlayerEntities, OpenMaps, progression info
 const mapCache = {};
-const entities = {};
 
 app.use('/', express.static(path.join(__dirname, '..', 'client', 'dist')));
 
 app.get('/client', (req, res) => {
+  // creates client ID cookie if one doesn't exist
+  // returns found === true if clientID is active, aka has a corresp. entityID
   const { cid } = parseCookies(req.headers.cookie);
-  const clientId = cid || `CID${Math.random().toString(36).substring(6)}`;
+  const clientId = cid || `CID${generateID()}`;
   console.log(clientId, Object.keys(clients));
   if (clients[clientId]) {
     console.log(clients[clientId]);
@@ -40,141 +41,72 @@ app.get('/client', (req, res) => {
 });
 
 app.post('/entity', (req, res) => {
+  // create entity (and guild if one doesn't exist) based on submitted name/locale
   const { cid } = parseCookies(req.headers.cookie);
   const { name, area } = req.body;
-  console.log('REGISTERING NEW ENTITY FOR CLIENT: ', cid);
-  const eid = `EID${req.body.name.toUpperCase() + Math.random().toString(36).substring(6)}`;
-  const playerEntity = {
-    id: eid,
-    name,
-    textureKey: 'player',
-    x: 0,
-    y: 0,
-    map: 'world',
-    guild: area, // TODO - edit to use guild name gen
-  };
-
   if (!{}.hasOwnProperty.call(guilds, area)) {
     // if the guild has yet to be established, create
-    guilds[area] = {
-      name: area, // TODO - edit like above to use guild name gen
-      entities: [],
-      maps: {},
-      stats: {},
-    };
+    guilds[area] = new Guild(area);
   }
 
   if (!{}.hasOwnProperty.call(clients, cid)) {
+    // if cid not yet registered, instantiate to handle member properties
     clients[cid] = {};
   }
-
-  clients[cid].eid = eid;
-  clients[cid].area = area;
-  entities[eid] = playerEntity;
-  guilds[area].entities.push(playerEntity);
-  console.log(clients);
+  clients[cid].entity = guilds[area].newMember(name);
+  clients[cid].eid = clients[cid].entity.eid;
+  clients[cid].guild = guilds[area];
+  console.log(`REGISTERING EID${clients[cid].eid} for CID${cid}`);
   res.status(200).send();
 });
 
 // load all entities, starting with player (will be empty if cid not found/registered)
 app.get('/entity', (req, res) => {
   const { cid } = parseCookies(req.headers.cookie);
-  // TODO - read map of current entity and return list of all visible entities
-  res.status(200).send(entities[clients[cid].eid]);
-  // const entityList = [];
-  // if (cid && clients[cid] && clients[cid].eid) {
-  //   // player character found, add to start of entity list
-  //   entityList.push(entities[clients[cid].eid]);
-  // } else {
-  //   // no player character OR no cid found, create and send one
-  //   // TODO - build real generator functions for server
-  //   const name = `Apron${Math.random().toString(36).substring(6)}`;
-  //   const entityId = `EID${name.toUpperCase() + Math.random().toString(36).substring(6)}`;
-  //   const playerEntityBase = {
-  //     id: entityId,
-  //     name,
-  //     textureKey: 'player',
-  //     x: 0,
-  //     y: 0,
-  //     gameMap: 0,
-  //   };
-  //   entityList.push(playerEntityBase);
-  //   entities[entityId] = playerEntityBase;
-  //   clients[cid] = { eid: entityId };
-  // }
-  // Object.keys(entities).forEach((key) => {
-  //   if (key !== clients[cid].eid) {
-  //     entityList.push(entities[key]);
-  //   }
-  // });
-  // res.status(200).send(entityList);
-});
-
-// map saving
-app.post('/map', (req, res) => {
-  console.log(`Saving Map, "${req.body.name}"`);
-  // save to cache
-  mapCache[req.body.name] = req.body.grid;
-
-  // save to file
-  fs.writeFile(path.join(__dirname, '..', 'maps', `${req.body.name}.map`),
-    req.body.grid, () => {
-      res.status(201).send('Map Successfully Saved');
-    });
+  res.status(200).send(clients[cid].entity);
 });
 
 // map loading
-app.get('/map/:mapName', (req, res) => {
-  console.log(`Loading Map, "${req.params.mapName}"`);
-  if (mapCache[req.params.mapName]) {
-    // load from cache if available
-    console.log(`Loaded Map, "${req.params.mapName}"`);
-    res.status(200).send({ mapFound: true, mapData: mapCache[req.params.mapName] });
+app.get('/map', (req, res) => {
+  const { cid } = parseCookies(req.headers.cookie);
+  console.log('Loading map for', cid);
+
+  if ({}.hasOwnProperty.call(clients, cid) && {}.hasOwnProperty.call(clients[cid], 'eid')) {
+    const eid = clients[cid].eid;
+    // cid and eid exist, so check for map
+    if (!clients[cid].entity.hasMap()) {
+      // no map found, generate
+      console.log('No map found for entity, generating...');
+      clients[cid].guild.newMap(eid);
+    }
+    res.status(200).send(clients[cid].guild.getMapObj(eid));
   } else {
-    // otherwise, load from file TODO changed to generate
-    // fs.readFile(path.join(__dirname, '..', 'maps', `${req.params.mapName}.map`), 'utf8',
-    //   (err, data) => {
-    //     if (err) {
-    //       console.log(err);
-    //       res.status(200).send({ mapFound: false });
-    //     } else {
-    //       res.status(200).send({ mapFound: true, mapData: data });
-    //     }
-    //   });
-    console.log(`Generating Map, "${req.params.mapName}"`);
-    const mapData = new GameMap();
-    mapData.generate('rogue', ',', '#');
-    res.status(200).send({
-      mapFound: true,
-      mapData: mapData.toString(),
-      width: mapData.width,
-      height: mapData.height,
-      spawn: mapData.spawn,
-    });
-    console.log('Spawn location found for generated map: ', mapData.spawn);
+    res.status(400).send({ mapFound: false });
   }
 });
 
 io.on('connection', (socket) => {
-  let clientId;
-  let entityId;
+  let cid;
 
   socket.on('register', ({ cookie }) => {
     console.log('REGISTER DATA RECEIVED: ', cookie);
-    clientId = parseCookies(cookie).cid;
+    cid = parseCookies(cookie).cid;
     socket.join('root');
 
     // TODO - generate a clientId if one doesn't exist
-    if (clientId && clients[clientId] && clients[clientId].eid) {
-      console.log('CLIENT ID FOUND, attached EID = ', clients[clientId].eid);
-      entityId = clients[clientId].eid;
-      const {
-        name, textureKey, x, y, gameMap, id,
-      } = entities[entityId];
+    if (cid && clients[cid] && clients[cid].eid) {
+      console.log('CLIENT ID FOUND, attached EID = ', clients[cid].eid);
+      const { eid, name, textureKey, pos } = clients[cid].entity;
 
-      clients[clientId].sid = socket.id;
-      io.to(clients[clientId].sid).emit('gameEvent', { signal: 'DEBUG_MSG', params: ['SID REGISTERED'] });
-      socket.to('/').emit('gameEvent', { signal: 'NEW_ENTITY', params: [name, textureKey, x, y, gameMap, id] });
+      clients[cid].sid = socket.id;
+      io.to(clients[cid].sid).emit('gameEvent', {
+        signal: 'DEBUG_MSG',
+        params: ['SID REGISTERED'],
+      });
+      socket.to('/').emit('gameEvent', {
+        signal: 'NEW_ENTITY',
+        params: [eid, name, textureKey, pos],
+      });
     } else {
       // TODO - signal to reregister for a client ID
       // NOTE - io.to broadcasts from server, socket.to broadcasts from (and not back to) sender
@@ -185,9 +117,12 @@ io.on('connection', (socket) => {
     // TODO refactor move_entity handling to only allow and pass on legal movements
     // AND proper handling of rooms for instanced maps between players
     // TODO refactor signal responses into a response hashmap/object for ease of use/speed
-    if (data.signal === 'MOVE_ENTITY' && entityId) {
-      entities[entityId].x += data.params[1];
-      entities[entityId].y += data.params[2];
+    if (data.signal === 'MOVE_ENTITY' && clients[cid].eid) {
+      // if signal is MOVE ENTITY and signal target is owned by client, perform
+      // TODO do I run an EntityManager to validate entity actions?
+      clients[cid].entity.move(data.params[1], data.params[2]);
+      // clients[cid].entity.x += data.params[1];
+      // entities[entityId].y += data.params[2];
     }
     socket.to('root').emit('gameEvent', data);
   });

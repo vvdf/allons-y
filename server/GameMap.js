@@ -1,4 +1,4 @@
-const { rng } = require('./utility');
+const { generateID, rng } = require('./utility');
 const mapTools = require('./mapTools');
 
 const tiles = {
@@ -11,17 +11,20 @@ const tiles = {
 };
 
 class GameMap {
-  constructor(width = 80, height = 40, type = 'rogue') {
+  constructor(mapId, width = 100, height = 100, type = 'rogue') {
+    this.mapId = mapId; // mapId
     this.width = width;
     this.height = height;
     this.grid = [];
-    this.entities = {};
+    this.entities = [];
     this.spawn = { x: -1, y: -1 };
     this.generate(type);
   }
 
   addEntity(entity) {
+    entity.setPos(this.spawn.x, this.spawn.y, this.mapId);
     this.entities.push(entity);
+    this.findNextSpawn();
   }
 
   removeEntity(eid) {
@@ -167,6 +170,16 @@ class GameMap {
 
   toString() {
     return mapTools.mapToString(this.grid);
+  }
+
+  getMapObj() {
+    return {
+      mapFound: true,
+      mapData: this.toString(),
+      width: this.width,
+      height: this.height,
+      spawn: this.spawn,
+    };
   }
 }
 
