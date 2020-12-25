@@ -83,19 +83,19 @@ class Input {
     if (this.owner) {
       this.keyMap.field = {};
       // player actions
-      this.keyMap.field[this.key.moveUp] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 0, -1] };
-      this.keyMap.field[this.key.moveDown] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 0, 1] };
-      this.keyMap.field[this.key.moveLeft] = { signal: 'MOVE_ENTITY', params: [this.owner.id, -1, 0] };
-      this.keyMap.field[this.key.moveRight] = { signal: 'MOVE_ENTITY', params: [this.owner.id, 1, 0] };
+      this.keyMap.field[this.key.moveUp] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 0, -1] };
+      this.keyMap.field[this.key.moveDown] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 0, 1] };
+      this.keyMap.field[this.key.moveLeft] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, -1, 0] };
+      this.keyMap.field[this.key.moveRight] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 1, 0] };
 
       this.keyMap.field[this.key.toggleUI] = { signal: 'TOGGLE_UI', params: [] };
 
       // debug field key mapping
       this.keyMap.field[this.key.refresh] = { signal: 'RERENDER', params: ['full'] };
-      this.keyMap.field[this.key.paintGrass] = { signal: 'PAINT_MAP', params: [this.owner.id, 'g'] };
-      this.keyMap.field[this.key.paintDirt] = { signal: 'PAINT_MAP', params: [this.owner.id, 'd'] };
-      this.keyMap.field[this.key.paintRoad] = { signal: 'PAINT_MAP', params: [this.owner.id, 'r'] };
-      this.keyMap.field[this.key.paintWater] = { signal: 'PAINT_MAP', params: [this.owner.id, 'w'] };
+      this.keyMap.field[this.key.paintGrass] = { signal: 'PAINT_MAP', params: [this.owner.eid, 'g'] };
+      this.keyMap.field[this.key.paintDirt] = { signal: 'PAINT_MAP', params: [this.owner.eid, 'd'] };
+      this.keyMap.field[this.key.paintRoad] = { signal: 'PAINT_MAP', params: [this.owner.eid, 'r'] };
+      this.keyMap.field[this.key.paintWater] = { signal: 'PAINT_MAP', params: [this.owner.eid, 'w'] };
     }
   }
 

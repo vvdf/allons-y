@@ -1,6 +1,6 @@
 class Entity {
-  constructor(name, textureKey, x, y, id) {
-    this.id = id;
+  constructor(eid, name, textureKey) {
+    this.eid = eid;
     this.name = name;
     this.textureKey = textureKey;
     this.visible = textureKey !== 'blank'; // default to hidden if texture blank
@@ -13,6 +13,11 @@ class Entity {
   }
 
   setPos(x, y) {
+    this.pos.x = x;
+    this.pos.y = y;
+  }
+
+  setPosObj({ x, y }) {
     this.pos.x = x;
     this.pos.y = y;
   }

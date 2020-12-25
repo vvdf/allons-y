@@ -28,29 +28,12 @@ class GameMap {
     return result;
   }
 
-  save(mapName = 'blank') {
-    // return Promise to save current map to file
-    return new Promise((resolve, reject) => {
-      axios.post('/map', {
-        grid: this.toString(),
-        name: mapName,
-      })
-        .then((res) => {
-          if (res.status === 201) {
-            resolve('Map Saved');
-          } else {
-            reject();
-          }
-        });
-    });
-  }
-
-  load(mapName = 'blank') {
+  load() {
     // return Promise to load map from file
     return new Promise((resolve, reject) => {
-      axios.get(`/map/${mapName}`)
+      axios.get(`/map`)
         .then((res) => {
-          console.log('Load attempted for: ', mapName, res);
+          console.log('Load attempted ', res);
           if (res.data.mapFound) {
             this.height = res.data.height;
             this.width = res.data.width;

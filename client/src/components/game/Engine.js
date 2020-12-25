@@ -44,7 +44,8 @@ class Engine {
       this.messageLog,
     );
     this.flagRerender = false;
-    targetEle.appendChild(this.renderer.getView());
+    targetEle.appendChild(this.renderer.getView()); // attach PIXI app to html element
+    this.createEntity({ eid: 0, name: 'Camera', textureKey: 'blank' }); // instantiate camera
     this.renderer.setup()
       .then(() => this.initEvents())
       .then(() => this.renderer.addToTicker((delta) => this.gameLoop(delta)));
@@ -57,49 +58,29 @@ class Engine {
         // test to determine if target cell is movable before processing at all
         const moveIsValid = this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy));
         if (moveIsValid) {
-          console.log("move is valid");
           this.entityIdMap[entityId].move(dx, dy);
-          if (entityId === this.entities[1].id) {
+          if (entityId === this.entities[1].eid) {
             // if entity moved is player, move camera also
             // restrict movement, no need to broadcast 'attempts' at moving into a wall
             this.entityIdMap[0].move(dx, dy);
             this.sio.emit('gameEvent', { signal: 'MOVE_ENTITY', params: [entityId, dx, dy] });
           }
+        } else {
+          console.log("move is invalid");
         }
       });
 
     this.eventQueue.defineEvent('NEW_ENTITY',
-      (name, textureKey, x, y, id) => {
-        if (this.entityIdMap[id]) {
+      (eid, name, textureKey, pos) => {
+        if (this.entityIdMap[eid]) {
           // if entity still exists in local storage
-          this.entityIdMap[id].setPos(x, y);
+          this.entityIdMap[eid].setPos(pos.x, pos.y);
         } else {
           // otherwise add new entity
-          this.createEntity({
-            name, textureKey, x, y, id,
-          });
+          this.createEntity({ eid, name, textureKey, pos });
           this.flagRerender = true;
         }
       });
-
-    this.eventQueue.defineEvent('PAINT_MAP',
-      (entityId, tile) => {
-        this.gameMap.set(this.entityIdMap[entityId].pos.x, this.entityIdMap[entityId].pos.y, tile);
-        if (entityId === this.entities[1].id) {
-          // only emit signal if you're the creator of it
-          this.sio.emit('gameEvent', { signal: 'PAINT_MAP', params: [entityId, tile] });
-        }
-        this.sio.emit('gameEvent', { signal: 'RERENDER', params: [] });
-        this.flagRerender = true;
-      });
-
-    this.eventQueue.defineEvent('RERENDER', (type) => {
-      if (type === 'full') {
-        this.fieldRefresh();
-      } else {
-        this.flagRerender = true;
-      }
-    });
 
     this.eventQueue.defineEvent('DEBUG_MSG', (msg) => { console.log(msg); });
     this.eventQueue.defineEvent('TOGGLE_UI', () => { 
@@ -169,7 +150,6 @@ class Engine {
           // user id AND living entity found, jump to base menu
           axios.get('/entity')
             .then(({ data }) => {
-              this.createEntity({ name: 'Camera', id: 0 });
               this.createEntity(data);
               this.currentMap = data.map;
               this.input.setOwner(this.entities[1]);
@@ -236,7 +216,6 @@ class Engine {
               .then(() => {
                 axios.get('/entity')
                   .then(({ data }) => {
-                    this.createEntity({ name: 'Camera', id: 0 });
                     this.createEntity(data);
                     this.currentMap = data.map;
                     this.input.setOwner(this.entities[1]);
@@ -350,16 +329,10 @@ class Engine {
   // ----------------------------------
   // engine helper methods
   // ----------------------------------
-  createEntity({
-    name = 'Generic Entity',
-    textureKey = 'blank',
-    x = 0,
-    y = 0,
-    id = 1,
-  }) {
-    const createdEntity = new Entity(name, textureKey, x, y, id);
+  createEntity({ eid, name, textureKey, pos }) {
+    const createdEntity = new Entity(eid, name, textureKey, pos);
     this.entities.push(createdEntity);
-    this.entityIdMap[id] = createdEntity;
+    this.entityIdMap[eid] = createdEntity;
   }
 
   centerCamera(updateView = true) {
