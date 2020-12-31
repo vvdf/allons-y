@@ -19,6 +19,7 @@
   * Build main page
   * Build sidebar
   * Build proper login page
+    * Build account management
 
   Game
   ~~* Refactor to utilize 'position' module for entities, and decouple interactions between gameMap and entities~~
