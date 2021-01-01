@@ -117,6 +117,11 @@ class Engine {
         this.ui.select();
       }
     });
+
+    this.eventQueue.defineEvent('RERENDER', (input) => {
+      console.log('Rerender Flag Set');
+      this.flagRerender = true;
+    });
   }
 
   gameLoop(delta) {
@@ -134,8 +139,12 @@ class Engine {
       if (this.eventQueue.length < 1) {
         // if event queue is emptied, ie all potential state change is computed, re-render
         if (this.flagRerender) {
+          // rerender then clear flag until flag is set/called again
+          console.log('Play State: Rerendering');
           this.renderer.render();
+          this.flagRerender = false;
         } else {
+          console.log('Play State: Updating');
           this.renderer.update();
         }
       }
