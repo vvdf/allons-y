@@ -43,12 +43,6 @@ class Input {
     this.key.minus = '173'; // space
 
     // debug key assignments
-    // paint floor tiles
-    this.key.paintGrass = '71'; // 'G'
-    this.key.paintDirt = '68'; // 'D'
-    this.key.paintRoad = '82'; // 'R'
-    this.key.paintWater = '87'; // 'W'
-
     this.key.refresh = '192'; // tilde
     this.key.toggleUI = '85'; // 'U'
 
@@ -92,10 +86,6 @@ class Input {
 
       // debug field key mapping
       this.keyMap.field[this.key.refresh] = { signal: 'RERENDER', params: ['full'] };
-      this.keyMap.field[this.key.paintGrass] = { signal: 'PAINT_MAP', params: [this.owner.eid, 'g'] };
-      this.keyMap.field[this.key.paintDirt] = { signal: 'PAINT_MAP', params: [this.owner.eid, 'd'] };
-      this.keyMap.field[this.key.paintRoad] = { signal: 'PAINT_MAP', params: [this.owner.eid, 'r'] };
-      this.keyMap.field[this.key.paintWater] = { signal: 'PAINT_MAP', params: [this.owner.eid, 'w'] };
     }
   }
 
