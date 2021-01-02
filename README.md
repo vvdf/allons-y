@@ -26,9 +26,9 @@
   ~~* Player UI while on field map screen~~
   ~~* Player input blocking on illegal actions/movements~~
   ~~* Update/rebuild client entity module (particular x,y coords to be a pos object containing x/y)~~
+  ~~* Connect dungeon/map generation on server to current gameplay flow~~
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
-  * Connect dungeon/map generation on server to current gameplay flow
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
     (Utilizing placeholder simple art assets for the base screen)
   * Back-end validation of player actions
