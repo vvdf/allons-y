@@ -27,6 +27,7 @@
   ~~* Player input blocking on illegal actions/movements~~
   ~~* Update/rebuild client entity module (particular x,y coords to be a pos object containing x/y)~~
   ~~* Connect dungeon/map generation on server to current gameplay flow~~
+  * FIX: Positioning on reload
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
