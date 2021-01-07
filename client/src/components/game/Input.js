@@ -45,6 +45,7 @@ class Input {
     // debug key assignments
     this.key.refresh = '192'; // tilde
     this.key.toggleUI = '85'; // 'U'
+    this.key.debugPrint = '32';
 
     for (let i = 0; i < 26; i += 1) {
       this.key[String.fromCharCode(97 + i)] = 65 + i;
@@ -86,6 +87,7 @@ class Input {
 
       // debug field key mapping
       this.keyMap.field[this.key.refresh] = { signal: 'RERENDER', params: ['full'] };
+      this.keyMap.field[this.key.debugPrint] = { signal: 'DEBUG_MSG', params: [''] };
     }
   }
 
