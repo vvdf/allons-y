@@ -43,6 +43,7 @@
     * Field relative temporary changes to inventory/ability loadout based on pickup
   * Guild/Division Research Trees
   * Develop Multiplayer interactions
+  * Vision handling
 
   Med Priority
   * Improve dungeon generation
