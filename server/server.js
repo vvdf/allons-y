@@ -17,9 +17,8 @@ app.use(express.json());
 // TODO - refactor for UserID and SessionID management once a proper
 //   login/register interface is implemented on the front end
 // TODO - build character, uid, etc generation utility methods
-const clients = {};
+const clients = {}; // comprised of client[cid] -> eid, entityObj, guildObj
 const guilds = {}; // comprised of Seed, PlayerEntities, OpenMaps, progression info
-const mapCache = {};
 
 app.use('/', express.static(path.join(__dirname, '..', 'client', 'dist')));
 
@@ -109,20 +108,30 @@ io.on('connection', (socket) => {
       });
     } else {
       // TODO - signal to reregister for a client ID
-      // NOTE - io.to broadcasts from server, socket.to broadcasts from (and not back to) sender
+      // NOTE - io.to broadcasts from server,
+      //  socket.to broadcasts from (and not back to) sender
     }
   });
 
   socket.on('gameEvent', (data) => {
-    // TODO refactor move_entity handling to only allow and pass on legal movements
-    // AND proper handling of rooms for instanced maps between players
-    // TODO refactor signal responses into a response hashmap/object for ease of use/speed
-    if (data.signal === 'MOVE_ENTITY' && clients[cid].eid) {
+    if (data.signal === 'INIT_MAP' && clients[cid] && clients[cid].eid) {
+      // get map and pass back each entity that isn't their own
+      const npcs = clients[cid].guild.getMap(clients[cid].eid).getEntities();
+      for (let i = 0; i < npcs.length; i += 1) {
+        if (npcs[i].eid !== clients[cid].eid) {
+          const { eid, name, textureKey, pos } = npcs[i];
+          console.log('Sending new entity', eid, name, pos);
+          io.to('root').emit('gameEvent', {
+            signal: 'NEW_ENTITY',
+            params: [eid, name, textureKey, { x: pos.x, y: pos.y }],
+          });
+        }
+      }
+    }
+
+    if (data.signal === 'MOVE_ENTITY' && clients[cid] && clients[cid].eid) {
       // if signal is MOVE ENTITY and signal target is owned by client, perform
-      // TODO do I run an EntityManager to validate entity actions?
       clients[cid].entity.move(data.params[1], data.params[2]);
-      // clients[cid].entity.x += data.params[1];
-      // entities[entityId].y += data.params[2];
     }
     socket.to('root').emit('gameEvent', data);
   });

@@ -36,6 +36,10 @@ class GameMap {
     }
   }
 
+  getEntities() {
+    return this.entities;
+  }
+
   clear(wallTile = '#') {
     this.grid = [];
     for (let i = 0; i < this.height; i += 1) {

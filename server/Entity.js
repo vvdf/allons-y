@@ -7,10 +7,15 @@ class Entity {
     this.textureKey = textureKey;
     this.visible = textureKey !== 'blank'; // default to hidden if texture blank
     this.pos = { x: 0, y: 0, mapId: '' };
+    this.inCombat = false;
   }
   
   setOwner(clientID) {
     this.cid = clientID;
+  }
+
+  setCombat(status) {
+    this.inCombat = status; // set combat status to true or false
   }
 
   setPos(x, y, mapId = '') {
@@ -21,6 +26,10 @@ class Entity {
     }
   }
 
+  setAi(aiObj) {
+    this.ai = aiObj;
+  }
+
   getPos() {
     return this.pos;
   }
@@ -29,21 +38,25 @@ class Entity {
     return this.pos.mapId;
   }
 
+  hasPos() {
+    return !!this.pos;
+  }
+
   hasMap() {
     return this.pos.mapId.length > 0;
+  }
+
+  hasAi() {
+    return !!this.ai;
+  }
+
+  clearPos() {
+    this.pos = {};
   }
 
   move(dx, dy, xMax = 100, yMax = 100) {
     this.pos.x = clamp(this.pos.x + dx, 0, xMax);
     this.pos.y = clamp(this.pos.y + dy, 0, yMax);
-  }
-
-  hasPos() {
-    return !!this.pos;
-  }
-
-  clearPos() {
-    this.pos = {};
   }
 
   show() {

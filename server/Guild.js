@@ -2,6 +2,7 @@ const GameMap = require('./GameMap');
 const Entity = require('./Entity');
 const { generateID, generateName } = require('./utility');
 
+// guild system manager/director
 class Guild {
   constructor(location) {
     this.name = `${location} ${generateName()}`;
@@ -28,6 +29,22 @@ class Guild {
     const mapId = `MID${generateID()}`;
     this.maps[mapId] = new GameMap(mapId);
     this.maps[mapId].addEntity(this.members[eid]);
+    // spawn entities on map
+    for (let i = 0; i < 10; i += 1) {
+      // TODO - 10 is a placeholder enemy count value, replace
+      const NPC = new Entity(generateName());
+      this.maps[mapId].addEntity(NPC);
+    }
+  }
+
+  processVision(eid) {
+    // check area around ref'd entity for NPCs in view
+    // TODO - implement vision, for now just using map wide actions
+  }
+
+  processNPCTurns(eid) {
+    // check map of ref'd entity for NPCs (ie entities with no AI)
+    // test if their turns should be processed, then process accordingly
   }
 
   closeMap() {
@@ -35,8 +52,12 @@ class Guild {
   }
 
   getMap(eid) {
-    // get ref to actual map object without parsing for client
+    // get ref to actual map object without parsing for passing to client
     return this.maps[this.members[eid].getMap()];
+  }
+
+  getMapEntities(eid) {
+    return this.getMap(eid).getEntities();
   }
 
   getMapObj(eid) {
