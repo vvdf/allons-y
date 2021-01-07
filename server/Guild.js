@@ -41,7 +41,10 @@ class Guild {
 
   getMapObj(eid) {
     // takes eid and returns the map they're on
-    return this.maps[this.members[eid].getMap()].getMapObj();
+    console.log( this.members[eid].getPos());
+    const mapObj = this.maps[this.members[eid].getMap()].getMapObj();
+    mapObj.spawn = this.members[eid].getPos();
+    return mapObj;
   }
 
   getMember(eid) {

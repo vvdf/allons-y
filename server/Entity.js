@@ -21,6 +21,10 @@ class Entity {
     }
   }
 
+  getPos() {
+    return this.pos;
+  }
+
   getMap() {
     return this.pos.mapId;
   }

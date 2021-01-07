@@ -54,19 +54,29 @@ class Engine {
   initEvents() {
     // define events for EventQueue/Reducer
     this.eventQueue.defineEvent('MOVE_ENTITY',
-      (entityId, dx = 0, dy = 0) => {
+      (eid, dx = 0, dy = 0) => {
         // test to determine if target cell is movable before processing at all
-        const moveIsValid = this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy));
+        const moveIsValid = this.gameMap.isWalkable(this.entityIdMap[eid].nextPos(dx, dy));
         if (moveIsValid) {
-          this.entityIdMap[entityId].move(dx, dy);
-          if (entityId === this.entities[1].eid) {
+          this.entityIdMap[eid].move(dx, dy);
+          if (eid === this.entities[1].eid) {
             // if entity moved is player, move camera also
             // restrict movement, no need to broadcast 'attempts' at moving into a wall
             this.entityIdMap[0].move(dx, dy);
-            this.sio.emit('gameEvent', { signal: 'MOVE_ENTITY', params: [entityId, dx, dy] });
+            this.sio.emit('gameEvent', { signal: 'MOVE_ENTITY', params: [eid, dx, dy] });
           }
         } else {
-          console.log("move is invalid");
+          console.log('move is invalid');
+        }
+      });
+
+    this.eventQueue.defineEvent('MOVE_TO', 
+      (eid, x, y) => {
+        const moveIsValid = this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy));
+        if (moveIsValid) {
+          this.entityIdMap[eid].setPos(x, y);
+        } else {
+          console.log('move_to call points to invalid cell');
         }
       });
 
@@ -116,6 +126,10 @@ class Engine {
       } else {
         this.ui.select();
       }
+    });
+
+    this.eventQueue.defineEvent('UPDATE_ENTITY', (eid) => {
+      // get updated stats and position for an entity
     });
 
     this.eventQueue.defineEvent('RERENDER', (input) => {
@@ -329,7 +343,8 @@ class Engine {
         this.fieldRefresh();
         this.input.setMode('field');
 
-        this.entities[1].setPos(this.gameMap.spawn.x, this.gameMap.spawn.y);
+        console.log('GAMEMAP SPAWN OBJ:', this.gameMap.spawn);
+        this.entities[1].setPosObj(this.gameMap.spawn);
         this.centerCamera();
       });
     this.state = this.play;

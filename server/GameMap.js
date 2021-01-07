@@ -178,7 +178,6 @@ class GameMap {
       mapData: this.toString(),
       width: this.width,
       height: this.height,
-      spawn: this.spawn,
     };
   }
 }
