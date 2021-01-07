@@ -30,6 +30,7 @@
   ~~* FIX: Positioning on reload~~
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
+  * Turn queue'ing for combat interactions
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
     (Utilizing placeholder simple art assets for the base screen)
   * Back-end validation of player actions
