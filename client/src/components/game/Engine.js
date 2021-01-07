@@ -35,6 +35,7 @@ class Engine {
     this.gameMap = new GameMap();
     this.input = new Input(this.eventQueue);
     this.ui = new UI();
+    this.sio = false; // socket interface, to be defined during initialization
     this.renderer = new Renderer(
       this.settings,
       this.constants,
@@ -66,7 +67,7 @@ class Engine {
             this.sio.emit('gameEvent', { signal: 'MOVE_ENTITY', params: [eid, dx, dy] });
           }
         } else {
-          console.log('move is invalid');
+          // console.log('move is invalid');
         }
       });
 
@@ -84,15 +85,21 @@ class Engine {
       (eid, name, textureKey, pos) => {
         if (this.entityIdMap[eid]) {
           // if entity still exists in local storage
-          this.entityIdMap[eid].setPos(pos.x, pos.y);
+          console.log('Add Entity attempted, updating');
+          this.entityIdMap[eid].setPosObj(pos);
         } else {
           // otherwise add new entity
+          console.log('Adding Entity', pos);
           this.createEntity({ eid, name, textureKey, pos });
           this.flagRerender = true;
         }
       });
 
-    this.eventQueue.defineEvent('DEBUG_MSG', (msg) => { console.log(msg); });
+    this.eventQueue.defineEvent('DEBUG_MSG', (msg) => {
+      console.log('DEBUG: PRINTING ENTITY LIST');
+      console.log(this.entities);
+    });
+
     this.eventQueue.defineEvent('TOGGLE_UI', () => { 
       this.ui.hidden = !this.ui.hidden;
       if (this.ui.hidden) {
@@ -154,11 +161,11 @@ class Engine {
         // if event queue is emptied, ie all potential state change is computed, re-render
         if (this.flagRerender) {
           // rerender then clear flag until flag is set/called again
-          console.log('Play State: Rerendering');
+          // console.log('Play State: Rerendering');
           this.renderer.render();
           this.flagRerender = false;
         } else {
-          console.log('Play State: Updating');
+          // console.log('Play State: Updating');
           this.renderer.update();
         }
       }
@@ -326,7 +333,7 @@ class Engine {
     this.renderer.clear();
     this.renderer.render();
     this.renderer.hide('map', 'entities', 'ui');
-    this.renderer.animate(['map', 'entities', 'ui'], 'fadeIn', 80);
+    this.renderer.animate(['map', 'entities', 'ui'], 'fadeIn', 50);
   }
 
   fieldMode(delta) {
@@ -342,6 +349,7 @@ class Engine {
         this.renderer.setMode('field');
         this.fieldRefresh();
         this.input.setMode('field');
+        this.sio.emit('gameEvent', { signal: 'INIT_MAP', params: [] });
         this.entities[1].setPosObj(this.gameMap.spawn); // load entity position
         this.centerCamera();
       });
@@ -352,7 +360,10 @@ class Engine {
   // engine helper methods
   // ----------------------------------
   createEntity({ eid, name, textureKey, pos }) {
-    const createdEntity = new Entity(eid, name, textureKey, pos);
+    const createdEntity = new Entity(eid, name, textureKey);
+    if (!!pos) {
+      createdEntity.setPosObj(pos);
+    }
     this.entities.push(createdEntity);
     this.entityIdMap[eid] = createdEntity;
   }
