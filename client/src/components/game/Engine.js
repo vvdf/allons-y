@@ -342,9 +342,7 @@ class Engine {
         this.renderer.setMode('field');
         this.fieldRefresh();
         this.input.setMode('field');
-
-        console.log('GAMEMAP SPAWN OBJ:', this.gameMap.spawn);
-        this.entities[1].setPosObj(this.gameMap.spawn);
+        this.entities[1].setPosObj(this.gameMap.spawn); // load entity position
         this.centerCamera();
       });
     this.state = this.play;
