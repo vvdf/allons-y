@@ -457,6 +457,7 @@ class Renderer {
 
   entitiesRender() {
     this.sprites.entities = new PIXI.Container();
+    this.sprites.entities.sortableChildren = true;
     for (let i = 1; i < this.entities.length; i += 1) {
       // start at 1, as camera is 0 and is always blank
       // const sprite = this.entitySpriteMap[this.entities[i].id];
@@ -466,6 +467,7 @@ class Renderer {
       const dy = this.entities[i].pos.y - this.entities[0].pos.y;
       sprite.x = this.gridToViewX(sprite, dx, dy);
       sprite.y = this.gridToViewY(sprite, dx, dy, true);
+      sprite.zIndex = this.entities[i].pos.x + this.entities[i].pos.y;
       delete this.entities[i].sprite;
       this.entities[i].sprite = sprite;
 
@@ -483,6 +485,7 @@ class Renderer {
       const dy = this.entities[i].pos.y - this.entities[0].pos.y;
       this.entities[i].sprite.x = this.gridToViewX(this.entities[i].sprite, dx, dy);
       this.entities[i].sprite.y = this.gridToViewY(this.entities[i].sprite, dx, dy, true);
+      this.entities[i].sprite.zIndex = this.entities[i].pos.x + this.entities[i].pos.y;
     }
   }
 
