@@ -37,8 +37,9 @@
   * Implement loading of nearby entities during player action validation
   * Build interaction layer between entities/player
   * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with placeholder sprites)
-  * Update/rebuild client gamemap module
-  * Handle proper zIndexing for tiles (notably walls/entities)
+  ~~* Update/rebuild client gamemap module~~
+  * Handle proper zIndexing for tiles
+    ~~* Handle zIndexing for entities~~
   * Missions/Cases/Objective definitions (primary and secondary objectives)
   * Inventory/Ability management (grid based system)
     * Field relative temporary changes to inventory/ability loadout based on pickup
