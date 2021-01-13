@@ -28,6 +28,8 @@
   ~~* Update/rebuild client entity module (particular x,y coords to be a pos object containing x/y)~~
   ~~* Connect dungeon/map generation on server to current gameplay flow~~
   ~~* FIX: Positioning on reload~~
+  ~~* Handle zIndexing for entities~~
+  ~~* Update/rebuild client gamemap module~~
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
   * Turn queue'ing for combat interactions
@@ -37,9 +39,7 @@
   * Implement loading of nearby entities during player action validation
   * Build interaction layer between entities/player
   * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with placeholder sprites)
-  ~~* Update/rebuild client gamemap module~~
   * Handle proper zIndexing for tiles
-    ~~* Handle zIndexing for entities~~
   * Missions/Cases/Objective definitions (primary and secondary objectives)
   * Inventory/Ability management (grid based system)
     * Field relative temporary changes to inventory/ability loadout based on pickup
