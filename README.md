@@ -53,6 +53,8 @@
     creation)
   * Character management page
   * Improve general page look
+  * Improve sprite handling (smaller sprites, better center calculations, proper
+    handling of scaling, and user settings, etc)
 
   Low Priority
   * Development of more art assets
