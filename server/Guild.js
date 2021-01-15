@@ -32,7 +32,7 @@ class Guild {
     // spawn entities on map
     for (let i = 0; i < 10; i += 1) {
       // TODO - 10 is a placeholder enemy count value, replace
-      const NPC = new Entity(generateName());
+      const NPC = new Entity(generateName(), 'npc');
       this.maps[mapId].addEntity(NPC);
     }
   }

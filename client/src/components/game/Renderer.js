@@ -27,10 +27,12 @@ class Renderer {
     return new Promise((res, rej) => {
       // load assets into renderer and then run renderer setup using loaded assets
       this.loader
-        .add('assets/96x48_rally_police_girl.png')
+        .add('assets/96x96_rally.png')
+        .add('assets/96x96_rand.png')
         .add('assets/643212_floor_tiles.json')
         .load(() => {
-          this.textures.player = this.loader.resources['assets/96x48_rally_police_girl.png'].texture;
+          this.textures.player = this.loader.resources['assets/96x96_rand.png'].texture;
+          this.textures.npc = this.loader.resources['assets/96x96_rally.png'].texture;
           this.textures.wall = PIXI.utils.TextureCache['wall.png'];
           // this.textures.blank = PIXI.utils.TextureCache['blank.png'];
           this.textures.grass = PIXI.utils.TextureCache['grass.png'];
