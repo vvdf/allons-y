@@ -30,12 +30,12 @@
   ~~* FIX: Positioning on reload~~
   ~~* Handle zIndexing for entities~~
   ~~* Update/rebuild client gamemap module~~
+  * Back-end validation of player actions
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
   * Turn queue'ing for combat interactions
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
     (Utilizing placeholder simple art assets for the base screen)
-  * Back-end validation of player actions
   * Implement loading of nearby entities during player action validation
   * Build interaction layer between entities/player
   * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with placeholder sprites)
