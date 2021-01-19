@@ -22,6 +22,7 @@
     * Build account management
 
   Game
+  High Priority
   * Back-end validation of player actions
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
