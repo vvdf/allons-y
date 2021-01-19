@@ -22,14 +22,6 @@
     * Build account management
 
   Game
-  ~~* Refactor to utilize 'position' module for entities, and decouple interactions between gameMap and entities~~
-  ~~* Player UI while on field map screen~~
-  ~~* Player input blocking on illegal actions/movements~~
-  ~~* Update/rebuild client entity module (particular x,y coords to be a pos object containing x/y)~~
-  ~~* Connect dungeon/map generation on server to current gameplay flow~~
-  ~~* FIX: Positioning on reload~~
-  ~~* Handle zIndexing for entities~~
-  ~~* Update/rebuild client gamemap module~~
   * Back-end validation of player actions
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
