@@ -34,6 +34,7 @@
   * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with placeholder sprites)
   * Handle proper zIndexing for tiles
   * Missions/Cases/Objective definitions (primary and secondary objectives)
+  * Stat/ability progression
   * Inventory/Ability management (grid based system)
     * Field relative temporary changes to inventory/ability loadout based on pickup
   * Guild/Division Research Trees
@@ -48,6 +49,7 @@
   * Improve general page look
   * Improve sprite handling (smaller sprites, better center calculations, proper
     handling of scaling, and user settings, etc)
+  * Expand enemy list
 
   Low Priority
   * Development of more art assets
