@@ -9,7 +9,7 @@ class Entity {
     this.pos = { x: 0, y: 0, mapId: '' };
     this.inCombat = false;
   }
-  
+
   setOwner(clientID) {
     this.cid = clientID;
   }

@@ -7,7 +7,7 @@ class Guild {
   constructor(location) {
     this.name = `${location} ${generateName()}`;
     this.location = location;
-    this.seed = ""; // generate on guild creation to allow consistency of procgen
+    this.seed = ''; // generate on guild creation to allow consistency of procgen
     this.members = {}; // eid : entity
     this.maps = {}; // list of open maps from the guild's players
     // TODO - add progression info, stuff like guild level/rank/research tree/etc
