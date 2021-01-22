@@ -23,6 +23,7 @@
 
   Game
   High Priority
+  * Build Manager modules for serverside
   * Back-end validation of player actions
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
@@ -42,6 +43,8 @@
   * Vision handling
 
   Med Priority
+  * Restructure/rename of 'Guild' module serverside to better represent that it actually handles game logic
+    server-side
   * Improve dungeon generation
   * Possible expansion into options during character creation (also possible external page for character
     creation)
