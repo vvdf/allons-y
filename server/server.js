@@ -71,7 +71,7 @@ app.get('/map', (req, res) => {
   console.log('Loading map for', cid);
 
   if ({}.hasOwnProperty.call(clients, cid) && {}.hasOwnProperty.call(clients[cid], 'eid')) {
-    const eid = clients[cid].eid;
+    const { eid } = clients[cid];
     // cid and eid exist, so check for map
     if (!clients[cid].entity.hasMap()) {
       // no map found, generate
