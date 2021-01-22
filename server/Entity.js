@@ -4,6 +4,7 @@ class Entity {
   constructor(name, textureKey = 'player') {
     this.eid = generateID();
     this.name = name;
+    this.hp = 5;
     this.textureKey = textureKey;
     this.visible = textureKey !== 'blank'; // default to hidden if texture blank
     this.pos = { x: 0, y: 0, mapId: '' };

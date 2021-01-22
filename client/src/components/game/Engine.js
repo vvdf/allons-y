@@ -71,9 +71,9 @@ class Engine {
         }
       });
 
-    this.eventQueue.defineEvent('MOVE_TO', 
+    this.eventQueue.defineEvent('MOVE_TO',
       (eid, x, y) => {
-        const moveIsValid = this.gameMap.isWalkable(this.entityIdMap[entityId].nextPos(dx, dy));
+        const moveIsValid = this.gameMap.isWalkable(this.entityIdMap[eid].nextPos(x, y));
         if (moveIsValid) {
           this.entityIdMap[eid].setPos(x, y);
         } else {
@@ -100,7 +100,7 @@ class Engine {
       console.log(this.entities);
     });
 
-    this.eventQueue.defineEvent('TOGGLE_UI', () => { 
+    this.eventQueue.defineEvent('TOGGLE_UI', () => {
       this.ui.hidden = !this.ui.hidden;
       if (this.ui.hidden) {
         this.renderer.animate(['ui'], 'fadeOut', 50);
