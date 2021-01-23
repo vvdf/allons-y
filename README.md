@@ -24,6 +24,7 @@
   Game
   High Priority
   * Build Manager modules for serverside
+    * Entity/Guild/Map managers
   * Back-end validation of player actions
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
