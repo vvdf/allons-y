@@ -25,6 +25,8 @@
   High Priority
   * Build Manager modules for serverside
     * Entity/Guild/Map managers
+    * Simplify signal handling/lookup? for example sending more detail in signal to server to ease lookup on server side (ie passing a client and/or entity uid, along
+    with a map uid and the designated payload)
   * Back-end validation of player actions
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
