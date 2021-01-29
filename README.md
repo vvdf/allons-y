@@ -13,9 +13,8 @@
   As it is, this will run the Node.js webserver on port 3000, and the websocket server on port 3001
 
 ## Development Roadmap
-  High Priority
-  
   Main Site
+  High Priority
   * Build main page
   * Build sidebar
   * Build proper login page
