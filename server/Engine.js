@@ -1,6 +1,6 @@
 const GameMap = require('./GameMap'); // TODO: refactor this and entity out into manager modules
 const Entity = require('./Entity');
-const EntityManager = require('./ClientManager');
+const UserManager = require('./UserManager');
 const GuildManager = require('./GuildManager');
 const EntityManager = require('./EntityManager');
 const MapManager = require('./MapManager');
@@ -18,22 +18,42 @@ class Engine {
 
     console.log(this.name, ' GUILD CREATED');
 
+    this.UserManager = new UserManager();
     this.GuildManager = new GuildManager();
     this.EntityManager = new EntityManager();
     this.MapManager = new MapManager();
   }
 
-  newClient() {
-    
+  newUser() {
+    return this.UserManager.newUser();
+  }
+
+  addUser(uid) {
+    this.UserManager.addUser(uid);
+  }
+
+  userExists(uid) {
+    return this.UserManager.userExists(uid);
+  }
+
+  userHasEntity(uid) {
+    return this.UserManager.userHasEntity(uid);
   }
 
   newGuild(location) {
     this.GuildManager.addGuild(location); // TODO: update with player submitted name creation rather than gen'd
   }
 
+  guildExists(location) {
+    return this.GuildManager.guildExists(location);
+  }
+
   newEntity(name) {
     this.EntityManager.addEntity(name)
   }
+
+
+  userExists
 
   ////// refactor below to be handled by individual manager modules
 
