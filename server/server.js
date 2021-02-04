@@ -17,47 +17,74 @@ app.use(express.json());
 // TODO - refactor for UserID and SessionID management once a proper
 //   login/register interface is implemented on the front end
 // TODO - build character, uid, etc generation utility methods
-const clients = {}; // comprised of client[cid] -> eid, entityObj, guildObj
-const guilds = {}; // comprised of Seed, PlayerEntities, OpenMaps, progression info
+// const clients = {}; // comprised of client[cid] -> eid, entityObj, guildObj
+// const guilds = {}; // comprised of Seed, PlayerEntities, OpenMaps, progression info
 
 app.use('/', express.static(path.join(__dirname, '..', 'client', 'dist')));
 
-app.get('/client', (req, res) => {
+app.get('/user', (req, res) => {
   // creates client ID cookie if one doesn't exist
   // returns found === true if clientID is active, aka has a corresp. entityID
-  const { cid } = parseCookies(req.headers.cookie);
-  const clientId = cid || `CID${generateID()}`;
-  console.log(clientId, Object.keys(clients));
-  if (clients[clientId]) {
-    console.log(clients[clientId]);
-  }
+  const { uid } = parseCookies(req.headers.cookie);
+  const userID = uid || Engine.newUser();
   const responseData = {
-    found: {}.hasOwnProperty.call(clients, clientId) // ret true if client exists
-      && {}.hasOwnProperty.call(clients[clientId], 'eid'), // AND client has entity
-    userID: clientId,
+    found: Engine.userHasEntity(userID), // ret true if user exists AND user has entity
+    userID: userID,
   };
-  res.cookie('cid', clientId).status(200).send(responseData);
+  res.cookie('uid', clientId).status(200).send(responseData);
+
+  // const { cid } = parseCookies(req.headers.cookie);
+  // const clientId = cid || `CID${generateID()}`;
+  // console.log(clientId, Object.keys(clients));
+  // if (clients[clientId]) {
+  //   console.log(clients[clientId]);
+  // }
+  // const responseData = {
+  //   found: {}.hasOwnProperty.call(clients, clientId) // ret true if client exists
+  //     && {}.hasOwnProperty.call(clients[clientId], 'eid'), // AND client has entity
+  //   userID: clientId,
+  // };
+  // res.cookie('cid', clientId).status(200).send(responseData);
 });
 
 app.post('/entity', (req, res) => {
   // create entity (and guild if one doesn't exist) based on submitted name/locale
-  const { cid } = parseCookies(req.headers.cookie);
+  const { uid } = parseCookies(req.headers.cookie);
   const { name, area } = req.body;
-  if (!{}.hasOwnProperty.call(guilds, area)) {
-    // if the guild has yet to be established, create
-    Engine.newGuild(area);
-    // guilds[area] = new Guild(area);
+  let gid;
+  if (!Engine.guildExists(area)) {
+    // if no guild exists at location yet, then create
+    gid = Engine.newGuild(area);
+  } else {
+    // guild exists at location, retrieve GID to attach to newly submitted entity
+    gid = Engine.getGuild(area);
   }
 
-  if (!{}.hasOwnProperty.call(clients, cid)) {
-    // if cid not yet registered, instantiate to handle member properties
-    clients[cid] = {};
-  }
-  clients[cid].entity = guilds[area].newMember(name);
-  clients[cid].eid = clients[cid].entity.eid;
-  clients[cid].guild = guilds[area];
-  console.log(`REGISTERING EID${clients[cid].eid} for CID${cid}`);
+  // check if uid exists/is instantiated, if it is, continue and attach new data to
+  // given uid, ELSE generate new user, replacing uid cookie, and continue
+  // generate new entity
+  // attach new eid to uid
+  
   res.status(200).send();
+
+  
+  // const { cid } = parseCookies(req.headers.cookie);
+  // const { name, area } = req.body;
+  // if (!{}.hasOwnProperty.call(guilds, area)) {
+  //   // if the guild has yet to be established, create
+  //   Engine.newGuild(area);
+  //   // guilds[area] = new Guild(area);
+  // }
+
+  // if (!{}.hasOwnProperty.call(clients, cid)) {
+  //   // if cid not yet registered, instantiate to handle member properties
+  //   clients[cid] = {};
+  // }
+  // clients[cid].entity = guilds[area].newMember(name);
+  // clients[cid].eid = clients[cid].entity.eid;
+  // clients[cid].guild = guilds[area];
+  // console.log(`REGISTERING EID${clients[cid].eid} for CID${cid}`);
+  // res.status(200).send();
 });
 
 // load all entities, starting with player (will be empty if cid not found/registered)

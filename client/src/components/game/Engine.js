@@ -174,9 +174,9 @@ class Engine {
 
   startGame(delta) {
     // determine if game is loading or enters main menu
-    axios.get('/client')
-      .then((clientData) => {
-        if (clientData.data.found) {
+    axios.get('/user')
+      .then((userData) => {
+        if (userData.data.found) {
           // user id AND living entity found, jump to base menu
           axios.get('/entity')
             .then(({ data }) => {
@@ -195,7 +195,7 @@ class Engine {
           // user id not found, new user id assigned, go to main menu
           this.state = this.mainMenu;
         }
-        this.userID = clientData.userID;
+        this.userID = userData.userID;
       });
     this.state = this.play;
   }
