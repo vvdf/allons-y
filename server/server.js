@@ -5,7 +5,7 @@ const path = require('path');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const Guild = require('./Guild');
+const Engine = require('./Engine');
 const { parseCookies, generateID } = require('./utility');
 
 const REST_PORT = 3000;
@@ -45,7 +45,8 @@ app.post('/entity', (req, res) => {
   const { name, area } = req.body;
   if (!{}.hasOwnProperty.call(guilds, area)) {
     // if the guild has yet to be established, create
-    guilds[area] = new Guild(area);
+    Engine.newGuild(area);
+    // guilds[area] = new Guild(area);
   }
 
   if (!{}.hasOwnProperty.call(clients, cid)) {

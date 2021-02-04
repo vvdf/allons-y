@@ -1,8 +1,9 @@
 const { generateID, clamp } = require('./utility');
 
 class Entity {
-  constructor(name, textureKey = 'player') {
+  constructor(name, textureKey = 'player', guildID = '0') {
     this.eid = generateID();
+    this.guild = guildID;
     this.name = name;
     this.hp = 5;
     this.textureKey = textureKey;
