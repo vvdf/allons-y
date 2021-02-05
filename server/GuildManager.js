@@ -14,6 +14,14 @@ class GuildManager {
       this.guildLocationList[location] = {};
     }
     this.guildLocationList[location] = newGuild.id;
+    return newGuild.id;
+  }
+
+  getGuild(location) {
+    if (this.guildExists(location)) {
+      return this.guildLocationList[location].id;
+    }
+    return false;
   }
 
   removeGuild(gid) {
