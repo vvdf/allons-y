@@ -12,7 +12,7 @@ const tiles = {
 
 class GameMap {
   constructor(mapId, width = 100, height = 100, type = 'rogue') {
-    this.mapId = mapId; // mapId
+    this.mapId = mapId; // mapId // TODO: refactor so GameMap runs genID and isn't fed one
     this.width = width;
     this.height = height;
     this.grid = [];
