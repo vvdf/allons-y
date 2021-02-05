@@ -8,10 +8,15 @@ class EntityManager {
   addEntity(name) {
     const newEntity = new Entity(name);
     this.entityList[newEntity.id] = newEntity;
+    return newEntity.id;
   }
 
   removeEntity(eid) {
     delete this.entityList[eid];
+  }
+
+  getEntityForClient(eid) {
+    return this.entityList[eid];
   }
 }
 

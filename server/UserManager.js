@@ -18,6 +18,18 @@ class UserManager {
   userHasEntity(uid) {
     return this.userExists(uid) && this.userList[uid].hasEntity();
   }
+
+  attachEntity(uid, eid) {
+    if (this.userExists(uid)) {
+      this.userList[uid].attachEntity(eid);
+    }
+  }
+
+  clearEntity(uid) {
+    if (this.userExists(uid)) {
+      this.userList[uid].removeEntity();
+    }
+  }
 }
 
 module.exports = UserManager;
