@@ -26,12 +26,12 @@ app.get('/user', (req, res) => {
   // creates client ID cookie if one doesn't exist
   // returns found === true if clientID is active, aka has a corresp. entityID
   const { uid } = parseCookies(req.headers.cookie);
-  const userID = uid || Engine.newUser();
+  const userID = uid && uid.length > 0 ? uid : Engine.newUser();
   const responseData = {
     found: Engine.userHasEntity(userID), // ret true if user exists AND user has entity
     userID: userID,
   };
-  res.cookie('uid', clientId).status(200).send(responseData);
+  res.cookie('uid', userID).status(200).send(responseData);
 
   // const { cid } = parseCookies(req.headers.cookie);
   // const clientId = cid || `CID${generateID()}`;
@@ -48,53 +48,30 @@ app.get('/user', (req, res) => {
 });
 
 app.post('/entity', (req, res) => {
-  // create entity (and guild if one doesn't exist) based on submitted name/locale
+  // create entity (and guild, and user if ones do not exist) based on submitted name/locale
   const { uid } = parseCookies(req.headers.cookie);
   const { name, area } = req.body;
-  let gid;
-  if (!Engine.guildExists(area)) {
-    // if no guild exists at location yet, then create
-    gid = Engine.newGuild(area);
-  } else {
-    // guild exists at location, retrieve GID to attach to newly submitted entity
-    gid = Engine.getGuild(area);
-  }
-
-  // check if uid exists/is instantiated, if it is, continue and attach new data to
-  // given uid, ELSE generate new user, replacing uid cookie, and continue
-  // generate new entity
-  // attach new eid to uid
-  
-  res.status(200).send();
-
-  
-  // const { cid } = parseCookies(req.headers.cookie);
-  // const { name, area } = req.body;
-  // if (!{}.hasOwnProperty.call(guilds, area)) {
-  //   // if the guild has yet to be established, create
-  //   Engine.newGuild(area);
-  //   // guilds[area] = new Guild(area);
-  // }
-
-  // if (!{}.hasOwnProperty.call(clients, cid)) {
-  //   // if cid not yet registered, instantiate to handle member properties
-  //   clients[cid] = {};
-  // }
-  // clients[cid].entity = guilds[area].newMember(name);
-  // clients[cid].eid = clients[cid].entity.eid;
-  // clients[cid].guild = guilds[area];
-  // console.log(`REGISTERING EID${clients[cid].eid} for CID${cid}`);
-  // res.status(200).send();
+  const gid = Engine.guildExists(area) ? Engine.getGuild(area) : Engine.newGuild(area); // if no guild exists, create
+  const userID = Engine.userExists(uid) ? uid : Engine.newUser(); // if no user exists, create
+  const eid = Engine.newEntity(name); // generate new entity
+  Engine.attachEntity(userID, eid); // connect user to entity
+  Engine.attachGuild(userID, gid); // connect user to guild
+  res.cookie('uid', userID).status(200).send(responseData); // update uid cookie
 });
 
 // load all entities, starting with player (will be empty if cid not found/registered)
 app.get('/entity', (req, res) => {
-  const { cid } = parseCookies(req.headers.cookie);
-  res.status(200).send(clients[cid].entity);
+  const { uid } = parseCookies(req.headers.cookie);
+  res.status(200).send(Engine.getEntityByUid(uid));
 });
 
 // map loading
 app.get('/map', (req, res) => {
+  const { uid } = parseCookies(req.headers.cookie);
+  // const map = Engine.userExists(uid) && Engine.userHasEntity(uid)
+  //   ? : ;
+
+
   const { cid } = parseCookies(req.headers.cookie);
   console.log('Loading map for', cid);
 
