@@ -11,35 +11,65 @@ const tiles = {
 };
 
 class GameMap {
-  constructor(mapId, width = 100, height = 100, type = 'rogue') {
-    this.mapId = mapId; // mapId // TODO: refactor so GameMap runs genID and isn't fed one
+  constructor(type = 'rogue', width = 100, height = 100) {
+    this.mid = `MID${generateID()}`;
     this.width = width;
     this.height = height;
     this.grid = [];
-    this.entities = [];
+    this.entityPositionMap = {}; // map of eids to their map positions
     this.spawn = { x: -1, y: -1 };
     this.generate(type);
   }
 
-  addEntity(entity) {
-    entity.setPos(this.spawn.x, this.spawn.y, this.mapId);
-    this.entities.push(entity);
+  // -- ENTITY INTERACTION METHODS
+  addEntity(eid) {
+    this.entityPositionMap[eid] = { x: this.spawn.x, y: this.spawn.y };
     this.findNextSpawn();
   }
 
-  removeEntity(eid) {
-    for (let i = 0; i < this.entities.length; i += 1) {
-      if (this.entities[i].eid === eid) {
-        this.entities.splice(i, 1);
-        break;
-      }
-    }
-  }
-
   getEntities() {
-    return this.entities;
+    return this.entityPositionMap;
   }
 
+  getEntityPos(eid) {
+    return this.entityPositionMap[eid];
+  }
+
+  hasEntity(eid) {
+    return {}.hasOwnProperty(this.entityPositionMap, eid);
+  }
+
+  moveEntity(eid, targetX, targetY) {
+    const { x, y } = this.entityPositionMap[eid];
+    if (Math.abs(targetX - x + targetY - y) === 1 && this.isWalkable(targetX, targetY)) {
+      // move has a correct delta AND target cell is walkable
+      this.entityPositionMap[eid].x = targetX;
+      this.entityPositionMap[eid].y = targetY;
+      return true; // move was successful
+    }
+    return false; // move attempt was not successful
+  }
+
+  // addEntity(entity) {
+  //   entity.setPos(this.spawn.x, this.spawn.y, this.id);
+  //   this.entities.push(entity);
+  //   this.findNextSpawn();
+  // }
+
+  // removeEntity(eid) {
+  //   for (let i = 0; i < this.entities.length; i += 1) {
+  //     if (this.entities[i].eid === eid) {
+  //       this.entities.splice(i, 1);
+  //       break;
+  //     }
+  //   }
+  // }
+
+  // getEntities() {
+  //   return this.entities;
+  // }
+
+  // -- MAP GENERATION/MANIPULATION METHODS
   clear(wallTile = '#') {
     this.grid = [];
     for (let i = 0; i < this.height; i += 1) {
@@ -168,16 +198,41 @@ class GameMap {
     }
   }
 
+  // -- MAP HELPER MeTHODS
   isInBounds(x, y) {
     return mapTools.isInBounds(this.grid, x, y);
+  }
+
+  isWalkable(targetX, targetY) {
+    // TODO: rebuild tile definition to inherently manage passability
+    if (!this.isInBounds(targetX, targetY)
+      || this.getTile(targetX, targetY) === tiles.WALL
+      || this.getTile(targetX, targetY) === tiles.WATER) {
+      return false;
+    }
+
+    // is in bounds, not a wall, test against entities
+    for (let eidKey in this.entityPositionMap) {
+      const { x, y } = this.entityPositionMap[eidKey];
+      if (targetX === x && targetY === y) {
+        return false;
+      }
+    }
+    return true;
   }
 
   toString() {
     return mapTools.mapToString(this.grid);
   }
 
+  getTile(x, y) {
+    return this.grid[y][x];
+  }
+
   getMapObj() {
+    // parse map object to a client-friendly shape
     return {
+      mid: this.mid,
       mapFound: true,
       mapData: this.toString(),
       width: this.width,

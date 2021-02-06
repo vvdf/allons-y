@@ -7,8 +7,8 @@ class UserManager {
 
   newUser() {
     const newestUser = new User();
-    this.userList[newestUser.id] = newestUser;
-    return newestUser.id;
+    this.userList[newestUser.uid] = newestUser;
+    return newestUser.uid;
   }
 
   userExists(uid) {
@@ -19,9 +19,19 @@ class UserManager {
     return this.userExists(uid) && this.userList[uid].hasEntity();
   }
 
-  attachEntity(uid, eid) {
+  getEntityId(uid) {
+    return this.userList[uid].eid;
+  }
+
+  setGuildId(uid, gid) {
     if (this.userExists(uid)) {
-      this.userList[uid].attachEntity(eid);
+      this.userList[uid].setGuildId(gid);
+    }
+  }
+
+  setEntityId(uid, eid) {
+    if (this.userExists(uid)) {
+      this.userList[uid].setEntityId(eid);
     }
   }
 
@@ -29,6 +39,14 @@ class UserManager {
     if (this.userExists(uid)) {
       this.userList[uid].removeEntity();
     }
+  }
+
+  setSocketId(uid, sid) {
+    this.userList[uid].setSocketId(sid);
+  }
+
+  getSocketId(uid) {
+    return this.userList[uid].sid;
   }
 }
 

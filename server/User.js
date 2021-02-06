@@ -2,25 +2,30 @@ const { generateID } = require('./utility');
 
 class User {
   constructor() {
-    this.id = `UID${generateID()}`;
+    this.uid = `UID${generateID()}`;
     this.eid = '';
     this.gid = '';
+    this.sid = '';
   }
 
-  attachGuild(gid) {
+  setGuildId(gid) {
     this.gid = gid;
+  }
+
+  setEntityId(eid) {
+    this.eid = eid;
+  }
+
+  removeEntity() {
+    this.eid = '';
   }
 
   hasEntity() {
     return this.eid.length > 0;
   }
 
-  attachEntity(eid) {
-    this.eid = eid;
-  }
-
-  removeEntity() {
-    this.eid = '';
+  setSocketId(sid) {
+    this.sid = sid;
   }
 }
 

@@ -8,7 +8,7 @@ const { generateID, generateName } = require('./utility');
 
 // guild system manager/director
 class Engine {
-  constructor(location) {
+  constructor() {
     // this.name = `${location} ${generateName()}`;
     // this.location = location;
     // this.seed = ''; // generate on guild creation to allow consistency of procgen
@@ -24,6 +24,7 @@ class Engine {
     this.mapManager = new MapManager();
   }
 
+  // -- USER MANAGER METHODS
   newUser() {
     return this.userManager.newUser();
   }
@@ -40,14 +41,19 @@ class Engine {
     return this.userManager.userHasEntity(uid);
   }
 
-  attachEntity(uid, eid) {
-    this.userManager.attachEntity(eid);
+  userOwnsEntity(uid, eid) {
+    return this.userManager.getEntityId(uid) === eid;
   }
 
-  attachGuild(uid, gid) {
-    this.userManager.attachGuild(gid);
+  setEntityId(uid, eid) {
+    this.userManager.setEntityId(uid, eid);
   }
 
+  setGuildId(uid, gid) {
+    this.userManager.setGuildId(uid, gid);
+  }
+
+  // -- GUILD MANAGER METHODS
   newGuild(location) {
     return this.guildManager.addGuild(location); // TODO: update with player submitted name creation rather than gen'd
   }
@@ -60,26 +66,59 @@ class Engine {
     return this.guildManager.guildExists(location);
   }
 
+  // -- ENTITY MANAGEMENT METHODS
   newEntity(name) {
     return this.entityManager.addEntity(name)
   }
 
+  getEntityId(uid) {
+    return this.userManager.getEntityId(uid);
+  }
+
   getEntityByUid(uid) {
-    const eid = this.userManager.getEntity(uid);
-    return this.entityManager.getEntity(eid);
+    const eid = this.userManager.getEntityId(uid);
+    return this.entityManager.getEntityForClient(eid);
   }
 
-  getEntityByEid(eid) {
-    return this.entityManager.getEntity(eid);
+  hasMap(eid) {
+    return this.entityManager.hasMap(eid);
   }
 
-  getMapObj(eid) {
-    // takes eid and returns the map they're on
-    const mapID = this.entityManager.getMap(eid);
-    return this.mapManager.getMapObj(mapID);
-    // const mapObj = this.maps[this.members[eid].getMap()].getMapObj();
-    // mapObj.spawn = this.members[eid].getPos();
-    // return mapObj;
+  // -- MAP MANAGEMENT METHODS
+  newMap(eid) {
+    // gen map, attach entityId to map, attach mapId to entity, return mapId
+    const mapId = this.mapManager.newMap();
+    this.mapManager.addEntity(mapId, eid);
+    this.entityManager.setMap(eid, mapId);
+    return mapId;
+  }
+
+  getMapId(eid) {
+    return this.entityManager.getMapId(eid);
+  }
+
+  getMapObj(mid) {
+    // retrieve mapObject, attach player spawn coordinates, return
+    return this.mapManager.getMapObj(mid);
+  }
+
+  getEntityPos(eid) {
+    const mapId = this.entityManager.getMapId(eid);
+    return this.mapManager.getEntityPos(mapId, eid);
+  }
+
+  moveEntity(eid, targetX, targetY) {
+    const mapId = this.entityManager.getMapId(eid);
+    return this.mapManager.moveEntity(mapId, eid, targetX, targetY);
+  }
+
+  // -- SOCKET MANAGEMENT METHODS
+  setSocketId(uid, sid) {
+    this.userManager.setSocketId(uid, sid);
+  }
+
+  getSocketId(uid) {
+    return this.userManager.getSocketId(uid);
   }
 
   ////// refactor below to be handled by individual manager modules

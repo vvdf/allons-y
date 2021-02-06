@@ -7,12 +7,24 @@ class EntityManager {
 
   addEntity(name) {
     const newEntity = new Entity(name);
-    this.entityList[newEntity.id] = newEntity;
-    return newEntity.id;
+    this.entityList[newEntity.eid] = newEntity;
+    return newEntity.eid;
   }
 
   removeEntity(eid) {
     delete this.entityList[eid];
+  }
+
+  getMapId(eid) {
+    return this.entityList[eid].getMapId();
+  }
+
+  setMap(eid, mid) {
+    this.entityList[eid].setMap(mid);
+  }
+
+  hasMap(eid) {
+    return this.entityList[eid].hasMap();
   }
 
   getEntityForClient(eid) {
