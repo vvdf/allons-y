@@ -63,10 +63,15 @@ class GameMap {
     return this.grid[y][x];
   }
 
+  isInBounds(x, y) {
+    return x >= 0 && x < this.width - 1 && y >= 0 && y < this.height - 1;
+  }
+
   isWalkable({ x, y }) {
     // TODO - expand these to use a tile walkable.property check map eventually
     // so client can dynamically discern IF you should be allowed to walk on water etc
-    return !(this.get(x, y) === tiles.WALL || this.get(x, y) === tiles.WATER);
+    return this.isInBounds(x, y)
+      && !(this.get(x, y) === tiles.WALL || this.get(x, y) === tiles.WATER);
   }
 
   set(x, y, tile) {
