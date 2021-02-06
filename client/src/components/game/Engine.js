@@ -58,7 +58,7 @@ class Engine {
     this.eventQueue.defineEvent('MOVE_ENTITY',
       (eid, dx = 0, dy = 0) => {
         // test to determine if target cell is movable before processing at all
-        const moveIsValid = this.gameMap.isWalkable(this.entityIdMap[eid].nextPos(dx, dy));
+        const moveIsValid = this.isWalkable(this.entityIdMap[eid].nextPos(dx, dy));
         if (moveIsValid) {
           this.entityIdMap[eid].move(dx, dy);
           if (eid === this.entities[1].eid) {
@@ -90,7 +90,7 @@ class Engine {
           this.entityIdMap[eid].setPosObj(pos);
         } else {
           // otherwise add new entity
-          console.log('Adding Entity', pos);
+          console.log('Adding Entity');
           this.createEntity({ eid, name, textureKey, pos });
           this.flagRerender = true;
         }
@@ -150,9 +150,7 @@ class Engine {
     this.state(delta);
   }
 
-  // ----------------------------------
-  // game states
-  // ----------------------------------
+  // -- GAME STATE METHODS
   play(delta) {
     // play state function
     if (this.eventQueue.length > 0) {
@@ -357,9 +355,7 @@ class Engine {
     this.state = this.play;
   }
 
-  // ----------------------------------
-  // engine helper methods
-  // ----------------------------------
+  // -- ENGINE HELPER METHODS
   createEntity({ eid, name, textureKey, pos }) {
     const createdEntity = new Entity(eid, name, textureKey);
     if (!!pos) {
@@ -374,6 +370,15 @@ class Engine {
     if (updateView) {
       this.renderer.update();
     }
+  }
+
+  isWalkable({ x, y }) {
+    let moveIsValid = this.gameMap.isWalkable({ x, y });
+    for (let i = 2; i < this.entities.length; i += 1) {
+      const { pos } = this.entities[i];
+      moveIsValid = pos.x === x && pos.y === y ? false : moveIsValid;
+    }
+    return moveIsValid;
   }
 }
 
