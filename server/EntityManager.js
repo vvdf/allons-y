@@ -27,7 +27,11 @@ class EntityManager {
     return this.entityList[eid].hasMap();
   }
 
-  getEntityForClient(eid) {
+  setTexture(eid, textureKey) {
+    this.entityList[eid].setTexture(textureKey);
+  }
+
+  getEntity(eid) {
     return this.entityList[eid];
   }
 }
