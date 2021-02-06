@@ -36,7 +36,11 @@ class Renderer {
         .add('assets/643212_floor_tiles.json')
         .load(() => {
           this.textures.player = this.loader.resources['assets/96x96_rally.png'].texture;
-          this.textures.npc = this.loader.resources['assets/96x96_munch.png'].texture;
+          this.textures.bun = this.loader.resources['assets/96x96_munch.png'].texture;
+          this.textures.demoness = this.loader.resources['assets/96x96_demoness.png'].texture;
+          this.textures.spider = this.loader.resources['assets/96x96_mon_spiderGreen.png'].texture;
+          this.textures.dweller = this.loader.resources['assets/96x96_mon_deepDweller.png'].texture;
+          this.textures.rand = this.loader.resources['assets/96x96_rand.png'].texture;
           this.textures.wall = PIXI.utils.TextureCache['wall.png'];
           // this.textures.blank = PIXI.utils.TextureCache['blank.png'];
           this.textures.grass = PIXI.utils.TextureCache['grass.png'];
