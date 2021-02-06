@@ -6,19 +6,16 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const Engine = require('./Engine');
-const { parseCookies, generateID } = require('./utility');
+const engine = new Engine();
+const { parseCookies } = require('./utility');
 
 const REST_PORT = 3000;
 const SOCK_PORT = 3001;
 app.use(express.json());
 
-// client id : entity id map
 // TODO - to be reformatted into DBMS
 // TODO - refactor for UserID and SessionID management once a proper
 //   login/register interface is implemented on the front end
-// TODO - build character, uid, etc generation utility methods
-// const clients = {}; // comprised of client[cid] -> eid, entityObj, guildObj
-// const guilds = {}; // comprised of Seed, PlayerEntities, OpenMaps, progression info
 
 app.use('/', express.static(path.join(__dirname, '..', 'client', 'dist')));
 
@@ -26,91 +23,76 @@ app.get('/user', (req, res) => {
   // creates client ID cookie if one doesn't exist
   // returns found === true if clientID is active, aka has a corresp. entityID
   const { uid } = parseCookies(req.headers.cookie);
-  const userID = uid && uid.length > 0 ? uid : Engine.newUser();
+  const userID = uid && uid.length > 0 ? uid : engine.newUser();
   const responseData = {
-    found: Engine.userHasEntity(userID), // ret true if user exists AND user has entity
+    found: engine.userHasEntity(userID), // ret true if user exists AND user has entity
     userID: userID,
   };
   res.cookie('uid', userID).status(200).send(responseData);
-
-  // const { cid } = parseCookies(req.headers.cookie);
-  // const clientId = cid || `CID${generateID()}`;
-  // console.log(clientId, Object.keys(clients));
-  // if (clients[clientId]) {
-  //   console.log(clients[clientId]);
-  // }
-  // const responseData = {
-  //   found: {}.hasOwnProperty.call(clients, clientId) // ret true if client exists
-  //     && {}.hasOwnProperty.call(clients[clientId], 'eid'), // AND client has entity
-  //   userID: clientId,
-  // };
-  // res.cookie('cid', clientId).status(200).send(responseData);
 });
 
 app.post('/entity', (req, res) => {
   // create entity (and guild, and user if ones do not exist) based on submitted name/locale
   const { uid } = parseCookies(req.headers.cookie);
   const { name, area } = req.body;
-  const gid = Engine.guildExists(area) ? Engine.getGuild(area) : Engine.newGuild(area); // if no guild exists, create
-  const userID = Engine.userExists(uid) ? uid : Engine.newUser(); // if no user exists, create
-  const eid = Engine.newEntity(name); // generate new entity
-  Engine.attachEntity(userID, eid); // connect user to entity
-  Engine.attachGuild(userID, gid); // connect user to guild
-  res.cookie('uid', userID).status(200).send(responseData); // update uid cookie
+  const gid = engine.guildExists(area) ? engine.getGuild(area) : engine.newGuild(area); // if no guild exists, create
+  const userId = engine.userExists(uid) ? uid : engine.newUser(); // if no user exists, create
+  const eid = engine.newEntity(name); // generate new entity
+  engine.setEntityId(userId, eid); // connect user to entity
+  engine.setGuildId(userId, gid); // connect user to guild
+  res.cookie('uid', userId).status(200).send(); // update uid cookie
 });
 
 // load all entities, starting with player (will be empty if cid not found/registered)
 app.get('/entity', (req, res) => {
   const { uid } = parseCookies(req.headers.cookie);
-  res.status(200).send(Engine.getEntityByUid(uid));
+  res.status(200).send(engine.getEntityByUid(uid));
 });
 
 // map loading
 app.get('/map', (req, res) => {
+  console.log('-- MAP REQUESTED');
   const { uid } = parseCookies(req.headers.cookie);
-  // const map = Engine.userExists(uid) && Engine.userHasEntity(uid)
-  //   ? : ;
-
-
-  const { cid } = parseCookies(req.headers.cookie);
-  console.log('Loading map for', cid);
-
-  if ({}.hasOwnProperty.call(clients, cid) && {}.hasOwnProperty.call(clients[cid], 'eid')) {
-    const { eid } = clients[cid];
-    // cid and eid exist, so check for map
-    if (!clients[cid].entity.hasMap()) {
-      // no map found, generate
-      console.log('No map found for entity, generating...');
-      clients[cid].guild.newMap(eid);
-    }
-    res.status(200).send(clients[cid].guild.getMapObj(eid));
+  if (engine.userExists(uid) && engine.userHasEntity(uid)) {
+    const eid = engine.getEntityId(uid); // get respective entity's id, to generate a map for them
+    const mid = engine.hasMap(eid) ? engine.getMapId(eid) : engine.newMap(eid);
+    const mapData = engine.getMapObj(mid);
+    mapData.spawn = engine.getEntityPos(eid);
+    res.status(200).send(mapData);
+    console.log('-- MAP SENT', mid);
   } else {
-    res.status(400).send({ mapFound: false });
+    const message = `User ID ${engine.userExists(uid) ? '' : 'Not '}Found,` +
+      ` Entity ID ${engine.userHasEntity(uid) ? '' : 'Not '} Found`;
+    console.log(message);
+    res.status(400).send({ mapFound: false, message });
+    console.log('-- MAP FAILED TO SEND');
   }
 });
 
 io.on('connection', (socket) => {
-  let cid;
+  let uid;
 
   socket.on('register', ({ cookie }) => {
     console.log('REGISTER DATA RECEIVED: ', cookie);
-    cid = parseCookies(cookie).cid;
+    uid = parseCookies(cookie).uid;
     socket.join('root');
 
-    // TODO - generate a clientId if one doesn't exist
-    if (cid && clients[cid] && clients[cid].eid) {
-      console.log('CLIENT ID FOUND, attached EID = ', clients[cid].eid);
-      const { eid, name, textureKey, pos } = clients[cid].entity;
+    // TODO - generate a userID if one doesn't exist
+    if (engine.userExists(uid) && engine.userHasEntity(uid)) {
+      // console.log('CLIENT ID FOUND, attached EID = ', clients[cid].eid);
+      const { eid, name, textureKey } = engine.getEntityByUid(uid);
+      // const pos = engine.getEntityPos(eid);
+      engine.setSocketId(uid, socket.id);
 
-      clients[cid].sid = socket.id;
-      io.to(clients[cid].sid).emit('gameEvent', {
+      // clients[cid].sid = socket.id;
+      io.to(socket.id).emit('gameEvent', {
         signal: 'DEBUG_MSG',
         params: ['SID REGISTERED'],
       });
-      socket.to('/').emit('gameEvent', {
-        signal: 'NEW_ENTITY',
-        params: [eid, name, textureKey, pos],
-      });
+      // socket.to('/').emit('gameEvent', {
+      //   signal: 'NEW_ENTITY',
+      //   params: [eid, name, textureKey, pos],
+      // });
     } else {
       // TODO - signal to reregister for a client ID
       // NOTE - io.to broadcasts from server,
@@ -119,25 +101,32 @@ io.on('connection', (socket) => {
   });
 
   socket.on('gameEvent', (data) => {
-    if (data.signal === 'INIT_MAP' && clients[cid] && clients[cid].eid) {
-      // get map and pass back each entity that isn't their own
-      const npcs = clients[cid].guild.getMap(clients[cid].eid).getEntities();
-      for (let i = 0; i < npcs.length; i += 1) {
-        if (npcs[i].eid !== clients[cid].eid) {
-          const { eid, name, textureKey, pos } = npcs[i];
-          console.log('Sending new entity', eid, name, pos);
-          io.to('root').emit('gameEvent', {
-            signal: 'NEW_ENTITY',
-            params: [eid, name, textureKey, { x: pos.x, y: pos.y }],
-          });
-        }
-      }
+    if (data.signal === 'INIT_MAP' && engine.userHasEntity(uid)) {
+    }
+    // if (data.signal === 'INIT_MAP' && clients[cid] && clients[cid].eid) {
+    //   // get map and pass back each entity that isn't their own
+    //   const npcs = clients[cid].guild.getMap(clients[cid].eid).getEntities();
+    //   for (let i = 0; i < npcs.length; i += 1) {
+    //     if (npcs[i].eid !== clients[cid].eid) {
+    //       const { eid, name, textureKey, pos } = npcs[i];
+    //       console.log('Sending new entity', eid, name, pos);
+    //       io.to('root').emit('gameEvent', {
+    //         signal: 'NEW_ENTITY',
+    //         params: [eid, name, textureKey, { x: pos.x, y: pos.y }],
+    //       });
+    //     }
+    //   }
+    // }
+
+    if (data.signal === 'MOVE_ENTITY' && engine.userExists(uid) && engine.userOwnsEntity(uid, data.params[0])) {
+      // if signal is MOVE ENTITY, AND userid is registered, AND user is owner of submitted entity
+      const eid = data.params[0];
+      const dx = data.params[1];
+      const dy = data.params[2];
+      const pos = engine.getEntityPos(eid);
+      engine.moveEntity(eid, pos.x + dx, pos.y + dy);
     }
 
-    if (data.signal === 'MOVE_ENTITY' && clients[cid] && clients[cid].eid) {
-      // if signal is MOVE ENTITY and signal target is owned by client, perform
-      clients[cid].entity.move(data.params[1], data.params[2]);
-    }
     socket.to('root').emit('gameEvent', data);
   });
 });
