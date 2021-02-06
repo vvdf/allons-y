@@ -50,25 +50,6 @@ class GameMap {
     return false; // move attempt was not successful
   }
 
-  // addEntity(entity) {
-  //   entity.setPos(this.spawn.x, this.spawn.y, this.id);
-  //   this.entities.push(entity);
-  //   this.findNextSpawn();
-  // }
-
-  // removeEntity(eid) {
-  //   for (let i = 0; i < this.entities.length; i += 1) {
-  //     if (this.entities[i].eid === eid) {
-  //       this.entities.splice(i, 1);
-  //       break;
-  //     }
-  //   }
-  // }
-
-  // getEntities() {
-  //   return this.entities;
-  // }
-
   // -- MAP GENERATION/MANIPULATION METHODS
   clear(wallTile = '#') {
     this.grid = [];
