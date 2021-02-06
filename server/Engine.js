@@ -4,20 +4,11 @@ const UserManager = require('./UserManager');
 const GuildManager = require('./GuildManager');
 const EntityManager = require('./EntityManager');
 const MapManager = require('./MapManager');
-const { generateID, generateName } = require('./utility');
+const { generateID, generateName, rng } = require('./utility');
 
 // guild system manager/director
 class Engine {
   constructor() {
-    // this.name = `${location} ${generateName()}`;
-    // this.location = location;
-    // this.seed = ''; // generate on guild creation to allow consistency of procgen
-    // this.members = {}; // eid : entity
-    // this.maps = {}; // list of open maps from the guild's players
-    // TODO - add progression info, stuff like guild level/rank/research tree/etc
-
-    // console.log(this.name, ' GUILD CREATED');
-
     this.userManager = new UserManager();
     this.guildManager = new GuildManager();
     this.entityManager = new EntityManager();
@@ -71,26 +62,46 @@ class Engine {
     return this.entityManager.addEntity(name)
   }
 
+  getEntity(eid) {
+    return this.entityManager.getEntity(eid);
+  }
+
   getEntityId(uid) {
     return this.userManager.getEntityId(uid);
   }
 
   getEntityByUid(uid) {
     const eid = this.userManager.getEntityId(uid);
-    return this.entityManager.getEntityForClient(eid);
+    return this.entityManager.getEntity(eid);
   }
 
   hasMap(eid) {
     return this.entityManager.hasMap(eid);
   }
 
+  setTexture(eid, textureKey) {
+    this.entityManager.setTexture(eid, textureKey);
+  }
+
   // -- MAP MANAGEMENT METHODS
   newMap(eid) {
-    // gen map, attach entityId to map, attach mapId to entity, return mapId
+    // gen map, attach entityId to map, attach mapId to entity, populate map, return mapId
     const mapId = this.mapManager.newMap();
-    this.mapManager.addEntity(mapId, eid);
-    this.entityManager.setMap(eid, mapId);
+    this.addEntityToMap(mapId, eid); // add player who instantiated the map to the map
+    // populate map
+    const textureList = ['bun', 'demoness', 'spider', 'dweller', 'rand'];
+    for (let i = 0; i < 20; i += 1) {
+      const textureKey = textureList[rng(0, textureList.length - 1)];
+      const npcEid = this.newEntity(generateName());
+      this.setTexture(npcEid, textureKey);
+      this.addEntityToMap(mapId, npcEid);
+    }
     return mapId;
+  }
+
+  addEntityToMap(mid, eid) {
+    this.mapManager.addEntity(mid, eid);
+    this.entityManager.setMap(eid, mid);
   }
 
   getMapId(eid) {
@@ -105,6 +116,24 @@ class Engine {
   getEntityPos(eid) {
     const mapId = this.entityManager.getMapId(eid);
     return this.mapManager.getEntityPos(mapId, eid);
+  }
+
+  getEntities(mid) {
+    // entity obj need to have data shape of eid, name, textureKey, pos
+    const entityPosList = this.mapManager.getEntities(mid);
+    const formattedEntityList = [];
+    for (let eid in entityPosList) {
+      const entityObj = this.getEntity(eid); // retrieve entity object
+      entityObj.pos = entityPosList[eid]; // append position property to entity
+      formattedEntityList.push(entityObj);
+    }
+    return formattedEntityList;
+  }
+
+  getEntitiesByUid(uid) {
+    const eid = this.getEntityId(uid);
+    const mid = this.getMapId(eid);
+    return this.getEntities(mid);
   }
 
   moveEntity(eid, targetX, targetY) {
