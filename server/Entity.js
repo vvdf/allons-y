@@ -1,11 +1,11 @@
 const { generateID } = require('./utility');
 
 class Entity {
-  constructor(name, userID = '', guildID = '', textureKey = 'player') {
+  constructor(name, textureKey = 'player') {
     // rebuild entity, move should be in engine/map, eid should generated an EID, etc
     this.eid = `EID${generateID()}`;
-    this.uid = userID;
-    this.gid = guildID;
+    this.uid = '';
+    this.gid = '';
     this.mid = '';
     this.name = name;
     this.hp = 5;
