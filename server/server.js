@@ -102,6 +102,17 @@ io.on('connection', (socket) => {
 
   socket.on('gameEvent', (data) => {
     if (data.signal === 'INIT_MAP' && engine.userHasEntity(uid)) {
+      console.log('INIT_MAP signal received, processing...');
+      const npcs = engine.getEntitiesByUid(uid);
+      for (let i = 0; i < npcs.length; i += 1) {
+        if (npcs[i].eid !== engine.getEntityId(uid)) {
+          const { eid, name, textureKey, pos } = npcs[i];
+          io.to('root').emit('gameEvent', {
+            signal: 'NEW_ENTITY',
+            params: [eid, name, textureKey, { x: pos.x, y: pos.y }],
+          });
+        }
+      }
     }
     // if (data.signal === 'INIT_MAP' && clients[cid] && clients[cid].eid) {
     //   // get map and pass back each entity that isn't their own
