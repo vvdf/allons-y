@@ -54,6 +54,7 @@ class Engine {
 
   initEvents() {
     // define events for EventQueue/Reducer
+    // TODO: deprecate, strictly utilize MOVE_TO until animations are implemented
     this.eventQueue.defineEvent('MOVE_ENTITY',
       (eid, dx = 0, dy = 0) => {
         // test to determine if target cell is movable before processing at all
@@ -247,14 +248,14 @@ class Engine {
                 axios.get('/entity')
                   .then(({ data }) => {
                     this.createEntity(data);
-                    this.currentMap = data.map;
+                    this.currentMap = data.mid;
                     this.input.setOwner(this.entities[1]);
                     this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
                     this.ui.clear();
                     this.ui.newMenu([{
                       text: 'start game',
                       onSelect: () => {
-                        if (this.currentMap === 'world') {
+                        if (this.currentMap === '') {
                           console.log('Entering World');
                           this.state = this.worldMap;
                           // this.state = this.baseMenu;
