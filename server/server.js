@@ -114,21 +114,7 @@ io.on('connection', (socket) => {
         }
       }
     }
-    // if (data.signal === 'INIT_MAP' && clients[cid] && clients[cid].eid) {
-    //   // get map and pass back each entity that isn't their own
-    //   const npcs = clients[cid].guild.getMap(clients[cid].eid).getEntities();
-    //   for (let i = 0; i < npcs.length; i += 1) {
-    //     if (npcs[i].eid !== clients[cid].eid) {
-    //       const { eid, name, textureKey, pos } = npcs[i];
-    //       console.log('Sending new entity', eid, name, pos);
-    //       io.to('root').emit('gameEvent', {
-    //         signal: 'NEW_ENTITY',
-    //         params: [eid, name, textureKey, { x: pos.x, y: pos.y }],
-    //       });
-    //     }
-    //   }
-    // }
-
+    
     if (data.signal === 'MOVE_ENTITY' && engine.userExists(uid) && engine.userOwnsEntity(uid, data.params[0])) {
       // if signal is MOVE ENTITY, AND userid is registered, AND user is owner of submitted entity
       const eid = data.params[0];
