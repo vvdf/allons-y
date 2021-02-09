@@ -23,7 +23,7 @@
   Game
   High Priority
   * Build Manager modules for serverside
-    * Entity/Guild/Map managers
+    * Expand Entity/Guild/Map managers
     * Simplify signal handling/lookup? for example sending more detail in signal to server to ease lookup on server side (ie passing a client and/or entity uid, along
     with a map uid and the designated payload)
   * Back-end validation of player actions
@@ -45,8 +45,6 @@
   * Vision handling
 
   Med Priority
-  * Restructure/rename of 'Guild' module serverside to better represent that it actually handles game logic
-    server-side
   * Improve dungeon generation
   * Possible expansion into options during character creation (also possible external page for character
     creation)
