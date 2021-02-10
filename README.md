@@ -22,7 +22,10 @@
 
   Game
   High Priority
+  * Battle interactions/mechanics
+    * Tile based cursor control targetting for skills
   * Build Manager modules for serverside
+    * Turn Management when factoring in multiplayer battles
     * Expand Entity/Guild/Map managers
     * Simplify signal handling/lookup? for example sending more detail in signal to server to ease lookup on server side (ie passing a client and/or entity uid, along
     with a map uid and the designated payload)
