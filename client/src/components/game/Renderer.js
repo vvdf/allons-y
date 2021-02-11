@@ -33,17 +33,22 @@ class Renderer {
         .add('assets/96x96_munch.png')
         .add('assets/96x96_mon_spiderGreen.png')
         .add('assets/96x96_mon_deepDweller.png')
-        .add('assets/96x96_highlighted_tile.png')
+        .add('assets/96x96_highlighted_tile01.png')
+        .add('assets/96x96_highlighted_tile02.png')
+        .add('assets/96x96_highlighted_tile03.png')
         .add('assets/643212_floor_tiles.json')
         .load(() => {
-          // this.textures.player = this.loader.resources['assets/96x96_rally.png'].texture;
+          this.textures.player = this.loader.resources['assets/96x96_rally.png'].texture;
           this.textures.bun = this.loader.resources['assets/96x96_munch.png'].texture;
           this.textures.demoness = this.loader.resources['assets/96x96_demoness.png'].texture;
           this.textures.spider = this.loader.resources['assets/96x96_mon_spiderGreen.png'].texture;
           this.textures.dweller = this.loader.resources['assets/96x96_mon_deepDweller.png'].texture;
           this.textures.rand = this.loader.resources['assets/96x96_rand.png'].texture;
-          this.textures.player = this.loader.resources['assets/96x96_highlighted_tile.png'].texture;
-          this.textures.wall = PIXI.utils.TextureCache['wall.png'];
+          this.textures.highlight = [
+            this.loader.resources['assets/96x96_highlighted_tile01.png'].texture,
+            this.loader.resources['assets/96x96_highlighted_tile02.png'].texture,
+            this.loader.resources['assets/96x96_highlighted_tile03.png'].texture,
+          ];
           // this.textures.blank = PIXI.utils.TextureCache['blank.png'];
           this.textures.grass = PIXI.utils.TextureCache['grass.png'];
           this.textures.road = PIXI.utils.TextureCache['road.png'];
@@ -474,16 +479,23 @@ class Renderer {
       // start at 1, as camera is 0 and is always blank
       // const sprite = this.entitySpriteMap[this.entities[i].id];
       // TODO - add validity check to assure key exists, else blank or default
-      const sprite = new PIXI.Sprite(this.textures[this.entities[i].textureKey]);
+      const { textureKey } = this.entities[i];
+      const sprite = textureKey === 'highlight'
+        ? new PIXI.AnimatedSprite(this.textures[textureKey])
+        : new PIXI.Sprite(this.textures[textureKey]);
       const dx = this.entities[i].pos.x - this.entities[0].pos.x;
       const dy = this.entities[i].pos.y - this.entities[0].pos.y;
       sprite.x = this.gridToViewX(sprite, dx, dy);
       sprite.y = this.gridToViewY(sprite, dx, dy, true);
       sprite.zIndex = this.entities[i].pos.x + this.entities[i].pos.y;
-      sprite.alpha = i === 1 ? 0.75 : 1;
       delete this.entities[i].sprite;
       this.entities[i].sprite = sprite;
 
+      if (textureKey === 'highlight') {
+        sprite.alpha = 0.65;
+        sprite.animationSpeed = 0.05;
+        sprite.play();
+      }
       this.sprites.entities.addChild(sprite);
     }
 
