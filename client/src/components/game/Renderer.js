@@ -33,14 +33,16 @@ class Renderer {
         .add('assets/96x96_munch.png')
         .add('assets/96x96_mon_spiderGreen.png')
         .add('assets/96x96_mon_deepDweller.png')
+        .add('assets/96x96_highlighted_tile.png')
         .add('assets/643212_floor_tiles.json')
         .load(() => {
-          this.textures.player = this.loader.resources['assets/96x96_rally.png'].texture;
+          // this.textures.player = this.loader.resources['assets/96x96_rally.png'].texture;
           this.textures.bun = this.loader.resources['assets/96x96_munch.png'].texture;
           this.textures.demoness = this.loader.resources['assets/96x96_demoness.png'].texture;
           this.textures.spider = this.loader.resources['assets/96x96_mon_spiderGreen.png'].texture;
           this.textures.dweller = this.loader.resources['assets/96x96_mon_deepDweller.png'].texture;
           this.textures.rand = this.loader.resources['assets/96x96_rand.png'].texture;
+          this.textures.player = this.loader.resources['assets/96x96_highlighted_tile.png'].texture;
           this.textures.wall = PIXI.utils.TextureCache['wall.png'];
           // this.textures.blank = PIXI.utils.TextureCache['blank.png'];
           this.textures.grass = PIXI.utils.TextureCache['grass.png'];
@@ -478,6 +480,7 @@ class Renderer {
       sprite.x = this.gridToViewX(sprite, dx, dy);
       sprite.y = this.gridToViewY(sprite, dx, dy, true);
       sprite.zIndex = this.entities[i].pos.x + this.entities[i].pos.y;
+      sprite.alpha = i === 1 ? 0.75 : 1;
       delete this.entities[i].sprite;
       this.entities[i].sprite = sprite;
 

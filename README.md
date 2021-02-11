@@ -32,7 +32,7 @@
   * Back-end validation of player actions
   * Entity loading/action handling on server side
     * Partitioning of entity and map groups by "division/guild"
-  * Turn queue'ing for combat interactions
+  * Heightened ground implementation
   * Build complete flow between character creation, base management screen, and entering a dungeon/map
     (Utilizing placeholder simple art assets for the base screen)
   * Implement loading of nearby entities during player action validation
