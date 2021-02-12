@@ -376,7 +376,7 @@ class Engine {
     let moveIsValid = this.gameMap.isWalkable({ x, y });
     for (let i = 2; i < this.entities.length; i += 1) {
       const { pos } = this.entities[i];
-      moveIsValid = pos.x === x && pos.y === y ? false : moveIsValid;
+      moveIsValid = pos.x === x && pos.y === y && pos.blocking ? false : moveIsValid;
     }
     return moveIsValid;
   }

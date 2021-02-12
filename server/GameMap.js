@@ -22,8 +22,8 @@ class GameMap {
   }
 
   // -- ENTITY INTERACTION METHODS
-  addEntity(eid) {
-    this.entityPositionMap[eid] = { x: this.spawn.x, y: this.spawn.y };
+  addEntity(eid, blocking = true) {
+    this.entityPositionMap[eid] = { x: this.spawn.x, y: this.spawn.y, blocking };
     this.findNextSpawn();
   }
 
@@ -194,8 +194,8 @@ class GameMap {
 
     // is in bounds, not a wall, test against entities
     for (let eidKey in this.entityPositionMap) {
-      const { x, y } = this.entityPositionMap[eidKey];
-      if (targetX === x && targetY === y) {
+      const { x, y, blocking } = this.entityPositionMap[eidKey];
+      if (targetX === x && targetY === y && blocking) {
         return false;
       }
     }

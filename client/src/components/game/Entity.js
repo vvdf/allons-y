@@ -4,7 +4,7 @@ class Entity {
     this.name = name;
     this.textureKey = textureKey;
     this.visible = textureKey !== 'blank'; // default to hidden if texture blank
-    this.pos = { x: 0, y: 0 };
+    this.pos = { x: 0, y: 0, blocking: textureKey !== 'blank' && textureKey !== 'highlight' };
   }
 
   move(dx, dy) {

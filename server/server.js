@@ -106,10 +106,10 @@ io.on('connection', (socket) => {
       const npcs = engine.getEntitiesByUid(uid);
       for (let i = 0; i < npcs.length; i += 1) {
         if (npcs[i].eid !== engine.getEntityId(uid)) {
-          const { eid, name, textureKey, pos } = npcs[i];
+          const { eid, name, textureKey, pos, blocking } = npcs[i];
           io.to('root').emit('gameEvent', {
             signal: 'NEW_ENTITY',
-            params: [eid, name, textureKey, { x: pos.x, y: pos.y }],
+            params: [eid, name, textureKey, { x: pos.x, y: pos.y, blocking: pos.blocking }],
           });
         }
       }

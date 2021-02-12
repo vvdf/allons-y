@@ -124,7 +124,7 @@ class Engine {
     const formattedEntityList = [];
     for (let eid in entityPosList) {
       const entityObj = this.getEntity(eid); // retrieve entity object
-      entityObj.pos = entityPosList[eid]; // append position property to entity
+      entityObj.pos = entityPosList[eid]; // append position incl blocking property to entity
       formattedEntityList.push(entityObj);
     }
     return formattedEntityList;

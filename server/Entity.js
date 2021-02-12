@@ -11,6 +11,7 @@ class Entity {
     this.hp = 5;
     this.textureKey = textureKey;
     this.visible = textureKey !== 'blank'; // default to hidden if texture blank
+    this.blocking = textureKey !== 'blank' && textureKey !== 'highlight';
   }
 
   setUser(userId) {
