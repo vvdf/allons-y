@@ -46,7 +46,7 @@
   * Inventory/Ability management (grid based system)
     * Field relative temporary changes to inventory/ability loadout based on pickup
   * Guild/Division Research Trees
-  * Develop Multiplayer interactions
+  * Expand Multiplayer interactions
   * Vision handling
 
   Med Priority
