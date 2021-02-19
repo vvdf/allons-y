@@ -24,6 +24,7 @@
   High Priority
   * Battle interactions/mechanics
     * Tile based cursor control targetting for skills/tile highlighting
+    * Expand skill/action system/controls
   * Build Manager modules for serverside
     * Turn Management when factoring in multiplayer battles
     * Expand Entity/Guild/Map managers
