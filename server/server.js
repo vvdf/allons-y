@@ -114,7 +114,7 @@ io.on('connection', (socket) => {
         }
       }
     }
-    
+
     if (data.signal === 'MOVE_ENTITY' && engine.userExists(uid) && engine.userOwnsEntity(uid, data.params[0])) {
       // if signal is MOVE ENTITY, AND userid is registered, AND user is owner of submitted entity
       const eid = data.params[0];
