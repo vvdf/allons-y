@@ -40,7 +40,7 @@ class Input {
     this.key.select = '13'; // enter
     this.key.back = '8'; // backspace
     this.key.space = '32'; // space
-    this.key.minus = '173'; // space
+    this.key.minus = '173'; // minus
 
     // debug key assignments
     this.key.refresh = '192'; // tilde
