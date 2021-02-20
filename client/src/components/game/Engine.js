@@ -373,12 +373,16 @@ class Engine {
   }
 
   isWalkable({ x, y }) {
-    let moveIsValid = this.gameMap.isWalkable({ x, y });
+    if (!this.gameMap.isWalkable({ x, y })) {
+      return false;
+    }
     for (let i = 2; i < this.entities.length; i += 1) {
       const { pos } = this.entities[i];
-      moveIsValid = pos.x === x && pos.y === y && pos.blocking ? false : moveIsValid;
+      if (pos.x === x && pos.y === y && pos.blocking) {
+        return false;
+      }
     }
-    return moveIsValid;
+    return true;
   }
 }
 
