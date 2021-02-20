@@ -32,6 +32,7 @@ class Input {
 
   registerKeys() {
     // TODO - refactor to allow this to check for custom key assignments in user profile
+    // TODO - allow double assignments/double checks, for example numpad numbers + reg numbers
     // key assignments
     this.key.moveUp = '38'; // arrow up
     this.key.moveDown = '40'; // arrow down
@@ -41,6 +42,14 @@ class Input {
     this.key.back = '8'; // backspace
     this.key.space = '32'; // space
     this.key.minus = '173'; // minus
+    this.key.key1 = '49';
+    this.key.key2 = '50';
+    this.key.key3 = '51';
+    this.key.key4 = '52';
+    this.key.num1 = '97';
+    this.key.num2 = '98';
+    this.key.num3 = '99';
+    this.key.num4 = '100';
 
     // debug key assignments
     this.key.refresh = '192'; // tilde
@@ -84,6 +93,8 @@ class Input {
       this.keyMap.field[this.key.moveRight] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 1, 0] };
 
       this.keyMap.field[this.key.toggleUI] = { signal: 'TOGGLE_UI', params: [] };
+
+      this.keyMap.field[this.key.key1] = { signal: 'SHOW_RANGE', params: [3] };
 
       // debug field key mapping
       this.keyMap.field[this.key.refresh] = { signal: 'RERENDER', params: ['full'] };
