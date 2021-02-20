@@ -144,6 +144,26 @@ class Engine {
       console.log('Rerender Flag Set');
       this.flagRerender = true;
     });
+
+    this.eventQueue.defineEvent('SHOW_RANGE', (range) => {
+      console.log('Displaying range');
+      const cellsWithinRange = this.gameMap.getCellsWithinRange(this.entities[1].pos.x, this.entities[1].pos.y, range);
+      console.log('Cells obtained, rendering: ');
+      for (let i = 0; i < cellsWithinRange.length; i += 1) {
+        const highlightEntity = {
+          eid: -1 - i,
+          name: 'highlighted tile',
+          textureKey: 'highlight',
+          pos: {
+            x: cellsWithinRange[i].x,
+            y: cellsWithinRange[i].y
+          },
+        };
+        this.createEntity(highlightEntity);
+      }
+      console.log('highlighted cells added to entity list');
+      this.flagRerender = true;
+    });
   }
 
   gameLoop(delta) {
