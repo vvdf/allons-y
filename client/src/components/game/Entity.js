@@ -12,6 +12,10 @@ class Entity {
     this.pos.y += dy;
   }
 
+  setTint(colorValue) {
+    this.tint = colorValue;
+  }
+
   setPos(x, y) {
     this.pos.x = x;
     this.pos.y = y;
