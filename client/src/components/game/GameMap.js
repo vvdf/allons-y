@@ -79,14 +79,17 @@ class GameMap {
     this.save();
   }
 
-  getCellsWithinRange(x, y, range, includeCenter = false) {
+  getCellsWithinRange(x, y, range, minRange = 1, includeCenter = false) {
     // return a list of positions { x, y } within range from a given coordinate
     const cellsInRange = [];
     console.log('GAMEMAP: Getting Cells in range of ', range);
     for (let i = x - range; i <= x + range; i += 1) {
       for (let j = y - range; j <= y + range; j += 1) {
         const delta = Math.abs(x - i) + Math.abs(y - j);
-        if (delta <= range && this.isWalkable({ x: i, y: j }) && (includeCenter || !(delta < 1))) {
+        if (delta <= range
+          && delta >= minRange
+          && this.isWalkable({ x: i, y: j })
+          && (includeCenter || !(delta < 1))) {
           cellsInRange.push({ x: i, y: j });
         }
       }
