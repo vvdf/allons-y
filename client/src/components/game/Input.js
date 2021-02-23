@@ -94,7 +94,7 @@ class Input {
 
       this.keyMap.field[this.key.toggleUI] = { signal: 'TOGGLE_UI', params: [] };
 
-      this.keyMap.field[this.key.key1] = { signal: 'SHOW_RANGE', params: [3] };
+      this.keyMap.field[this.key.key1] = { signal: 'SHOW_RANGE', params: [5, 3] };
 
       // debug field key mapping
       this.keyMap.field[this.key.refresh] = { signal: 'RERENDER', params: ['full'] };
