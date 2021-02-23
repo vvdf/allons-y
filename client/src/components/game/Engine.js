@@ -145,19 +145,28 @@ class Engine {
       this.flagRerender = true;
     });
 
-    this.eventQueue.defineEvent('SHOW_RANGE', (range) => {
+    this.eventQueue.defineEvent('SHOW_RANGE', (range, minRange = 1) => {
       console.log('Displaying range');
-      const cellsWithinRange = this.gameMap.getCellsWithinRange(this.entities[1].pos.x, this.entities[1].pos.y, range);
+      const { x: playerX, y: playerY } = this.entities[1].pos;
+      const cellsWithinRange = this.gameMap.getCellsWithinRange(playerX, playerY, range, minRange);
+      // const entityList FINISH ME
       console.log('Cells obtained, rendering: ');
+      const entityPosMap = this.getEntityPosMap();
       for (let i = 0; i < cellsWithinRange.length; i += 1) {
+        const { x, y } = cellsWithinRange[i];
+        const posKey = `${x},${y}`;
+
+        // if target exists on range display tile, highlight red, else display blue for empty
+        const tint = {}.hasOwnProperty.call(entityPosMap, posKey) ? 0xFF4040 : 0x4040FF;
         const highlightEntity = {
           eid: -1 - i,
           name: 'highlighted tile',
           textureKey: 'highlight',
           pos: {
-            x: cellsWithinRange[i].x,
-            y: cellsWithinRange[i].y
+            x: x,
+            y: y
           },
+          tint,
         };
         this.createEntity(highlightEntity);
       }
@@ -376,10 +385,13 @@ class Engine {
   }
 
   // -- ENGINE HELPER METHODS
-  createEntity({ eid, name, textureKey, pos }) {
+  createEntity({ eid, name, textureKey, pos, tint }) {
     const createdEntity = new Entity(eid, name, textureKey);
     if (!!pos) {
       createdEntity.setPosObj(pos);
+    }
+    if (!!tint) {
+      createdEntity.setTint(tint);
     }
     this.entities.push(createdEntity);
     this.entityIdMap[eid] = createdEntity;
@@ -390,6 +402,15 @@ class Engine {
     if (updateView) {
       this.renderer.update();
     }
+  }
+
+  getEntityPosMap() {
+    const positionMap = {};
+    for (let i = 2; i < this.entities.length; i += 1) {
+      const { pos: { x, y } } = this.entities[i];
+      positionMap[`${x},${y}`] = true;
+    }
+    return positionMap;
   }
 
   isWalkable({ x, y }) {
