@@ -475,19 +475,23 @@ class Renderer {
   entitiesRender() {
     this.sprites.entities = new PIXI.Container();
     this.sprites.entities.sortableChildren = true;
+    const { pos: cameraPos } = this.entities[0];
     for (let i = 1; i < this.entities.length; i += 1) {
       // start at 1, as camera is 0 and is always blank
       // const sprite = this.entitySpriteMap[this.entities[i].id];
       // TODO - add validity check to assure key exists, else blank or default
-      const { textureKey } = this.entities[i];
+      const { textureKey, pos: entityPos, tint } = this.entities[i];
       const sprite = textureKey === 'highlight'
         ? new PIXI.AnimatedSprite(this.textures[textureKey])
         : new PIXI.Sprite(this.textures[textureKey]);
-      const dx = this.entities[i].pos.x - this.entities[0].pos.x;
-      const dy = this.entities[i].pos.y - this.entities[0].pos.y;
+      const dx = entityPos.x - cameraPos.x;
+      const dy = entityPos.y - cameraPos.y;
       sprite.x = this.gridToViewX(sprite, dx, dy);
       sprite.y = this.gridToViewY(sprite, dx, dy, true);
-      sprite.zIndex = this.entities[i].pos.x + this.entities[i].pos.y;
+      sprite.zIndex = textureKey === 'highlight'
+        ? entityPos.x + entityPos.y - 1
+        : entityPos.x + entityPos.y;
+      sprite.tint = !!tint ? tint : 0xFFFFFF;
       delete this.entities[i].sprite;
       this.entities[i].sprite = sprite;
 
