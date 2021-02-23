@@ -157,7 +157,7 @@ class Engine {
         const posKey = `${x},${y}`;
 
         // if target exists on range display tile, highlight red, else display blue for empty
-        const tint = {}.hasOwnProperty.call(entityPosMap, posKey) ? 0xFF4040 : 0x4040FF;
+        const tint = {}.hasOwnProperty.call(entityPosMap, posKey) ? 0xFF4040 : 0x4055FF;
         const highlightEntity = {
           eid: -1 - i,
           name: 'highlighted tile',
