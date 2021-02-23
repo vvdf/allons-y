@@ -61,6 +61,7 @@
   * Improve sprite handling (smaller sprites, better center calculations, proper
     handling of scaling, and user settings, etc)
   * Expand enemy list
+  * Export constants to an external config file/json object, ie alpha values or ui colors, etc.
 
   Low Priority
   * Development of more art assets
