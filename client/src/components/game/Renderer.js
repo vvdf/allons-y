@@ -492,7 +492,7 @@ class Renderer {
       this.entities[i].sprite = sprite;
 
       if (textureKey === 'highlight') {
-        sprite.alpha = 0.65;
+        sprite.alpha = 0.7;
         sprite.animationSpeed = 0.05;
         sprite.play();
       }
