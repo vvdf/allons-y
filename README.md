@@ -24,6 +24,7 @@
   High Priority
   * Battle interactions/mechanics
     * Tile based cursor control targetting for skills/tile highlighting
+    * Tab autocentering for camera during target selection
     * Expand skill/action system/controls
     * Redefine input definitions to read externally from engine, possibly via json object
   * Build Manager modules for serverside
