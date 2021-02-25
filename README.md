@@ -33,6 +33,9 @@
     * Simplify signal handling/lookup? for example sending more detail in signal to server to ease lookup on server side (ie passing a client and/or entity uid, along
     with a map uid and the designated payload)
   * User profiles/profile settings (including keymapping)
+  * Stat/ability progression
+  * Inventory/Ability management (grid based system)
+    * Field relative temporary changes to inventory/ability loadout based on pickup
   * Build out message logging system
     * Eventually to expand into a working chat system
   * Back-end validation of player actions
@@ -46,9 +49,6 @@
   * Implement Battle system for individual player interactions including implementation of simple AI for enemies (represented with placeholder sprites)
   * Handle proper zIndexing for tiles
   * Missions/Cases/Objective definitions (primary and secondary objectives)
-  * Stat/ability progression
-  * Inventory/Ability management (grid based system)
-    * Field relative temporary changes to inventory/ability loadout based on pickup
   * Guild/Division Research Trees
   * Expand Multiplayer interactions
   * Vision handling
