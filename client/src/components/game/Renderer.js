@@ -9,6 +9,9 @@ class Renderer {
       margin: 12,
       fieldUIX: 12,
       fieldUIY: this.settings.height - 180,
+      barAlpha: 0.8,
+      boxAlpha: 0.5,
+      boxColor: 0x43434f,
       textFont18: { fontFamily: 'terminus', fontSize: 18, fill: 0xffffeb, align: 'left' }, // white
       textFont16: { fontFamily: 'terminus', fontSize: 16, fill: 0xffffeb, align: 'left' }, // white
     };
@@ -491,21 +494,21 @@ class Renderer {
     const { margin, fieldUIX, fieldUIY } = this.uiSettings;
     // health bar(s)
     const hpBarRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
-    hpBarRect.x = fieldUIX;
+    hpBarRect.x = fieldUIX + 25;
     hpBarRect.y = fieldUIY;
     hpBarRect.width = 150;
     hpBarRect.height = 20;
     hpBarRect.tint = 0xeb564b; // salmon-red
-    hpBarRect.alpha = 0.8;
+    hpBarRect.alpha = this.uiSettings.barAlpha;
 
     // energy bar
     const energyBarRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
-    energyBarRect.x = fieldUIX;
+    energyBarRect.x = fieldUIX + 25;
     energyBarRect.y = fieldUIY + hpBarRect.height + margin;
     energyBarRect.width = 150;
     energyBarRect.height = 20;
     energyBarRect.tint = 0x4b5bab; // lightly muted blue
-    energyBarRect.alpha = 0.8;
+    energyBarRect.alpha = this.uiSettings.barAlpha;
 
     // add hpbar, energybar to ui render group
     this.sprites.ui.addChild(hpBarRect);
@@ -519,20 +522,20 @@ class Renderer {
     actionRect.x = fieldUIX;
     actionRect.y = fieldUIY + 65;
     actionRect.width = 200;
-    actionRect.height = 90;
-    actionRect.tint = 0x43434f; // dark gray
-    actionRect.alpha = 0.6;
+    actionRect.height = 103;
+    actionRect.tint = this.uiSettings.boxColor; // dark gray
+    actionRect.alpha = this.uiSettings.boxAlpha;
     const actionList = [];
 
-    actionList.push(new PIXI.Text(' ACTIONS:', textFont18));
-    actionList.push(new PIXI.Text('  1: MK22  < 100 / 100 >', textFont16));
-    actionList.push(new PIXI.Text('  2: AR-15 <  30 / 120 >', textFont16));
-    actionList.push(new PIXI.Text('  3: FLASH <   1       >', textFont16));
-    actionList.push(new PIXI.Text('  4: PFIRE < 100%      >', textFont16));
+    actionList.push(new PIXI.Text('ACTIONS:', textFont18));
+    actionList.push(new PIXI.Text('[1: MK22  <100/100>]', textFont18));
+    actionList.push(new PIXI.Text(' 2: AR-15 < 30/120>', textFont18));
+    actionList.push(new PIXI.Text(' 3: FLASH <  1    >', textFont18));
+    actionList.push(new PIXI.Text(' 4: PFIRE <100%   >', textFont18));
 
     for (let i = 0; i < actionList.length; i += 1) {
-      actionList[i].x = fieldUIX;
-      actionList[i].y = fieldUIY + margin + 40 + (i + 1) * (margin + 5);
+      actionList[i].x = fieldUIX + 10;
+      actionList[i].y = fieldUIY + margin + 44 + (i + 1) * (margin + 6);
     }
 
     this.sprites.ui.addChild(actionRect);
@@ -549,8 +552,8 @@ class Renderer {
     logRect.y = fieldUIY;
     logRect.width = this.settings.width - logRect.x - margin;
     logRect.height = this.settings.height - logRect.y - margin;
-    logRect.tint = 0x43434f; // dark gray
-    logRect.alpha = 0.6;
+    logRect.tint = this.uiSettings.boxColor; // dark gray
+    logRect.alpha = this.uiSettings.boxAlpha;
 
     // log text
     const logList = [];
