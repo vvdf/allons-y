@@ -41,6 +41,30 @@ class Entity {
   hide() {
     this.visible = false;
   }
+
+  hasAction() {
+    return !!this.actionList;
+  }
+
+  addAction(text) {
+    console.log('attempting to add action');
+    if (!this.hasAction()) {
+      console.log('creating blank action list table');
+      this.actionList = [];
+    }
+    console.log('adding to action list table');
+    this.actionList.push(text);
+  }
+
+  removeAction() {
+    this.actionList.pop();
+  }
+
+  getActions() {
+    console.log('get actions called');
+    console.log(this.actionList);
+    return this.hasAction() ? this.actionList.slice() : [];
+  }
 }
 
 export default Entity;
