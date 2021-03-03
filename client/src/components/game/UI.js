@@ -7,11 +7,12 @@ class UI {
     this.textMaxLength = 16;
     this.textInput = '';
     this.textIdx = -1;
+    this.fieldSelection = 0; // selector for field options such as actions
     this.newMenu(uiOptionsArr);
   }
 
   setMode(newMode) {
-    if (newMode === 'menu' || newMode === 'text') {
+    if (newMode === 'menu' || newMode === 'text' || newMode === 'field') {
       this.mode = newMode;
     }
   }
@@ -28,6 +29,7 @@ class UI {
     this.selectorIdx = 0;
     this.textInput = '';
     this.textIdx = -1;
+    this.fieldSelection = 0;
     this.mode = 'menu';
   }
 
@@ -54,8 +56,16 @@ class UI {
   }
 
   select() {
+    // select from available menu ui options
     this.menuOptions[this.selectorIdx].onSelect();
     // this.clear();
+  }
+
+  fieldSelect(actionIdx) {
+    // 0 = nothing selected, 1+ = available player actions
+    if (this.mode === 'field') {
+      this.fieldSelection = actionIdx;
+    }
   }
 
   delete() {
