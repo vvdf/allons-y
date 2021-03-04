@@ -526,12 +526,12 @@ class Renderer {
     actionRect.tint = this.uiSettings.boxColor; // dark gray
     actionRect.alpha = this.uiSettings.boxAlpha;
     const actionList = [];
+    const playerActionList = this.entities[1].getActions();
 
     actionList.push(new PIXI.Text('ACTIONS:', textFont18));
-    actionList.push(new PIXI.Text('[1: MK22  <100/100>]', textFont18));
-    actionList.push(new PIXI.Text(' 2: AR-15 < 30/120>', textFont18));
-    actionList.push(new PIXI.Text(' 3: FLASH <  1    >', textFont18));
-    actionList.push(new PIXI.Text(' 4: PFIRE <100%   >', textFont18));
+    playerActionList.forEach((val, idx) => {
+      actionList.push(new PIXI.Text(` ${idx + 1}: ${val}`, textFont18));
+    });
 
     for (let i = 0; i < actionList.length; i += 1) {
       actionList[i].x = fieldUIX + 10;
