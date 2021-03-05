@@ -145,9 +145,9 @@ class Engine {
       this.flagRerender = true;
     });
 
-    this.eventQueue.defineEvent('SELECT_ACTION', (selectedVal) => {
+    this.eventQueue.defineEvent('SELECT_ACTION', (selectVal) => {
       this.addEvent({ signal: 'SHOW_RANGE', params: [5, 3] });
-      this.ui.fieldSelect(selectedVal);
+      this.ui.fieldSelect(selectVal);
       this.addEvent({ signal: 'RERENDER', params: [] });
     });
 
