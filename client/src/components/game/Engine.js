@@ -148,6 +148,8 @@ class Engine {
     this.eventQueue.defineEvent('SELECT_ACTION', (selectVal) => {
       this.addEvent({ signal: 'SHOW_RANGE', params: [5, 3] });
       this.ui.fieldSelect(selectVal);
+      // edit actions
+      // pull actions to be listed into different segments for ui displaying and render those in renderer
       this.addEvent({ signal: 'RERENDER', params: [] });
     });
 
