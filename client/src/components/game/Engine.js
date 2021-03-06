@@ -146,6 +146,7 @@ class Engine {
     });
 
     this.eventQueue.defineEvent('SELECT_ACTION', (selectVal) => {
+      // TODO: have the range pull in based on selected action slot of player entity
       this.addEvent({ signal: 'SHOW_RANGE', params: [5, 3] });
       this.ui.fieldSelect(selectVal);
       // edit actions
