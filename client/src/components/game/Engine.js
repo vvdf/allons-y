@@ -373,7 +373,7 @@ class Engine {
           this.state = this.fieldMode;
           this.renderer.animate(['ui'], 'fadeOut', 200)
             .then(() => {
-              this.ui.clear();
+              this.ui.clear(false);
             });
         },
       },

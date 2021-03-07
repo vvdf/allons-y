@@ -25,14 +25,14 @@ class UI {
     this.selectorIdx = 0;
   }
 
-  clear() {
+  clear(inclMode = true) {
     console.log('clear called');
     this.menuOptions = [{ text: 'empty', onSelect: () => {} }];
     this.selectorIdx = 0;
     this.textInput = '';
     this.textIdx = -1;
     this.fieldSelection = 0;
-    this.mode = 'menu';
+    this.mode = inclMode ? 'menu' : this.mode;
   }
 
   clearInput() {
