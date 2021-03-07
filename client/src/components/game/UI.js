@@ -8,6 +8,7 @@ class UI {
     this.textInput = '';
     this.textIdx = -1;
     this.fieldSelection = 0; // selector for field options such as actions
+    this.printDebug = false;
     this.newMenu(uiOptionsArr);
   }
 
@@ -25,6 +26,7 @@ class UI {
   }
 
   clear() {
+    console.log('clear called');
     this.menuOptions = [{ text: 'empty', onSelect: () => {} }];
     this.selectorIdx = 0;
     this.textInput = '';
@@ -96,6 +98,10 @@ class UI {
 
   getCurrentOption() {
     return this.menuOptions[this.selectorIdx].text;
+  }
+
+  toggleDebug() {
+    this.printDebug = !this.printDebug;
   }
 }
 

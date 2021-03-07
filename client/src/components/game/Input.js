@@ -53,9 +53,9 @@ class Input {
     this.key.num4 = '100';
 
     // debug key assignments
-    this.key.refresh = '192'; // tilde
+    this.key.refresh = '9'; // tab
     this.key.toggleUI = '85'; // 'U'
-    this.key.debugPrint = '32';
+    this.key.debugPrint = '192'; // tilde
 
     for (let i = 0; i < 26; i += 1) {
       this.key[String.fromCharCode(97 + i)] = 65 + i;
@@ -95,14 +95,16 @@ class Input {
     this.keyMap.field[this.key.moveRight] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 1, 0] };
     this.keyMap.field[this.key.toggleUI] = { signal: 'TOGGLE_UI', params: [] };
     this.keyMap.field[this.key.key1] = { signal: 'SELECT_ACTION', params: [1] };
-    this.keyMap.field[this.key.key2] = { signal: 'SHOW_RANGE', params: [5, 3] };
+    this.keyMap.field[this.key.key2] = { signal: 'SELECT_ACTION', params: [2] };
+    this.keyMap.field[this.key.key3] = { signal: 'SELECT_ACTION', params: [3] };
+    this.keyMap.field[this.key.key4] = { signal: 'SELECT_ACTION', params: [4] };
 
     // player field targetting actions (move camera/jump to target, etc)
     // this.keyMap.fieldTarget[]
 
     // debug field key mapping
     this.keyMap.field[this.key.refresh] = { signal: 'RERENDER', params: ['full'] };
-    this.keyMap.field[this.key.debugPrint] = { signal: 'DEBUG_MSG', params: [''] };
+    this.keyMap.field[this.key.debugPrint] = { signal: 'DEBUG_RENDER', params: [] };
   }
 
   sendEvent(event) {

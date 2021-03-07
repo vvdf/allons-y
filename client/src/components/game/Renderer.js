@@ -314,11 +314,15 @@ class Renderer {
     // draw out some basic  rectangles and text as placeholders
     // field UI consists of, health bar, energy bar, (enemy health), item/action selection display,
     // game/chat log
+    console.log('RENDERING FIELD UI');
     this.clear('ui');
     this.sprites.ui = new PIXI.Container();
     this.fieldUIBarsRender();
     this.fieldUIActionsBoxRender();
     this.fieldUIMessageLogRender();
+    if (this.ui.printDebug) {
+      this.debugRender();
+    }
     this.game.stage.addChild(this.sprites.ui);
   }
 
@@ -528,9 +532,12 @@ class Renderer {
     const actionList = [];
     const playerActionList = this.entities[1].getActions();
 
+    const { fieldSelection } = this.ui;
+    console.log('fieldSelection #: ', fieldSelection, this.ui.mode);
     actionList.push(new PIXI.Text('ACTIONS:', textFont18));
     playerActionList.forEach((val, idx) => {
-      actionList.push(new PIXI.Text(` ${idx + 1}: ${val}`, textFont18));
+      const actionText = idx + 1 === fieldSelection ? `[${idx + 1}: ${val}]` : ` ${idx + 1}: ${val}`;
+      actionList.push(new PIXI.Text(actionText, textFont18));
     });
 
     for (let i = 0; i < actionList.length; i += 1) {
@@ -572,6 +579,36 @@ class Renderer {
   
     this.sprites.ui.addChild(logRect);
     logList.forEach((logText) => this.sprites.ui.addChild(logText));
+  }
+
+  debugRender() {
+    // purely for displaying debug information
+    console.log('attempting debugRender');
+    const { margin, fieldUIX, fieldUIY, textFont18, textFont16, textColor } = this.uiSettings;
+    // items/actions
+    const debugRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    debugRect.x = margin;
+    debugRect.y = margin;
+    debugRect.width = this.settings.width - margin * 2;
+    debugRect.height = 200;
+    debugRect.tint = this.uiSettings.boxColor; // dark gray
+    debugRect.alpha = this.uiSettings.boxAlpha;
+
+    const debugTexts = []; // define strings to be printed to screen
+    debugTexts.push(`UI - MODE: ${this.ui.mode} / FIELD_SELECT: ${this.ui.fieldSelection}`);
+
+    const debugRenders = []; // define PIXI renders to be added to
+    debugTexts.forEach((val, idx) => {
+      debugRenders.push(new PIXI.Text(val, textFont18));
+    });
+
+    for (let i = 0; i < debugTexts.length; i += 1) {
+      debugRenders[i].x = margin + 10;
+      debugRenders[i].y = margin + 10 + i * (margin + 6);
+    }
+
+    this.sprites.ui.addChild(debugRect);
+    debugRenders.forEach((debugRenderText) => this.sprites.ui.addChild(debugRenderText));
   }
 }
 

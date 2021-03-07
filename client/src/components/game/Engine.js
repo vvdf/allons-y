@@ -96,11 +96,6 @@ class Engine {
         }
       });
 
-    this.eventQueue.defineEvent('DEBUG_MSG', (msg) => {
-      console.log('DEBUG: PRINTING ENTITY LIST');
-      console.log(this.entities);
-    });
-
     this.eventQueue.defineEvent('TOGGLE_UI', () => {
       this.ui.hidden = !this.ui.hidden;
       if (this.ui.hidden) {
@@ -185,6 +180,18 @@ class Engine {
 
     this.eventQueue.defineEvent('ADD_ACTION', (actionText) => {
       this.entities[1].addAction(actionText);
+      this.addEvent({ signal: 'RERENDER', params: [] });
+    });
+
+    // DEBUG SIGNALS
+    this.eventQueue.defineEvent('DEBUG_MSG', (msg) => {
+      console.log('DEBUG: PRINTING ENTITY LIST');
+      console.log(this.entities);
+    });
+
+    this.eventQueue.defineEvent('DEBUG_RENDER', () => {
+      this.ui.toggleDebug();
+      console.log('ui debug flag: ', this.ui.printDebug)
       this.addEvent({ signal: 'RERENDER', params: [] });
     });
   }
