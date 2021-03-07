@@ -314,7 +314,6 @@ class Renderer {
     // draw out some basic  rectangles and text as placeholders
     // field UI consists of, health bar, energy bar, (enemy health), item/action selection display,
     // game/chat log
-    console.log('RENDERING FIELD UI');
     this.clear('ui');
     this.sprites.ui = new PIXI.Container();
     this.fieldUIBarsRender();
@@ -533,7 +532,6 @@ class Renderer {
     const playerActionList = this.entities[1].getActions();
 
     const { fieldSelection } = this.ui;
-    console.log('fieldSelection #: ', fieldSelection, this.ui.mode);
     actionList.push(new PIXI.Text('ACTIONS:', textFont18));
     playerActionList.forEach((val, idx) => {
       const actionText = idx + 1 === fieldSelection ? `[${idx + 1}: ${val}]` : ` ${idx + 1}: ${val}`;
@@ -583,7 +581,6 @@ class Renderer {
 
   debugRender() {
     // purely for displaying debug information
-    console.log('attempting debugRender');
     const { margin, fieldUIX, fieldUIY, textFont18, textFont16, textColor } = this.uiSettings;
     // items/actions
     const debugRect = PIXI.Sprite.from(PIXI.Texture.WHITE);

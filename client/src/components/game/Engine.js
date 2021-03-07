@@ -191,7 +191,6 @@ class Engine {
 
     this.eventQueue.defineEvent('DEBUG_RENDER', () => {
       this.ui.toggleDebug();
-      console.log('ui debug flag: ', this.ui.printDebug)
       this.addEvent({ signal: 'RERENDER', params: [] });
     });
   }
