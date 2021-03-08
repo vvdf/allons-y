@@ -449,6 +449,10 @@ class Renderer {
     }
   }
 
+  entitiesRefresh(entityList) {
+    this.entities = entityList;
+  }
+
   consoleRender() {
     this.clear('console', 'consoleText');
     this.sprites.console = new PIXI.Container();
