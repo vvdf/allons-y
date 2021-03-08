@@ -64,10 +64,11 @@ class UI {
   }
 
   fieldSelect(actionIdx) {
-    // 0 = nothing selected, 1+ = available player actions
+    // 0 = nothing selected, 1+ = available player actions, deselect if repeat input
     if (this.mode === 'field') {
-      this.fieldSelection = actionIdx;
+      this.fieldSelection = this.fieldSelection !== actionIdx ? actionIdx : 0;
     }
+    return this.fieldSelection > 0; // returns true if selection made or false if deselected
   }
 
   delete() {
