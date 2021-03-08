@@ -142,11 +142,13 @@ class Engine {
 
     this.eventQueue.defineEvent('SELECT_ACTION', (selectVal) => {
       // TODO: have the range pull in based on selected action slot of player entity
-      this.addEvent({ signal: 'SHOW_RANGE', params: [5, 3] });
-      this.ui.fieldSelect(selectVal);
-      // edit actions
-      // pull actions to be listed into different segments for ui displaying and render those in renderer
-      this.addEvent({ signal: 'RERENDER', params: [] });
+      if (this.ui.fieldSelect(selectVal)) {
+        this.addEvent({ signal: 'SHOW_RANGE', params: [5, 3] });
+        this.addEvent({ signal: 'RERENDER', params: [] });
+      } else {
+        this.addEvent({ signal: 'HIDE_RANGE', params: [] });
+        this.addEvent({ signal: 'RERENDER', params: [] });
+      }
     });
 
     this.eventQueue.defineEvent('SHOW_RANGE', (range, minRange = 1) => {
@@ -175,6 +177,13 @@ class Engine {
         this.createEntity(highlightEntity);
       }
       console.log('highlighted cells added to entity list');
+      this.addEvent({ signal: 'RERENDER', params: [] });
+    });
+
+    this.eventQueue.defineEvent('HIDE_RANGE', () => {
+      // clear ground tiles from entity list
+      this.entities = this.entities.filter((etty) => etty.textureKey !== 'highlight');
+      this.renderer.entitiesRefresh(this.entities);
       this.addEvent({ signal: 'RERENDER', params: [] });
     });
 
