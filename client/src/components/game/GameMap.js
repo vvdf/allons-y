@@ -96,6 +96,20 @@ class GameMap {
     }
     return cellsInRange;
   }
+
+  getCellsWithinRangeWall(x, y, range, minRange = 1, includeCenter = false) {
+    const cellsExplored = {};
+    const explore = (exploredX, exploredY) => {
+      const delta = Math.abs(x - exploredX) + Math.abs(y - exploredY);
+      if (delta <= range
+        && delta >= minRange
+        && this.isWalkable({ x: exploredX, y: exploredY })
+        && (includeCenter || delta > 0) {
+        cellsExplored[`${exploredX},${exploredY}`] = true;
+      }
+    };
+    return cellsExplored;
+  }
 }
 
 export default GameMap;
