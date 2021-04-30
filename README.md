@@ -1,6 +1,6 @@
-# Paranormal Divide
+# DOSA, Dept. Of Strange Activities
 ## About
-  Paranormal Divide is an open source multiplayer Roguelike, written in JavaScript, utilizing React and Pixi.js for page and game layer rendering.
+  DOSA is an open source multiplayer Roguelike, written in JavaScript, utilizing React and Pixi.js for page and game layer rendering.
   * **Plot**: The player Officer is a member of the Paranormal Division of a given city, going out on missions/cases to investigate and deal with whatever might be going on.
   * **Gameplay**: Classic turn based roguelike (permadeath, procedural generation, etc.), with multiplayer elements. Shared goals with development of a single base between multiple players (similar to a guild investment system in an MMO). And the eventual option to go on cases together with fellow Division members, this will be a shared turn system when all present players are involved in the same battle together, otherwise the world around each player will move at that player's pace.
   * **Aesthetic**: 2D Isometric sprite based visuals.
