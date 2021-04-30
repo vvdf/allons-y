@@ -7,11 +7,13 @@ class UI {
     this.textMaxLength = 16;
     this.textInput = '';
     this.textIdx = -1;
+    this.fieldSelection = 0; // selector for field options such as actions
+    this.printDebug = false;
     this.newMenu(uiOptionsArr);
   }
 
   setMode(newMode) {
-    if (newMode === 'menu' || newMode === 'text') {
+    if (newMode === 'menu' || newMode === 'text' || newMode === 'field') {
       this.mode = newMode;
     }
   }
@@ -23,12 +25,14 @@ class UI {
     this.selectorIdx = 0;
   }
 
-  clear() {
+  clear(inclMode = true) {
+    console.log('clear called');
     this.menuOptions = [{ text: 'empty', onSelect: () => {} }];
     this.selectorIdx = 0;
     this.textInput = '';
     this.textIdx = -1;
-    this.mode = 'menu';
+    this.fieldSelection = 0;
+    this.mode = inclMode ? 'menu' : this.mode;
   }
 
   clearInput() {
@@ -54,8 +58,17 @@ class UI {
   }
 
   select() {
+    // select from available menu ui options
     this.menuOptions[this.selectorIdx].onSelect();
     // this.clear();
+  }
+
+  fieldSelect(actionIdx) {
+    // 0 = nothing selected, 1+ = available player actions, deselect if repeat input
+    if (this.mode === 'field') {
+      this.fieldSelection = this.fieldSelection !== actionIdx ? actionIdx : 0;
+    }
+    return this.fieldSelection > 0; // returns true if selection made or false if deselected
   }
 
   delete() {
@@ -86,6 +99,10 @@ class UI {
 
   getCurrentOption() {
     return this.menuOptions[this.selectorIdx].text;
+  }
+
+  toggleDebug() {
+    this.printDebug = !this.printDebug;
   }
 }
 

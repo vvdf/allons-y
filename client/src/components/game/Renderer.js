@@ -5,6 +5,16 @@ import tiles from './Tiles';
 class Renderer {
   constructor(settings, constants, entities, gameMap, ui, messageLog) {
     this.settings = settings;
+    this.uiSettings = {
+      margin: 12,
+      fieldUIX: 12,
+      fieldUIY: this.settings.height - 180,
+      barAlpha: 0.8,
+      boxAlpha: 0.5,
+      boxColor: 0x43434f,
+      textFont18: { fontFamily: 'terminus', fontSize: 18, fill: 0xffffeb, align: 'left' }, // white
+      textFont16: { fontFamily: 'terminus', fontSize: 16, fill: 0xffffeb, align: 'left' }, // white
+    };
     this.constants = constants;
     this.game = new PIXI.Application(this.settings);
     this.render = this.mainUIRender;
@@ -304,93 +314,14 @@ class Renderer {
     // draw out some basic  rectangles and text as placeholders
     // field UI consists of, health bar, energy bar, (enemy health), item/action selection display,
     // game/chat log
-
     this.clear('ui');
     this.sprites.ui = new PIXI.Container();
-
-    // TODO: currently placeholder text, derive each value from entity once expanded
-    // to be broken into sub components so you can manage which sub item displays at all
-    //  also to modularly display things, like location text could pop up and dissappear
-
-    const margin = 12;
-    const fieldUIX = margin;
-    const fieldUIY = this.settings.height - 180;
-
-    // (location text)
-    // (enemy health)
-    // health bar
-    const hpBarRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
-    hpBarRect.x = fieldUIX;
-    hpBarRect.y = fieldUIY;
-    hpBarRect.width = 150;
-    hpBarRect.height = 20;
-    hpBarRect.tint = 0xeb564b; // salmon-red
-    hpBarRect.alpha = 0.8;
-
-    // energy bar
-    const energyBarRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
-    energyBarRect.x = fieldUIX;
-    energyBarRect.y = fieldUIY + hpBarRect.height + margin;
-    energyBarRect.width = 150;
-    energyBarRect.height = 20;
-    energyBarRect.tint = 0x4b5bab; // lightly muted blue
-    energyBarRect.alpha = 0.8;
-
-    // items/actions
-    const textColor = 0xffffeb; // white
-    const textFont18 = {
-      fontFamily: 'terminus', fontSize: 18, fill: textColor, align: 'left',
-    };
-    const textFont16 = {
-      fontFamily: 'terminus', fontSize: 16, fill: textColor, align: 'left',
-    };
-    const actionList = [];
-
-    actionList.push(new PIXI.Text('ACTIONS:', textFont18));
-    actionList.push(new PIXI.Text('  1: MK22   < 100 / 100 >', textFont16));
-    actionList.push(new PIXI.Text('  2: AR-15  <  30 / 120 >', textFont16));
-    actionList.push(new PIXI.Text('  3: FLASH  <   1       >', textFont16));
-    actionList.push(new PIXI.Text('  4: P-FIRE < 100%      >', textFont16));
-
-    for (let i = 0; i < actionList.length; i += 1) {
-      actionList[i].x = fieldUIX;
-      actionList[i].y = energyBarRect.y + energyBarRect.height + (i + 1) * (margin + 5);
+    this.fieldUIBarsRender();
+    this.fieldUIActionsBoxRender();
+    this.fieldUIMessageLogRender();
+    if (this.ui.printDebug) {
+      this.debugRender();
     }
-
-    // logs
-    // TODO probably build out log and log text functionality to being its own
-    // function
-    const logRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
-    logRect.x = fieldUIX + 200 + margin;
-    logRect.y = fieldUIY;
-    logRect.width = this.settings.width - logRect.x - margin;
-    logRect.height = this.settings.height - logRect.y - margin;
-    logRect.tint = 0x43434f; // dark gray
-    logRect.alpha = 0.6;
-
-    // log text
-    const logList = [];
-
-    logList.push(new PIXI.Text('You discovered some grass.', textFont18));
-    logList.push(new PIXI.Text('You\'ve been shot for 5 damage.', textFont18));
-    logList.push(new PIXI.Text('Sounds of something large are heard nearby.', textFont18));
-    logList.push(new PIXI.Text('You sense danger.', textFont18));
-    logList.push(new PIXI.Text('"Help me!" you hear in the distance.', textFont18));
-    logList.push(new PIXI.Text('You reload your MK22.', textFont18));
-    logList.push(new PIXI.Text('You waited.', textFont18));
-    logList.push(new PIXI.Text('You waited.', textFont18));
-    for (let i = 0; i < logList.length; i += 1) {
-      logList[i].x = logRect.x + margin;
-      logList[i].y = logRect.y + (i + 1) * (margin + 2);
-    }
-
-    // add hpbar, energybar, action options, logs to ui render group
-    this.sprites.ui.addChild(hpBarRect);
-    this.sprites.ui.addChild(energyBarRect);
-    actionList.forEach((actionText) => this.sprites.ui.addChild(actionText));
-    this.sprites.ui.addChild(logRect);
-    logList.forEach((logText) => this.sprites.ui.addChild(logText));
-
     this.game.stage.addChild(this.sprites.ui);
   }
 
@@ -518,6 +449,10 @@ class Renderer {
     }
   }
 
+  entitiesRefresh(entityList) {
+    this.entities = entityList;
+  }
+
   consoleRender() {
     this.clear('console', 'consoleText');
     this.sprites.console = new PIXI.Container();
@@ -560,6 +495,121 @@ class Renderer {
     }
 
     this.game.stage.addChild(this.sprites.consoleText);
+  }
+
+  fieldUIBarsRender() {
+    const { margin, fieldUIX, fieldUIY } = this.uiSettings;
+    // health bar(s)
+    const hpBarRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    hpBarRect.x = fieldUIX + 25;
+    hpBarRect.y = fieldUIY;
+    hpBarRect.width = 150;
+    hpBarRect.height = 20;
+    hpBarRect.tint = 0xeb564b; // salmon-red
+    hpBarRect.alpha = this.uiSettings.barAlpha;
+
+    // energy bar
+    const energyBarRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    energyBarRect.x = fieldUIX + 25;
+    energyBarRect.y = fieldUIY + hpBarRect.height + margin;
+    energyBarRect.width = 150;
+    energyBarRect.height = 20;
+    energyBarRect.tint = 0x4b5bab; // lightly muted blue
+    energyBarRect.alpha = this.uiSettings.barAlpha;
+
+    // add hpbar, energybar to ui render group
+    this.sprites.ui.addChild(hpBarRect);
+    this.sprites.ui.addChild(energyBarRect);
+  }
+
+  fieldUIActionsBoxRender() {
+    const { margin, fieldUIX, fieldUIY, textFont18, textFont16, textColor } = this.uiSettings;
+    // items/actions
+    const actionRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    actionRect.x = fieldUIX;
+    actionRect.y = fieldUIY + 65;
+    actionRect.width = 200;
+    actionRect.height = 103;
+    actionRect.tint = this.uiSettings.boxColor; // dark gray
+    actionRect.alpha = this.uiSettings.boxAlpha;
+    const actionList = [];
+    const playerActionList = this.entities[1].getActions();
+
+    const { fieldSelection } = this.ui;
+    actionList.push(new PIXI.Text('ACTIONS:', textFont18));
+    playerActionList.forEach((val, idx) => {
+      const actionText = idx + 1 === fieldSelection ? `[${idx + 1}: ${val}]` : ` ${idx + 1}: ${val}`;
+      actionList.push(new PIXI.Text(actionText, textFont18));
+    });
+
+    for (let i = 0; i < actionList.length; i += 1) {
+      actionList[i].x = fieldUIX + 10;
+      actionList[i].y = fieldUIY + margin + 44 + (i + 1) * (margin + 6);
+    }
+
+    this.sprites.ui.addChild(actionRect);
+    actionList.forEach((actionText) => this.sprites.ui.addChild(actionText));
+  }
+
+  fieldUIMessageLogRender() {
+    const { margin, fieldUIX, fieldUIY, textFont18, textFont16, textColor } = this.uiSettings;
+    // logs
+    // TODO probably build out log and log text functionality to being its own
+    // function
+    const logRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    logRect.x = fieldUIX + 200 + margin;
+    logRect.y = fieldUIY;
+    logRect.width = this.settings.width - logRect.x - margin;
+    logRect.height = this.settings.height - logRect.y - margin;
+    logRect.tint = this.uiSettings.boxColor; // dark gray
+    logRect.alpha = this.uiSettings.boxAlpha;
+
+    // log text
+    const logList = [];
+    logList.push(new PIXI.Text('You discovered some grass.', textFont18));
+    logList.push(new PIXI.Text('You\'ve been shot for 5 damage.', textFont18));
+    logList.push(new PIXI.Text('Sounds of something large are heard nearby.', textFont18));
+    logList.push(new PIXI.Text('You sense danger.', textFont18));
+    logList.push(new PIXI.Text('"Help me!" you hear in the distance.', textFont18));
+    logList.push(new PIXI.Text('You reload your MK22.', textFont18));
+    logList.push(new PIXI.Text('You waited.', textFont18));
+    logList.push(new PIXI.Text('You waited.', textFont18));
+    for (let i = 0; i < logList.length; i += 1) {
+      logList[i].x = logRect.x + margin;
+      logList[i].y = logRect.y + (i + 1) * (margin + 2);
+    }
+  
+    this.sprites.ui.addChild(logRect);
+    logList.forEach((logText) => this.sprites.ui.addChild(logText));
+  }
+
+  debugRender() {
+    // purely for displaying debug information
+    const { margin, fieldUIX, fieldUIY, textFont18, textFont16, textColor } = this.uiSettings;
+    // items/actions
+    const debugRect = PIXI.Sprite.from(PIXI.Texture.WHITE);
+    debugRect.x = margin;
+    debugRect.y = margin;
+    debugRect.width = this.settings.width - margin * 2;
+    debugRect.height = 200;
+    debugRect.tint = this.uiSettings.boxColor; // dark gray
+    debugRect.alpha = this.uiSettings.boxAlpha;
+
+    const debugTexts = []; // define strings to be printed to screen
+    debugTexts.push(`UI - MODE: ${this.ui.mode} / FIELD_SELECT: ${this.ui.fieldSelection}`);
+
+    const debugRenders = []; // define PIXI renders to be added to
+    debugTexts.forEach((val, idx) => {
+      debugRenders.push(new PIXI.Text(val, textFont18));
+    });
+
+    for (let i = 0; i < debugTexts.length; i += 1) {
+      debugRenders[i].x = margin + 10;
+      debugRenders[i].y = margin + 10 + i * (margin + 6);
+    }
+
+    this.sprites.ui.addChild(debugRect);
+    debugRenders.forEach((debugRenderText) => this.sprites.ui.addChild(debugRenderText));
   }
 }
 

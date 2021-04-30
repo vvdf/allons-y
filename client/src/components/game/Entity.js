@@ -41,6 +41,25 @@ class Entity {
   hide() {
     this.visible = false;
   }
+
+  hasAction() {
+    return !!this.actionList;
+  }
+
+  addAction(text) {
+    if (!this.hasAction()) {
+      this.actionList = [];
+    }
+    this.actionList.push(text);
+  }
+
+  removeAction() {
+    this.actionList.pop();
+  }
+
+  getActions() {
+    return this.hasAction() ? this.actionList.slice() : [];
+  }
 }
 
 export default Entity;

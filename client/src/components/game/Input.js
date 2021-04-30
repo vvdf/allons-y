@@ -14,7 +14,8 @@ class Input {
     this.mapKeys();
 
     // initialize key listener
-    window.addEventListener('keydown', ({ keyCode }) => {
+    // window.addEventListener('keydown', ({ keyInput }) => {
+      window.addEventListener('keydown', ({ keyCode }) => { // keyCode is a prop of the event obj
       if ({}.hasOwnProperty.call(this.keyMap[this.mode], keyCode)) {
         this.sendEvent(this.keyMap[this.mode][keyCode]);
       } else {
@@ -52,9 +53,9 @@ class Input {
     this.key.num4 = '100';
 
     // debug key assignments
-    this.key.refresh = '192'; // tilde
+    this.key.refresh = '9'; // tab
     this.key.toggleUI = '85'; // 'U'
-    this.key.debugPrint = '32';
+    this.key.debugPrint = '192'; // tilde
 
     for (let i = 0; i < 26; i += 1) {
       this.key[String.fromCharCode(97 + i)] = 65 + i;
@@ -82,24 +83,28 @@ class Input {
       const char = String.fromCharCode(97 + i);
       this.keyMap.text[this.key[char]] = { signal: 'UI_INPUT', params: [char] };
     }
+  }
 
+  mapFieldKeys() {
     // field key mapping, only allow if an owner entity is set
-    if (this.owner) {
-      this.keyMap.field = {};
-      // player actions
-      this.keyMap.field[this.key.moveUp] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 0, -1] };
-      this.keyMap.field[this.key.moveDown] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 0, 1] };
-      this.keyMap.field[this.key.moveLeft] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, -1, 0] };
-      this.keyMap.field[this.key.moveRight] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 1, 0] };
+    this.keyMap.field = {};
+    // player field actions
+    this.keyMap.field[this.key.moveUp] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 0, -1] };
+    this.keyMap.field[this.key.moveDown] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 0, 1] };
+    this.keyMap.field[this.key.moveLeft] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, -1, 0] };
+    this.keyMap.field[this.key.moveRight] = { signal: 'MOVE_ENTITY', params: [this.owner.eid, 1, 0] };
+    this.keyMap.field[this.key.toggleUI] = { signal: 'TOGGLE_UI', params: [] };
+    this.keyMap.field[this.key.key1] = { signal: 'SELECT_ACTION', params: [1] };
+    this.keyMap.field[this.key.key2] = { signal: 'SELECT_ACTION', params: [2] };
+    this.keyMap.field[this.key.key3] = { signal: 'SELECT_ACTION', params: [3] };
+    this.keyMap.field[this.key.key4] = { signal: 'SELECT_ACTION', params: [4] };
 
-      this.keyMap.field[this.key.toggleUI] = { signal: 'TOGGLE_UI', params: [] };
+    // player field targetting actions (move camera/jump to target, etc)
+    // this.keyMap.fieldTarget[]
 
-      this.keyMap.field[this.key.key1] = { signal: 'SHOW_RANGE', params: [5, 3] };
-
-      // debug field key mapping
-      this.keyMap.field[this.key.refresh] = { signal: 'RERENDER', params: ['full'] };
-      this.keyMap.field[this.key.debugPrint] = { signal: 'DEBUG_MSG', params: [''] };
-    }
+    // debug field key mapping
+    this.keyMap.field[this.key.refresh] = { signal: 'RERENDER', params: ['full'] };
+    this.keyMap.field[this.key.debugPrint] = { signal: 'DEBUG_RENDER', params: [] };
   }
 
   sendEvent(event) {
@@ -108,7 +113,7 @@ class Input {
 
   setOwner(ownerEntity) {
     this.owner = ownerEntity;
-    this.mapKeys(); // refresh key mappings to factor in owner entity
+    this.mapFieldKeys(); // refresh key mappings to factor in owner entity
   }
 }
 

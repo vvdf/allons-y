@@ -46,7 +46,7 @@ class Engine {
     );
     this.flagRerender = false;
     targetEle.appendChild(this.renderer.getView()); // attach PIXI app to html element
-    this.createEntity({ eid: 0, name: 'Camera', textureKey: 'blank' }); // instantiate camera
+    this.createEntity({ eid: 0, name: 'Camera', textureKey: 'blank' }); // instantiate camera entity
     this.renderer.setup()
       .then(() => this.initEvents())
       .then(() => this.renderer.addToTicker((delta) => this.gameLoop(delta)));
@@ -92,14 +92,9 @@ class Engine {
           // otherwise add new entity
           console.log('Adding Entity');
           this.createEntity({ eid, name, textureKey, pos });
-          this.flagRerender = true;
+          this.addEvent({ signal: 'RERENDER', params: [] });
         }
       });
-
-    this.eventQueue.defineEvent('DEBUG_MSG', (msg) => {
-      console.log('DEBUG: PRINTING ENTITY LIST');
-      console.log(this.entities);
-    });
 
     this.eventQueue.defineEvent('TOGGLE_UI', () => {
       this.ui.hidden = !this.ui.hidden;
@@ -145,12 +140,23 @@ class Engine {
       this.flagRerender = true;
     });
 
+    this.eventQueue.defineEvent('SELECT_ACTION', (selectVal) => {
+      // TODO: have the range pull in based on selected action slot of player entity
+      if (this.ui.fieldSelect(selectVal)) {
+        this.addEvent({ signal: 'SHOW_RANGE', params: [5, 3] });
+        this.addEvent({ signal: 'RERENDER', params: [] });
+      } else {
+        this.addEvent({ signal: 'HIDE_RANGE', params: [] });
+        this.addEvent({ signal: 'RERENDER', params: [] });
+      }
+    });
+
     this.eventQueue.defineEvent('SHOW_RANGE', (range, minRange = 1) => {
       console.log('Displaying range');
       const { x: playerX, y: playerY } = this.entities[1].pos;
       const cellsWithinRange = this.gameMap.getCellsWithinRange(playerX, playerY, range, minRange);
       // const entityList FINISH ME
-      console.log('Cells obtained, rendering: ');
+      console.log('Cells obtained, rendering: ', cellsWithinRange.length, ' cell count');
       const entityPosMap = this.getEntityPosMap();
       for (let i = 0; i < cellsWithinRange.length; i += 1) {
         const { x, y } = cellsWithinRange[i];
@@ -171,7 +177,30 @@ class Engine {
         this.createEntity(highlightEntity);
       }
       console.log('highlighted cells added to entity list');
-      this.flagRerender = true;
+      this.addEvent({ signal: 'RERENDER', params: [] });
+    });
+
+    this.eventQueue.defineEvent('HIDE_RANGE', () => {
+      // clear ground tiles from entity list
+      this.entities = this.entities.filter((etty) => etty.textureKey !== 'highlight');
+      this.renderer.entitiesRefresh(this.entities);
+      this.addEvent({ signal: 'RERENDER', params: [] });
+    });
+
+    this.eventQueue.defineEvent('ADD_ACTION', (actionText) => {
+      this.entities[1].addAction(actionText);
+      this.addEvent({ signal: 'RERENDER', params: [] });
+    });
+
+    // DEBUG SIGNALS
+    this.eventQueue.defineEvent('DEBUG_MSG', (msg) => {
+      console.log('DEBUG: PRINTING ENTITY LIST');
+      console.log(this.entities);
+    });
+
+    this.eventQueue.defineEvent('DEBUG_RENDER', () => {
+      this.ui.toggleDebug();
+      this.addEvent({ signal: 'RERENDER', params: [] });
     });
   }
 
@@ -208,7 +237,13 @@ class Engine {
           // user id AND living entity found, jump to base menu
           axios.get('/entity')
             .then(({ data }) => {
-              this.createEntity(data);
+              this.createEntity(data); // player entity loaded
+              // TODO: placeholder skills, to be stored/loaded later
+              this.entities[1].addAction('MK22  <100/100>');
+              this.entities[1].addAction('AR-15 < 30/120>');
+              this.entities[1].addAction('FLASH <  1    >');
+              this.entities[1].addAction('PFIRE <100%   >');
+
               this.currentMap = data.map;
               this.input.setOwner(this.entities[1]);
               this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
@@ -274,7 +309,13 @@ class Engine {
               .then(() => {
                 axios.get('/entity')
                   .then(({ data }) => {
-                    this.createEntity(data);
+                    this.createEntity(data); // create player entity from scratch
+                    // TODO: placeholder skills, to be stored/loaded later
+                    this.entities[1].addAction('MK22  <100/100>');
+                    this.entities[1].addAction('AR-15 < 30/120>');
+                    this.entities[1].addAction('FLASH <  1    >');
+                    this.entities[1].addAction('PFIRE <100%   >');
+
                     this.currentMap = data.mid;
                     this.input.setOwner(this.entities[1]);
                     this.sio = new SocketInterface(this.eventQueue, `${window.location.hostname}:3001`);
@@ -341,7 +382,7 @@ class Engine {
           this.state = this.fieldMode;
           this.renderer.animate(['ui'], 'fadeOut', 200)
             .then(() => {
-              this.ui.clear();
+              this.ui.clear(false);
             });
         },
       },
@@ -377,6 +418,7 @@ class Engine {
         this.renderer.setMode('field');
         this.fieldRefresh();
         this.input.setMode('field');
+        this.ui.setMode('field');
         this.sio.emit('gameEvent', { signal: 'INIT_MAP', params: [] });
         this.entities[1].setPosObj(this.gameMap.spawn); // load entity position
         this.centerCamera();
@@ -424,6 +466,10 @@ class Engine {
       }
     }
     return true;
+  }
+
+  addEvent(eventSignalParamObj) {
+    this.eventQueue.enqueue(eventSignalParamObj);
   }
 }
 
